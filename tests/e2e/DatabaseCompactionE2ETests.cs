@@ -1,5 +1,5 @@
-using Npgsql;
 using System.Globalization;
+using Npgsql;
 using Xunit;
 
 namespace BProMax.E2ETests;

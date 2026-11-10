@@ -31,6 +31,10 @@ data/
 ## macOS
 .DS_Store
 
+## Local tooling / infrastructure (not source)
+node_modules/
+pgsql/
+
 # Scratch / untracked projects (intentionally excluded per team agreement)
 src/BenchmarksTest.csproj
 src/BenchmarksTest/
