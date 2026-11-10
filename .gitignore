@@ -1,0 +1,32 @@
+## WinUI 3 / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+## Build output
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.appxupload
+
+## Data
+*.db
+*.sqlite
+data/
+*.log
+
+## Environment (secrets)
+.env
+
+## IDE
+.idea/
+.vscode/
+*.sln.ide
+
+## macOS
+.DS_Store

@@ -1,0 +1,27 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.cs]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directives = true
+dotnet_diagnostic.IDE0005.severity = suggestion
+dotnet_diagnostic.IDE0055.severity = none
+dotnet_diagnostic.CA1822.severity = none
+
+# Phase 3: Promote security category analyzers to errors (CA3xxx/CA5xxx).
+dotnet_analyzer_diagnostic.category-Security.severity = error
+
+[*.xaml]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
