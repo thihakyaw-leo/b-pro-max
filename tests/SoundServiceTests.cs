@@ -1,6 +1,6 @@
+using System.Runtime.Versioning;
 using BProMax.Services;
 using Xunit;
-using System.Runtime.Versioning;
 
 namespace BProMax.Tests;
 

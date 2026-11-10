@@ -78,13 +78,20 @@ public class AutoBuyServiceTests
         // Arrange
         var id = _autoBuyService.CreateRule(new AutoBuyRule
         {
-            AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = true
+            AgentName = "John Doe",
+            TriggerAmount = 1000,
+            AutoBuyAmount = 500,
+            IsEnabled = true
         });
 
         // Act
         var updated = new AutoBuyRule
         {
-            Id = id, AgentName = "John Doe", TriggerAmount = 2000, AutoBuyAmount = 1000, IsEnabled = false
+            Id = id,
+            AgentName = "John Doe",
+            TriggerAmount = 2000,
+            AutoBuyAmount = 1000,
+            IsEnabled = false
         };
         var rowsAffected = _autoBuyService.UpdateRule(updated);
         var rule = _autoBuyService.GetRuleById(id);

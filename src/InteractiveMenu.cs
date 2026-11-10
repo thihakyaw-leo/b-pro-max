@@ -1,7 +1,7 @@
-using BProMax.Services;
-using BProMax.Models;
-using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.Versioning;
+using BProMax.Models;
+using BProMax.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BProMax;
 

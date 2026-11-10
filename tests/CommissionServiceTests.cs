@@ -1,5 +1,5 @@
-using BProMax.Services;
 using BProMax.Models;
+using BProMax.Services;
 using Xunit;
 
 namespace BProMax.Tests;

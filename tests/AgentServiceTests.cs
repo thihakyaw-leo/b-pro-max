@@ -1,9 +1,9 @@
-using BProMax.Services;
 using BProMax.Models;
+using BProMax.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 using Npgsql;
+using Xunit;
 
 namespace BProMax.Tests;
 

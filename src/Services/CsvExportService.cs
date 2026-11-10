@@ -1,8 +1,8 @@
+using System.Globalization;
 using BProMax.Models;
 using BProMax.Services;
 using CsvHelper;
 using CsvHelper.Configuration;
-using System.Globalization;
 
 namespace BProMax.Services;
 

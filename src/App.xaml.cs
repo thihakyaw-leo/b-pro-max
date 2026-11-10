@@ -1,11 +1,11 @@
+using BProMax.Configuration;
+using BProMax.Services;
+using BProMax.Views;
 using DotNetEnv;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using BProMax.Configuration;
-using BProMax.Services;
-using BProMax.Views;
 using Microsoft.UI.Xaml;
 
 namespace BProMax;

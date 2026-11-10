@@ -1,8 +1,8 @@
+using System.Data;
 using BProMax.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using System.Data;
 
 namespace BProMax.Services;
 

@@ -1,12 +1,12 @@
+using System.Globalization;
 using BProMax.Configuration;
 using BProMax.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static Supabase.Postgrest.Constants;
 using Supabase.Postgrest;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Models;
-using System.Globalization;
+using static Supabase.Postgrest.Constants;
 
 namespace BProMax.Services;
 

@@ -1,5 +1,5 @@
-using BProMax.Services;
 using BProMax.Configuration;
+using BProMax.Services;
 using Microsoft.Extensions.Options;
 using Xunit;
 

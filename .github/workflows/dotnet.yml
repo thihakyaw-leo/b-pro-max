@@ -1,0 +1,46 @@
+name: .NET Quality CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore packages
+        run: dotnet restore
+
+      - name: Format check
+        run: dotnet format --verify-no-changes
+
+      - name: Build src
+        run: dotnet build src\b-pro-max.csproj --no-incremental
+
+      - name: Build tests
+        run: dotnet build tests\b-pro-max.tests.csproj --no-incremental
+
+      - name: Run unit tests
+        run: dotnet test tests\b-pro-max.tests.csproj --no-build
+
+      - name: Run tests with coverage
+        run: dotnet test tests\b-pro-max.tests.csproj --no-build --collect:"XPlat Code Coverage" --results-directory:.\coverage
+
+      - name: Build e2e tests
+        run: dotnet build tests\e2e\b-pro-max.e2e.csproj --no-incremental
+
+      - name: Run e2e tests
+        run: dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build

@@ -30,3 +30,29 @@ data/
 
 ## macOS
 .DS_Store
+
+# Scratch / untracked projects (intentionally excluded per team agreement)
+src/BenchmarksTest.csproj
+src/BenchmarksTest/
+src/ProgramApp.csproj
+src/RunBenchmarks.csproj
+src/simple_test.csproj
+src/test_program.csproj
+src/BenchmarksFolder/
+src/Benchmarks_File
+src/build_output.txt
+src/compile_test.bat
+src/global.json
+src/test.txt
+
+# Local tooling / data
+benchmarks/
+benchmarks.tmp
+node_modules/
+pgsql/
+test-winui3/
+test-xaml/
+test_file.txt
+
+# Coverage output
+coverage/

@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Options;
-using BProMax.Configuration;
 using System.Runtime.Versioning;
+using BProMax.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BProMax.Services;
 

@@ -21,10 +21,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240227000" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.260224002" />
     <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
     <PackageReference Include="Npgsql" Version="8.0.4" />
     <PackageReference Include="EPPlus" Version="7.2.3" />
+    <!-- EPPlus 7.2.3 -> EPPlus.System.Drawing 6.1.1 -> System.Drawing.Common 7.0.0 conflicts
+         with System.Windows.Extensions 8.0.0 -> System.Drawing.Common 8.0.0 (MSB3277).
+         Pin the newer assembly explicitly to unify the graph. -->
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
