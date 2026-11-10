@@ -1,10 +1,85 @@
+using BProMax.Helpers;
+using BProMax.Models;
+using BProMax.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+
 namespace BProMax.Views;
 
 /// <summary>
-/// Placeholder for WinUI 3 AgentListView (XAML).
-/// To be implemented in Visual Studio as Views/AgentListView.xaml + .xaml.cs
+/// WinUI 3 AgentListView (Page). Lists all agents (replaces VB6 frmAgentList).
 /// </summary>
-public class AgentListView
+public sealed partial class AgentListView : Page
 {
-    // WinUI 3 view - requires Visual Studio for XAML compilation
+    private readonly IAgentService _agentService;
+    private int? _editAgentId;
+
+    private TextBox SearchBox => this.FindChildByName<TextBox>("SearchBox")!;
+    private ListView AgentList => this.FindChildByName<ListView>("AgentList")!;
+    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
+
+    public AgentListView()
+    {
+        _agentService = App.Services?.GetRequiredService<IAgentService>()
+            ?? throw new InvalidOperationException("AgentService not registered.");
+    }
+
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        if (e.Parameter is int agentId)
+            _editAgentId = agentId;
+        await LoadAgentsAsync();
+    }
+
+    private async Task LoadAgentsAsync()
+    {
+        try
+        {
+            var agents = await _agentService.GetAllAgentsAsync();
+            AgentList.ItemsSource = agents;
+            StatusMessage.Text = $"Loaded {agents.Count} agents.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage.Text = $"Error: {ex.Message}";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
+    }
+
+    private async void SearchButton_Click(object sender, RoutedEventArgs e)
+    {
+        var term = SearchBox.Text ?? string.Empty;
+        try
+        {
+            var agents = string.IsNullOrWhiteSpace(term)
+                ? await _agentService.GetAllAgentsAsync()
+                : await _agentService.SearchAgentsAsync(term);
+            AgentList.ItemsSource = agents;
+            StatusMessage.Text = $"Found {agents.Count} agents.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage.Text = $"Error: {ex.Message}";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
+    }
+
+    private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+    {
+        SearchBox.Text = string.Empty;
+        await LoadAgentsAsync();
+    }
+
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is int agentId)
+        {
+            _ = this.Frame?.Navigate(typeof(AgentDetailView), agentId);
+        }
+    }
 }

@@ -1,0 +1,50 @@
+<Page
+    x:Class="BProMax.Views.TimeLockView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="TimeLockView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12" Spacing="8">
+            <TextBlock Text="Time Lock" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="TimeLockTitle"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="12" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <CheckBox x:Name="EnabledCheck" Content="Time Lock Enabled"
+                          AutomationProperties.AutomationId="TimeLockEnabledCheck"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Start Hour:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="TimeLockStartLabel"/>
+                <TextBox x:Name="StartHourBox" Width="100" Text="9"
+                         AutomationProperties.AutomationId="TimeLockStartBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="End Hour:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="TimeLockEndLabel"/>
+                <TextBox x:Name="EndHourBox" Width="100" Text="17"
+                         AutomationProperties.AutomationId="TimeLockEndBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="SaveButton" Content="Save Settings" Click="SaveButton_Click"
+                        AutomationProperties.AutomationId="TimeLockSaveButton"/>
+                <Button x:Name="CheckButton" Content="Check Access" Click="CheckButton_Click"
+                        AutomationProperties.AutomationId="TimeLockCheckButton"/>
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="TimeLockStatus"/>
+    </Grid>
+</Page>

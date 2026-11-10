@@ -1,0 +1,14 @@
+<Application
+    x:Class="BProMax.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <SolidColorBrush x:Key="BrandColor" Color="#0078D4" />
+            <SolidColorBrush x:Key="SurfaceColor" Color="#FAFAFA" />
+            <SolidColorBrush x:Key="ErrorColor" Color="#C42B1C" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

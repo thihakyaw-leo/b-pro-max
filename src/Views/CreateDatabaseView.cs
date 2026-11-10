@@ -1,11 +1,49 @@
+using BProMax.Helpers;
+using BProMax.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
 namespace BProMax.Views;
 
 /// <summary>
-/// Placeholder for WinUI 3 CreateDatabaseView (XAML).
-/// To be implemented in Visual Studio as Views/CreateDatabaseView.xaml + .xaml.cs
-/// Handles new database creation (replaces VB6 frmCreateNewDatabase).
+/// WinUI 3 CreateDatabaseView (Page). New database creation (replaces VB6 frmCreateNewDatabase).
 /// </summary>
-public class CreateDatabaseView
+public sealed partial class CreateDatabaseView : Page
 {
-    // WinUI 3 view - requires Visual Studio for XAML compilation
+    private readonly IDatabaseMaintenanceService _maintenanceService;
+
+    private TextBox DatabaseNameBox => this.FindChildByName<TextBox>("DatabaseNameBox")!;
+    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
+
+    public CreateDatabaseView()
+    {
+        _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
+            ?? throw new InvalidOperationException("DatabaseMaintenanceService not registered.");
+    }
+
+    private async void CreateButton_Click(object sender, RoutedEventArgs e)
+    {
+        StatusMessage.Text = string.Empty;
+        var dbName = DatabaseNameBox.Text ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(dbName))
+        {
+            StatusMessage.Text = "Please enter a database name.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            return;
+        }
+
+        try
+        {
+            var ok = await _maintenanceService.CreateNewDatabaseAsync(dbName);
+            StatusMessage.Text = ok ? $"Database '{dbName}' created." : "Database creation failed.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage.Text = $"Error: {ex.Message}";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
+    }
 }

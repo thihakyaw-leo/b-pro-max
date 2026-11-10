@@ -1,12 +1,41 @@
+using BProMax.Helpers;
+using BProMax.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
 namespace BProMax.Views;
 
 /// <summary>
-/// Placeholder for WinUI 3 CompactDatabaseView (XAML).
-/// To be implemented in Visual Studio as Views/CompactDatabaseView.xaml + .xaml.cs
-/// Handles database compaction/repair (replaces VB6 frmCompactMsg).
-/// Uses PostgreSQL VACUUM/REINDEX.
+/// WinUI 3 CompactDatabaseView (Page). Database compaction/repair (replaces VB6 frmCompactMsg).
 /// </summary>
-public class CompactDatabaseView
+public sealed partial class CompactDatabaseView : Page
 {
-    // WinUI 3 view - requires Visual Studio for XAML compilation
+    private readonly IDatabaseMaintenanceService _maintenanceService;
+
+    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
+
+    public CompactDatabaseView()
+    {
+        _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
+            ?? throw new InvalidOperationException("DatabaseMaintenanceService not registered.");
+    }
+
+    private async void CompactButton_Click(object sender, RoutedEventArgs e)
+    {
+        StatusMessage.Text = string.Empty;
+
+        try
+        {
+            var ok = await _maintenanceService.CompactDatabaseAsync();
+            StatusMessage.Text = ok ? "Database compacted successfully." : "Compaction failed.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage.Text = $"Error: {ex.Message}";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
+    }
 }

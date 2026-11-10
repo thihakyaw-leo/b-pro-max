@@ -1,0 +1,51 @@
+<Page
+    x:Class="BProMax.Views.AgentListView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:BProMax.Models"
+        mc:Ignorable="d"
+        AutomationProperties.AutomationId="AgentListView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="8" Margin="12">
+            <TextBlock Text="Agent List" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="AgentListTitle"/>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox x:Name="SearchBox" PlaceholderText="Search by name..." Width="200"
+                         AutomationProperties.AutomationId="AgentSearchBox"/>
+                <Button x:Name="SearchButton" Content="Search" Click="SearchButton_Click"
+                        AutomationProperties.AutomationId="AgentSearchButton"/>
+                <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click"
+                        AutomationProperties.AutomationId="AgentRefreshButton"/>
+            </StackPanel>
+        </StackPanel>
+
+        <ListView Grid.Row="1" x:Name="AgentList" Margin="12"
+                  AutomationProperties.AutomationId="AgentList">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:Agent">
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4">
+                        <TextBlock Text="{x:Bind Id}" Width="40" AutomationProperties.AutomationId="AgentId"/>
+                        <TextBlock Text="{x:Bind AgentName}" Width="200" AutomationProperties.AutomationId="AgentName"/>
+                        <TextBlock Text="{x:Bind Address}" Width="250" AutomationProperties.AutomationId="AgentAddress"/>
+                        <TextBlock Text="{x:Bind Phone}" Width="120" AutomationProperties.AutomationId="AgentPhone"/>
+                        <TextBlock Text="{x:Bind Commission}" Width="100" AutomationProperties.AutomationId="AgentCommission"/>
+                        <TextBlock Text="{x:Bind Rate}" Width="80" AutomationProperties.AutomationId="AgentRate"/>
+                        <Button Content="Edit" Click="EditButton_Click" Tag="{x:Bind Id}"
+                                AutomationProperties.AutomationId="AgentEditButton"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <TextBlock x:Name="StatusMessage" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="AgentListStatus"/>
+    </Grid>
+</Page>

@@ -11,7 +11,7 @@
 ## Phase 0 — Foundation ✅ COMPLETE
 
 | Task | Status | Notes |
-|------|--------|-------|
+| --- | --- | --- |
 | P0-01 Initialize repo | ✅ Done | .sln, csproj, .NET 8 console project |
 | P0-02 Project structure | ✅ Done | App.cs, Program.cs, Models/, Services/, Views/, Configuration/ |
 | P0-03 Database connection | ✅ Done | Npgsql + Supabase.Postgrest |
@@ -32,7 +32,7 @@
 
 ### Option A: Local PostgreSQL
 | Task | Status | Instructions |
-|------|--------|--------------|
+| --- | --- | --- |
 | Install PostgreSQL | ⏳ Manual | https://www.postgresql.org/download/windows/ |
 | Create `bpro_max` database | ⏳ Manual | `createdb -U postgres bpro_max` |
 | Run `Scripts/001_agents.sql` | ⏳ Manual | Execute against `bpro_max` |
@@ -40,7 +40,7 @@
 
 ### Option B: Supabase (REST API) ✅ CODE READY
 | Task | Status | Instructions |
-|------|--------|--------------|
+| --- | --- | --- |
 | Create Supabase project | ⏳ Manual | https://app.supabase.com/ |
 | Get DB password | ⏳ Manual | Settings → Database → Connection string |
 | Get Anon Key | ⏳ Manual | Settings → API → public anon key |
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS agents (
 ## Phase 1 — Core Agent Management ✅ CODE COMPLETE
 
 | Task | Status |
-|------|--------|
+| --- | --- |
 | P1-01 Agent CRUD service | ✅ AgentService.cs + SupabaseAgentService.cs |
 | P1-02 Agent list view | ✅ Console menu + placeholder view |
 | P1-03 Agent detail/edit form | ✅ Placeholder view created |
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS agents (
 ## Phase 2 — Sales & Commission ✅ CODE COMPLETE
 
 | Task | Status |
-|------|--------|
+| --- | --- |
 | P2-01 Commission/rate calculation logic | ✅ CommissionService.cs enhanced |
 | P2-02 Sales filtering UI | ✅ SalesFilterService.cs + placeholder view |
 | P2-03 Auto-purchase feature | ✅ AutoBuyService.cs + placeholder view |
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS agents (
 ## View Placeholders Created (WinUI 3 — to be implemented in Visual Studio)
 
 | View | File | Replaces VB6 Form |
-|------|------|-------------------|
+| --- | --- | --- |
 | AgentDetailView | `src\Views\AgentDetailView.cs` | frmCustomer |
 | SalesFilterView | `src\Views\SalesFilterView.cs` | frmSaleFilt |
 | AutoBuyView | `src\Views\AutoBuyView.cs` | frmAutoBuy |
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS agents (
 ## Test Results (78 tests, all passing)
 
 | Test Class | Tests |
-|------------|-------|
+| --- | --- |
 | AgentServiceTests | 8 |
 | CommissionServiceTests | 6 |
 | CommissionServiceCurrencyTests | 10 |

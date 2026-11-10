@@ -1,0 +1,51 @@
+<Page
+    x:Class="BProMax.Views.ReportView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="ReportView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12" Spacing="8">
+            <TextBlock Text="Reports" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="ReportTitle"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="12" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Start Date:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="ReportStartDateLabel"/>
+                <CalendarDatePicker x:Name="StartDatePicker" Width="150"
+                                    AutomationProperties.AutomationId="ReportStartDatePicker"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="End Date:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="ReportEndDateLabel"/>
+                <CalendarDatePicker x:Name="EndDatePicker" Width="150"
+                                    AutomationProperties.AutomationId="ReportEndDatePicker"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="AgentReportButton" Content="Agent Report" Click="AgentReportButton_Click"
+                        AutomationProperties.AutomationId="ReportAgentButton"/>
+                <Button x:Name="SalesReportButton" Content="Sales Report" Click="SalesReportButton_Click"
+                        AutomationProperties.AutomationId="ReportSalesButton"/>
+                <Button x:Name="ExportButton" Content="Export" Click="ExportButton_Click"
+                        AutomationProperties.AutomationId="ReportExportButton"/>
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Text="Report output will appear here."
+                   Margin="12" VerticalAlignment="Center" HorizontalAlignment="Center"
+                   AutomationProperties.AutomationId="ReportOutput"/>
+        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="ReportStatus"/>
+    </Grid>
+</Page>

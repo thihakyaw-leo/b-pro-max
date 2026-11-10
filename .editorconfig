@@ -18,6 +18,13 @@ dotnet_diagnostic.CA1822.severity = none
 # Phase 3: Promote security category analyzers to errors (CA3xxx/CA5xxx).
 dotnet_analyzer_diagnostic.category-Security.severity = error
 
+# Phase 3: Promote Performance warnings to errors (CA1848, CA1305)
+dotnet_diagnostic.CA1848.severity = error
+dotnet_diagnostic.CA1305.severity = error
+
+# Phase 3: Promote Reliability warning to error (CA1416)
+dotnet_diagnostic.CA1416.severity = error
+
 # === Meziantou.Analyzer Configuration ===
 # Phase 1: Start with suggestions so the analyzer reports findings without
 # breaking the build under TreatWarningsAsErrors=true. The team can promote

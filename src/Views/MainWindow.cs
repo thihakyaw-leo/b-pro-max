@@ -1,10 +1,2 @@
-namespace BProMax.Views;
-
-/// <summary>
-/// Placeholder for WinUI 3 MainWindow (XAML).
-/// To be implemented in Visual Studio as Views/MainWindow.xaml + .xaml.cs
-/// </summary>
-public class MainWindow
-{
-    // WinUI 3 window - requires Visual Studio for XAML compilation
-}
+// Neutralized: MainWindow is now implemented as WinUI 3 at src/MainWindow.xaml(.cs).
+// This legacy placeholder class is no longer compiled to avoid a conflict with the XAML-generated partial class.

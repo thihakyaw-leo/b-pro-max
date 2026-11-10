@@ -1,0 +1,83 @@
+<Page
+    x:Class="BProMax.Views.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        MaxWidth="400"
+        Padding="24">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Text="b-pro-max"
+            FontSize="28"
+            FontWeight="SemiBold"
+            HorizontalAlignment="Center"
+            Margin="0,0,0,8" />
+
+        <TextBlock
+            Grid.Row="1"
+            Text="Login"
+            FontSize="18"
+            FontWeight="Medium"
+            HorizontalAlignment="Center"
+            Margin="0,0,0,24"
+            AutomationProperties.AutomationId="LoginTitle" />
+
+        <TextBlock
+            Grid.Row="2"
+            Text="Username"
+            Margin="0,0,0,6" />
+        <TextBox
+            x:Name="UsernameBox"
+            Grid.Row="2"
+            Grid.Column="0"
+            PlaceholderText="Username"
+            Margin="0,22,0,0"
+            AutomationProperties.AutomationId="UsernameBox" />
+
+        <TextBlock
+            Grid.Row="3"
+            Text="Password"
+            Margin="0,0,0,6" />
+        <PasswordBox
+            x:Name="PasswordBox"
+            Grid.Row="3"
+            Grid.Column="0"
+            PlaceholderText="Password"
+            Margin="0,22,0,24"
+            AutomationProperties.AutomationId="PasswordBox" />
+
+        <Button
+            x:Name="LoginButton"
+            Content="Login"
+            Grid.Row="4"
+            HorizontalAlignment="Stretch"
+            Height="40"
+            Margin="0,10,0,0"
+            Click="Login_Click"
+            AutomationProperties.AutomationId="LoginButton" />
+
+        <TextBlock
+            x:Name="StatusMessage"
+            Grid.Row="5"
+            HorizontalAlignment="Center"
+            Margin="0,12,0,0"
+            Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
+            AutomationProperties.AutomationId="StatusMessage" />
+
+    </Grid>
+</Page>

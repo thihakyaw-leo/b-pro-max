@@ -1,0 +1,38 @@
+<Page
+    x:Class="BProMax.Views.CreateDatabaseView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="CreateDatabaseView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12" Spacing="8">
+            <TextBlock Text="Create Database" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="CreateDatabaseTitle"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="12" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Database Name:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="CreateDbNameLabel"/>
+                <TextBox x:Name="DatabaseNameBox" Width="300"
+                         AutomationProperties.AutomationId="CreateDbNameBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="CreateButton" Content="Create Database" Click="CreateButton_Click"
+                        AutomationProperties.AutomationId="CreateDbButton"/>
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="CreateDatabaseStatus"/>
+    </Grid>
+</Page>

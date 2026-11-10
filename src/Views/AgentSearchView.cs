@@ -1,11 +1,51 @@
+using BProMax.Helpers;
+using BProMax.Models;
+using BProMax.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+
 namespace BProMax.Views;
 
 /// <summary>
-/// Placeholder for WinUI 3 AgentSearchView (XAML).
-/// To be implemented in Visual Studio as Views/AgentSearchView.xaml + .xaml.cs
-/// Handles agent search (replaces VB6 frmSearch).
+/// WinUI 3 AgentSearchView (Page). Agent search (replaces VB6 frmSearch).
 /// </summary>
-public class AgentSearchView
+public sealed partial class AgentSearchView : Page
 {
-    // WinUI 3 view - requires Visual Studio for XAML compilation
+    private readonly IAgentService _agentService;
+
+    private TextBox SearchBox => this.FindChildByName<TextBox>("SearchBox")!;
+    private ListView SearchResults => this.FindChildByName<ListView>("SearchResults")!;
+    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
+
+    public AgentSearchView()
+    {
+        _agentService = App.Services?.GetRequiredService<IAgentService>()
+            ?? throw new InvalidOperationException("AgentService not registered.");
+    }
+
+    private async void SearchButton_Click(object sender, RoutedEventArgs e)
+    {
+        var term = SearchBox.Text ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(term))
+        {
+            StatusMessage.Text = "Please enter a search term.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            return;
+        }
+
+        try
+        {
+            var agents = await _agentService.SearchAgentsAsync(term);
+            SearchResults.ItemsSource = agents;
+            StatusMessage.Text = $"Found {agents.Count} agents.";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage.Text = $"Error: {ex.Message}";
+            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
+    }
 }

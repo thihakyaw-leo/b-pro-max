@@ -1,0 +1,93 @@
+<Page
+    x:Class="BProMax.Views.AgentDetailView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:BProMax.Models"
+        mc:Ignorable="d"
+        AutomationProperties.AutomationId="AgentDetailView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12" Spacing="8">
+            <TextBlock Text="Agent Details" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="AgentDetailTitle"/>
+            <TextBlock x:Name="IdLabel" Text="New Agent" Visibility="Collapsed"
+                       AutomationProperties.AutomationId="AgentDetailIdLabel"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="12" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Agent Name:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentNameLabel"/>
+                <TextBox x:Name="AgentNameBox" Width="300"
+                         AutomationProperties.AutomationId="AgentNameBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Address:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentAddressLabel"/>
+                <TextBox x:Name="AddressBox" Width="300"
+                         AutomationProperties.AutomationId="AgentAddressBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Phone:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentPhoneLabel"/>
+                <TextBox x:Name="PhoneBox" Width="300"
+                         AutomationProperties.AutomationId="AgentPhoneBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Commission:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentCommissionLabel"/>
+                <TextBox x:Name="CommissionBox" Width="150" Text="0"
+                         AutomationProperties.AutomationId="AgentCommissionBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Rate:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentRateLabel"/>
+                <TextBox x:Name="RateBox" Width="150" Text="0"
+                         AutomationProperties.AutomationId="AgentRateBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Commission 1:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentCommission1Label"/>
+                <TextBox x:Name="Commission1Box" Width="150" Text="0"
+                         AutomationProperties.AutomationId="AgentCommission1Box"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Rate 1:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentRate1Label"/>
+                <TextBox x:Name="Rate1Box" Width="150" Text="0"
+                         AutomationProperties.AutomationId="AgentRate1Box"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Currency Type:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentCurrencyTypeLabel"/>
+                <TextBox x:Name="CurrencyTypeBox" Width="150"
+                         AutomationProperties.AutomationId="AgentCurrencyTypeBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Currency Rate:" Width="120" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="AgentCurrencyRateLabel"/>
+                <TextBox x:Name="CurrencyRateBox" Width="150" Text="1"
+                         AutomationProperties.AutomationId="AgentCurrencyRateBox"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Margin="12" Orientation="Horizontal" Spacing="8">
+            <Button x:Name="SaveButton" Content="Save" Click="SaveButton_Click"
+                    AutomationProperties.AutomationId="AgentSaveButton"/>
+            <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click"
+                    AutomationProperties.AutomationId="AgentCancelButton"/>
+            <Button x:Name="DeleteButton" Content="Delete" Click="DeleteButton_Click"
+                    AutomationProperties.AutomationId="AgentDeleteButton"/>
+            <TextBlock x:Name="StatusMessage" VerticalAlignment="Center" Margin="12,0,0,0"
+                       Foreground="Green" AutomationProperties.AutomationId="AgentDetailStatus"/>
+        </StackPanel>
+    </Grid>
+</Page>

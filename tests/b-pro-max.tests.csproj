@@ -1,14 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BProMax.Tests</RootNamespace>
     <AssemblyName>b-pro-max.tests</AssemblyName>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <DisablePriGen>true</DisablePriGen>
+    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+    <AppxPackage>false</AppxPackage>
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+    <EnableCoreMrtTooling>false</EnableCoreMrtTooling>
   </PropertyGroup>
+
+  <Target Name="ExpandPriContent" DependsOnTargets="" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
@@ -21,6 +29,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\b-pro-max.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The E2E suite is a separate project (tests\e2e). Without this exclusion the
+         default **/*.cs glob pulls in its generated obj\*.AssemblyInfo.cs files and
+         produces CS0579 duplicate assembly attribute errors. -->
+    <Compile Remove="e2e\**" />
+    <None Remove="e2e\**" />
   </ItemGroup>
 
 </Project>
