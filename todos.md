@@ -1,6 +1,6 @@
 # todos.md — b-pro-max Task List
 
-**Status:** Phase 0, 1 & 2 complete — WinUI 3 migration done — 78 tests pass  
+**Status:** Phase 0, 1 & 2 complete — WinUI 3 migration done — Code Analysis Phase 3+4 done — 78 tests pass  
 **Location:** `F:\b\b-pro-max\todos.md`  
 **Reference:** `plan.md` for phase details, `agent.md` for architecture  
 **Tech Stack:** .NET 9 WinUI 3 + Windows App SDK 1.5.240227000 + Npgsql + Supabase.Postgrest + EPPlus + JSON config  
@@ -323,6 +323,18 @@ CREATE TABLE IF NOT EXISTS agents (
 
 ---
 
+## Code Analysis — COMPLETE
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| CA-01 Promote CA1852 & CA1862 to errors | ✅ Done | .editorconfig: CA1852.severity=error, CA1862.severity=error (CA1416 already error) |
+| CA-02 Fix resulting src warnings | ✅ Done | 0 CA warnings in src after promotion — all clean |
+| CA-03 Phase 4: TreatWarningsAsErrors=true | ✅ Done | Already set in Directory.Build.props |
+| CA-04 WarningsNotAsErrors=CA1707 | ✅ Done | Added to Directory.Build.props (tests: 148 occurrences) |
+| CA-05 Validate full build + tests | ✅ Done | src 0 errors, tests 0 errors, 78/78 pass |
+
+---
+
 ## Phase 6 — Polish & Verification
 
 - [ ] P6-01 End-to-end testing against original DD.exe behavior
@@ -330,6 +342,7 @@ CREATE TABLE IF NOT EXISTS agents (
 - [ ] P6-03 UI/UX polish (WinUI 3 XAML views in Visual Studio)
 - [ ] P6-04 Documentation and deployment scripts — README.md done
 - [ ] P6-05 Final audit: no VB6/ActiveX/Registry dependencies remain
+
 
 ---
 

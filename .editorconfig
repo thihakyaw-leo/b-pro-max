@@ -25,6 +25,10 @@ dotnet_diagnostic.CA1305.severity = error
 # Phase 3: Promote Reliability warning to error (CA1416)
 dotnet_diagnostic.CA1416.severity = error
 
+# Phase 3: Promote CA1852 (seal types) and CA1862 (StringComparison) to errors
+dotnet_diagnostic.CA1852.severity = error
+dotnet_diagnostic.CA1862.severity = error
+
 # === Meziantou.Analyzer Configuration ===
 # Phase 1: Start with suggestions so the analyzer reports findings without
 # breaking the build under TreatWarningsAsErrors=true. The team can promote
