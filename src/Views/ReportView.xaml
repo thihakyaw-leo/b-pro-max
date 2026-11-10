@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="12" Spacing="8">
@@ -45,7 +46,7 @@
         <TextBlock Grid.Row="2" Text="Report output will appear here."
                    Margin="12" VerticalAlignment="Center" HorizontalAlignment="Center"
                    AutomationProperties.AutomationId="ReportOutput"/>
-        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+        <TextBlock x:Name="StatusMessage" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                    Margin="12" Foreground="Green" AutomationProperties.AutomationId="ReportStatus"/>
     </Grid>
 </Page>

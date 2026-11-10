@@ -13,6 +13,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="12" Spacing="8">
@@ -86,7 +88,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom"
+        <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom"
                     Margin="12" Spacing="8">
             <TextBlock Text="Total Amount:" AutomationProperties.AutomationId="TotalAmountLabel"/>
             <TextBlock x:Name="TotalAmountText" Text="0" Width="100"
@@ -96,7 +98,7 @@
                        AutomationProperties.AutomationId="TotalCommissionText"/>
         </StackPanel>
 
-        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+        <TextBlock x:Name="StatusMessage" Grid.Row="4" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                    Margin="12" Foreground="Green" AutomationProperties.AutomationId="SalesFilterStatus"/>
     </Grid>
 </Page>
