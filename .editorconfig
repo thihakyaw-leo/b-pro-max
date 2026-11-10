@@ -18,6 +18,41 @@ dotnet_diagnostic.CA1822.severity = none
 # Phase 3: Promote security category analyzers to errors (CA3xxx/CA5xxx).
 dotnet_analyzer_diagnostic.category-Security.severity = error
 
+# === Meziantou.Analyzer Configuration ===
+# Phase 1: Start with suggestions so the analyzer reports findings without
+# breaking the build under TreatWarningsAsErrors=true. The team can promote
+# individual rules to warning/error over time.
+dotnet_diagnostic.MA0001.severity = suggestion
+dotnet_diagnostic.MA0002.severity = suggestion
+dotnet_diagnostic.MA0004.severity = suggestion
+dotnet_diagnostic.MA0005.severity = suggestion
+dotnet_diagnostic.MA0006.severity = suggestion
+dotnet_diagnostic.MA0009.severity = suggestion
+dotnet_diagnostic.MA0011.severity = suggestion
+dotnet_diagnostic.MA0014.severity = error
+dotnet_diagnostic.MA0015.severity = suggestion
+dotnet_diagnostic.MA0016.severity = suggestion
+dotnet_diagnostic.MA0020.severity = suggestion
+dotnet_diagnostic.MA0025.severity = suggestion
+dotnet_diagnostic.MA0026.severity = none
+dotnet_diagnostic.MA0028.severity = suggestion
+dotnet_diagnostic.MA0029.severity = suggestion
+dotnet_diagnostic.MA0031.severity = suggestion
+dotnet_diagnostic.MA0035.severity = error
+dotnet_diagnostic.MA0040.severity = suggestion
+dotnet_diagnostic.MA0042.severity = suggestion
+dotnet_diagnostic.MA0045.severity = suggestion
+dotnet_diagnostic.MA0047.severity = suggestion
+dotnet_diagnostic.MA0048.severity = none
+dotnet_diagnostic.MA0051.severity = none
+dotnet_diagnostic.MA0053.severity = none
+dotnet_diagnostic.MA0055.severity = suggestion
+dotnet_diagnostic.MA0063.severity = suggestion
+dotnet_diagnostic.MA0067.severity = suggestion
+dotnet_diagnostic.MA0074.severity = suggestion
+dotnet_diagnostic.MA0076.severity = suggestion
+dotnet_diagnostic.MA0110.severity = suggestion
+
 [*.xaml]
 indent_style = space
 indent_size = 2

@@ -12,4 +12,8 @@
     <!-- Phase 5: Full TreatWarningsAsErrors — no exemptions remaining -->
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer" Version="3.0.322" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
