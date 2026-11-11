@@ -21,19 +21,22 @@ From repo root `F:\b\b-pro-max`:
 # 1. Format check (verify no uncommitted formatting changes)
 dotnet format --verify-no-changes
 
-# 2. Build src (0 errors, 0 warnings expected)
+# 2. Build the whole solution (src + tests + e2e; 0 errors, 0 warnings expected)
+dotnet build b-pro-max.sln -c Release
+
+# 3. Build src only (0 errors, 0 warnings expected)
 dotnet build src\b-pro-max.csproj
 
-# 3. Build tests (0 errors, 0 warnings expected)
+# 4. Build tests (0 errors, 0 warnings expected)
 dotnet build tests\b-pro-max.tests.csproj
 
-# 4. Run unit tests (VSTest/xunit)
+# 5. Run unit tests (VSTest/xunit)
 dotnet test tests\b-pro-max.tests.csproj --no-build
 
-# 5. Run tests with coverage
+# 6. Run tests with coverage
 dotnet test tests\b-pro-max.tests.csproj --collect:"XPlat Code Coverage" --results-directory:.\coverage
 
-# 6. Run e2e tests (separate project)
+# 7. Run e2e tests (separate project)
 dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 ```
 
@@ -50,9 +53,15 @@ dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 
 `WarningsNotAsErrors=CA1707` is the only explicit exception — tests have 148 CA1707 (identifier naming) occurrences. It is reported as a warning but does not fail the build.
 
+## Analyzer pack decisions
+
+- **Meziantou.Analyzer 3.0.322 — adopted.** Broad design/usage/security/performance coverage; severities owned by the repo-root `.editorconfig`.
+- **StyleCop.Analyzers — evaluated and not adopted (Phase 5 audit closed).** Rationale: StyleCop's rule set largely duplicates what the SDK analyzers (`AnalysisMode=Recommended` + `EnforceCodeStyleInBuild=true`) and `dotnet format` already enforce, while adding a large new warning surface that `TreatWarningsAsErrors=true` would turn into a wall of build breaks (documentation headers, file ordering, `this.` prefixes, and similar conventions) that carry no correctness value for this codebase. Revisit only if the team explicitly wants a single opinionated style owner and accepts a dedicated suppression/cleanup phase.
+
 ## Notes
 
-- `b-pro-max.sln` cannot be parsed by MSBuild 17.8.3 (MSB5014) — build projects individually.
+- `b-pro-max.sln` parses and builds cleanly; the solution contains `src`, `tests`, and `tests/e2e`. The earlier MSB5014 came from a malformed `Format Version = 12.00` header, which is now `Format Version 12.00`.
+- The root `benchmarks` entrypoint and `src/BenchmarksFolder` are local-only scratch (untracked, `.gitignore`d). The `BProMax.Benchmarks` namespace they reference no longer exists; the benchmark suite needs to be re-created as a proper `src/Benchmarks/` project before it can be tracked.
 - WinRT activation (`REGDB_E_CLASSNOTREG`) is unavailable in container — app launch requires Windows desktop with WinRT runtime registered; this is an environment limitation, not a code issue.
 - Transient CS2012 file-lock errors from Microsoft Defender Antivirus can occur during builds; retry usually succeeds.
 - Temp build log files should be cleaned up after each validation.

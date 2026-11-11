@@ -42,7 +42,7 @@ src/ProgramApp.csproj
 src/RunBenchmarks.csproj
 src/simple_test.csproj
 src/test_program.csproj
-src/BenchmarksFolder/
+/src/BenchmarksFolder
 src/Benchmarks_File
 src/build_output.txt
 src/compile_test.bat
@@ -50,13 +50,13 @@ src/global.json
 src/test.txt
 
 # Local tooling / data
-benchmarks/
-benchmarks.tmp
-node_modules/
-pgsql/
+# Root-anchored: a future src/Benchmarks/ project must stay trackable.
+/benchmarks
+/benchmarks.tmp
 test-winui3/
 test-xaml/
 test_file.txt
+test-results.json
 
 # Coverage output
 coverage/
