@@ -389,4 +389,19 @@ dotnet test tests\e2e\b-pro-max.e2e.csproj -c Release --no-build
 
 # Run (from repo root)
 dotnet run --project src\b-pro-max.csproj
+
+---
+
+## Legacy Data Migration (xDB2.mdb → PostgreSQL) ✅ COMPLETE
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| Install PostgreSQL 17 locally | ✅ Done | `C:\Program Files\PostgreSQL\17`, trust auth for local |
+| Create `bpro_max` database | ✅ Done | Via LegacyMigrator EnsureDatabase |
+| Build LegacyMigrator (x86, System.Data.OleDb) | ✅ Done | `tools/LegacyMigrator` — 0 warnings |
+| Run migration against local PostgreSQL | ✅ Done | agents=7, users=1, draws=62, bet_types=11, sales=8, sale_items=8, sale_item_numbers=8 |
+| Verify via psql | ✅ Done | All row counts match MDB source |
+| Integration hint in DatabaseMigrationService | ✅ Done | Logs instruction to run LegacyMigrator when agents table empty & xDB2.mdb exists |
+
+Commit: `b636693` — LegacyMigrator fixes + `src/Services/DatabaseMigrationService.cs` hint.
 ```
