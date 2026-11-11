@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS agents (
 | W3-10 Retarget tests to net9.0-windows | ✅ Done | tests + e2e retargeted, root global.json SDK 9.0.321 |
 | W3-11 Add DisablePriGen to test projects | ✅ Done | Same WindowsAppSDK suppression as src project |
 | W3-12 WinUI 3 code review fixes | ✅ Done | Window.Current → App.MainWindowInstance, hardcoded SolidColorBrush → ThemeResource, raw FontSize/FontWeight → Theme styles |
-| W3-13 UI test automation | ✅ Scripted | ui-tests.ps1 written per winui-ui-testing template; live execution blocked (no winapp CLI, REGDB_E_CLASSNOTREG in container) — run on Windows host |
+| W3-13 UI test automation | 🔧 Scripted | ui-tests.ps1 written per winui-ui-testing template; WinApp CLI 0.8.0 installed via winget; live execution still blocked by REGDB_E_CLASSNOTREG (WinRT unavailable in container) — run on Windows host with Sandbox |
 
 ---
 
