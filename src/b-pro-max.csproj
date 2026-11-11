@@ -71,7 +71,10 @@
   <Target Name="ExpandPriContent" DependsOnTargets="" />
 
   <ItemGroup>
-    <Compile Include="$(IntermediateOutputPath)**\*.g.cs" />
+    <!-- Pre-generated XAML .g.cs files. GlobalUsings.g.cs is excluded because the SDK
+         already contributes it to Compile; including it here duplicates it (CS2002). -->
+    <Compile Include="$(IntermediateOutputPath)**\*.g.cs"
+             Exclude="$(IntermediateOutputPath)**\*.GlobalUsings.g.cs" />
   </ItemGroup>
 
 </Project>
