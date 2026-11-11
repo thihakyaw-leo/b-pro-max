@@ -1,67 +1,47 @@
-# AGENTS.md — b-pro-max .NET Quality Baseline
+# AGENTS.md — b-pro-max
 
-## Repo-native baseline
+## What this repo is
+Modern WinUI 3 reimplementation of DD.exe (VB6 lottery/agent management). .NET 9 + C#, Windows App SDK / WinUI 3, PostgreSQL via Npgsql + Supabase REST, EPPlus/CsvHelper/QuestPDF for export/reporting, JSON config (`appsettings.json` + `.env` secrets via DotNetEnv), xUnit tests.
 
-| Item | Setting |
-| --- | --- |
-| Repo-root `.editorconfig` | Default source of truth for per-rule severity |
-| `Directory.Build.props` | `EnableNETAnalyzers=true`, `AnalysisLevel=latest-recommended`, `AnalysisMode=Recommended`, `EnforceCodeStyleInBuild=true`, `TreatWarningsAsErrors=true`, `WarningsNotAsErrors=CA1707` |
-| Analyzer pack | `Meziantou.Analyzer` 3.0.322 (repo-root Directory.Build.props) |
-| Promoted-to-error rules | CA1305, CA1416, CA1848, CA1852, CA1862, Security category (CA3xxx/CA5xxx) |
-| Phase 4 exception | `WarningsNotAsErrors=CA1707` (tests: 148 identifier-naming occurrences) |
-| Test runner | VSTest via xunit (`Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio`) |
-| Coverage | `coverlet.collector` 6.0.2 |
-| Target framework | `net9.0-windows10.0.19041.0`, Platform=x64, RuntimeIdentifiers=win-x64 |
+## Toolchain
+- `global.json`: pins .NET SDK `10.0.115`, `rollForward: latestMajor`. Installed SDKs: 8.0, 9.0, 10.0.403, 11.0-rc. `dotnet --version` resolves to the latest.
+- All projects target `net9.0-windows10.0.19041.0`, `Platform=x64`, `RuntimeIdentifiers=win-x64`. **Windows desktop only** — WinRT activation fails (`REGDB_E_CLASSNOTREG`) in containers/non-Windows.
+- `TreatWarningsAsErrors=true` — warnings fail the build. Only exception: `WarningsNotAsErrors=CA1707` (test identifier naming).
+- Analyzers: SDK (`AnalysisLevel=latest-recommended`, `AnalysisMode=Recommended`, `EnforceCodeStyleInBuild=true`) + `Meziantou.Analyzer 3.0.322`. StyleCop evaluated, not adopted.
+- Formatting: `dotnet format` (`.editorconfig` is source of truth). No CI workflows exist (`.github` only has `github-app.yml`).
 
-## Quality pass commands (run in order)
+## Project layout
+- `src/b-pro-max.csproj` — app (`OutputType=WinExe`, `UseWinUI=true`). Entry: `src/Program.cs` → `App.Initialize(args)` (DI + config) → `InteractiveMenu`. Composition root: `src/App.cs`.
+- `tests/b-pro-max.tests.csproj` — xUnit unit tests, references src. **Excludes `e2e/**`** (Compile Remove) to avoid CS0579 duplicate assembly attributes — e2e is its own project.
+- `tests/e2e/b-pro-max.e2e.csproj` — separate xUnit e2e project (Npgsql). Run independently.
+- `src/Views/` — WinUI views (`.xaml` + `.xaml.cs`).
+- `Scripts/001_agents.sql` — PostgreSQL `agents` table schema (from DD.exe `AgentThai`).
+- `appsettings.json` — config. `.env` (gitignored) overrides via DotNetEnv; never commit real credentials.
 
-From repo root `F:\b\b-pro-max`:
+## Build quirks (easily missed)
+1. **XAML compilation is disabled.** `MarkupCompilePass1`/`MarkupCompilePass2` are no-op'd; all `**\*.xaml` removed from compilation; pre-generated `.g.cs` files used instead. Reason: `System.Security.Permissions` v6 unavailable on .NET 9 and `XamlCompiler.exe` crashes silently. Do not add new XAML pages expecting normal compilation.
+2. **`System.Drawing.Common 8.0.0` is pinned** to unify an EPPlus/System.Windows.Extensions assembly conflict (MSB3277). Do not downgrade.
+3. `Package.appxmanifest` is copied to output as Content.
+4. Scratch under `src/` (`BenchmarksTest.csproj`, `ProgramApp.csproj`, `RunBenchmarks.csproj`, `simple_test.csproj`, `test_program.csproj`, `compile_test.bat`, `BenchmarksFolder`, `Benchmarks_File`, `test.txt`, `src/global.json`) and root `benchmarks/`, `benchmarks.tmp` are **gitignored local scratch** — do not add to the solution.
+5. Transient `CS2012` file-lock errors from Microsoft Defender can occur during builds; retry usually succeeds.
 
-```cmd
-# 1. Format check (verify no uncommitted formatting changes)
-dotnet format --verify-no-changes
-
-# 2. Build the whole solution (src + tests + e2e; 0 errors, 0 warnings expected)
-dotnet build b-pro-max.sln -c Release
-
-# 3. Build src only (0 errors, 0 warnings expected)
-dotnet build src\b-pro-max.csproj
-
-# 4. Build tests (0 errors, 0 warnings expected)
-dotnet build tests\b-pro-max.tests.csproj
-
-# 5. Run unit tests (VSTest/xunit)
-dotnet test tests\b-pro-max.tests.csproj --no-build
-
-# 6. Run tests with coverage
-dotnet test tests\b-pro-max.tests.csproj --collect:"XPlat Code Coverage" --results-directory:.\coverage
-
-# 7. Run e2e tests (separate project)
-dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
+## Commands (run from repo root `F:\b\b-pro-max`)
 ```
+# Quality pass, in order:
+dotnet format --verify-no-changes        # formatting check
+dotnet build b-pro-max.sln -c Release    # whole solution (src + tests + e2e)
+dotnet test tests\b-pro-max.tests.csproj # unit tests
+dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build   # e2e tests
+# Single test:
+dotnet test tests\b-pro-max.tests.csproj --filter "FullyQualifiedName~ClassName"
+# Run app:
+dotnet run --project src\b-pro-max.csproj
+```
+Always run `build -> test` before committing.
 
-## Rule ownership
+## Databases / secrets
+- `appsettings.json` has placeholder empty DB password and Supabase keys. Real credentials live in `.env` (gitignored, loaded by `DotNetEnv.Env.Load()` in `App.cs`).
+- Create the `agents` table via `Scripts/001_agents.sql` against PostgreSQL/Supabase before running the app (app continues in limited mode if the table is missing).
 
-- Formatting/style → `.editorconfig` + `dotnet format`
-- Correctness/static analysis → SDK analyzers + Meziantou.Analyzer + `TreatWarningsAsErrors=true`
-- Coverage → coverlet.collector, no coverage threshold gate currently enforced
-- Architecture → no architecture tests configured yet
-- Security scanning → no external security scanner configured yet
-- Mutation testing → not configured
-
-## Exceptions
-
-`WarningsNotAsErrors=CA1707` is the only explicit exception — tests have 148 CA1707 (identifier naming) occurrences. It is reported as a warning but does not fail the build.
-
-## Analyzer pack decisions
-
-- **Meziantou.Analyzer 3.0.322 — adopted.** Broad design/usage/security/performance coverage; severities owned by the repo-root `.editorconfig`.
-- **StyleCop.Analyzers — evaluated and not adopted (Phase 5 audit closed).** Rationale: StyleCop's rule set largely duplicates what the SDK analyzers (`AnalysisMode=Recommended` + `EnforceCodeStyleInBuild=true`) and `dotnet format` already enforce, while adding a large new warning surface that `TreatWarningsAsErrors=true` would turn into a wall of build breaks (documentation headers, file ordering, `this.` prefixes, and similar conventions) that carry no correctness value for this codebase. Revisit only if the team explicitly wants a single opinionated style owner and accepts a dedicated suppression/cleanup phase.
-
-## Notes
-
-- `b-pro-max.sln` parses and builds cleanly; the solution contains `src`, `tests`, and `tests/e2e`. The earlier MSB5014 came from a malformed `Format Version = 12.00` header, which is now `Format Version 12.00`.
-- The root `benchmarks` entrypoint and `src/BenchmarksFolder` are local-only scratch (untracked, `.gitignore`d). The `BProMax.Benchmarks` namespace they reference no longer exists; the benchmark suite needs to be re-created as a proper `src/Benchmarks/` project before it can be tracked.
-- WinRT activation (`REGDB_E_CLASSNOTREG`) is unavailable in container — app launch requires Windows desktop with WinRT runtime registered; this is an environment limitation, not a code issue.
-- Transient CS2012 file-lock errors from Microsoft Defender Antivirus can occur during builds; retry usually succeeds.
-- Temp build log files should be cleaned up after each validation.
+## Instruction files to keep in sync
+`AGENTS.md`, `agent.md`, `plan.md`, `todos.md` — update together when conventions change.

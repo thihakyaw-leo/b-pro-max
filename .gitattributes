@@ -1,0 +1,18 @@
+# Normalize line endings so the working tree matches the repo-root .editorconfig
+# (end_of_line = lf) on every platform and in CI. Without this, Git's
+# core.autocrlf=true on Windows checks out CRLF while the index stores LF,
+# which makes `dotnet format --verify-no-changes` fail with ENDOFLINE.
+* text=auto eol=lf
+
+# Binary assets (none currently tracked) must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.dll binary
+*.exe binary
+*.woff binary
+*.woff2 binary

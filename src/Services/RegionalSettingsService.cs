@@ -95,12 +95,26 @@ public class RegionalSettingsService : IRegionalSettingsService
 
     public string FormatDate(DateTime dateValue)
     {
-        return dateValue.ToString(DateFormat, GetCultureInfo());
+        return dateValue.ToString(DateFormat, GetDateTimeFormatInfo());
     }
 
     public string FormatDateTime(DateTime dateTimeValue)
     {
-        return dateTimeValue.ToString(DateTimeFormat, GetCultureInfo());
+        return dateTimeValue.ToString(DateTimeFormat, GetDateTimeFormatInfo());
+    }
+
+    /// <summary>
+    /// Gets the <see cref="DateTimeFormatInfo"/> for the current culture with a fixed date separator.
+    /// In a custom date format, "/" is a placeholder replaced by the culture's
+    /// <see cref="DateTimeFormatInfo.DateSeparator"/>, which varies by platform (this machine's ICU
+    /// data resolves en-US to "-"). Pinning it to "/" keeps configured formats such as "dd/MM/yyyy"
+    /// rendering exactly as written on every host.
+    /// </summary>
+    private DateTimeFormatInfo GetDateTimeFormatInfo()
+    {
+        var formatInfo = (DateTimeFormatInfo)GetCultureInfo().DateTimeFormat.Clone();
+        formatInfo.DateSeparator = "/";
+        return formatInfo;
     }
 
     public string FormatCurrency(decimal amount)
@@ -127,7 +141,7 @@ public class RegionalSettingsService : IRegionalSettingsService
     public string FormatDateBurmeseEra(DateTime dateValue)
     {
         int burmeseYear = dateValue.Year - BurmeseEraOffset;
-        return dateValue.ToString("dd/MM/" + burmeseYear, GetCultureInfo()) + " ME";
+        return dateValue.ToString("dd/MM/" + burmeseYear, GetDateTimeFormatInfo()) + " ME";
     }
 
     /// <summary>

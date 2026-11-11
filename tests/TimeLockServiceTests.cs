@@ -31,7 +31,7 @@ public class TimeLockServiceTests
     }
 
     [Fact]
-    public async Task IsEnabledDefaultsToFalse()
+    public void IsEnabledDefaultsToFalse()
     {
         // Arrange
         var service = CreateService(enabled: false);
@@ -41,7 +41,7 @@ public class TimeLockServiceTests
     }
 
     [Fact]
-    public async Task IsWithinAllowedTimeWhenDisabledReturnsTrue()
+    public void IsWithinAllowedTimeWhenDisabledReturnsTrue()
     {
         // Arrange
         var service = CreateService(enabled: false);
@@ -54,7 +54,7 @@ public class TimeLockServiceTests
     }
 
     [Fact]
-    public async Task StartHourDefaultsTo9()
+    public void StartHourDefaultsTo9()
     {
         // Arrange
         var service = CreateService(startHour: 9);
@@ -64,7 +64,7 @@ public class TimeLockServiceTests
     }
 
     [Fact]
-    public async Task EndHourDefaultsTo17()
+    public void EndHourDefaultsTo17()
     {
         // Arrange
         var service = CreateService(endHour: 17);
@@ -87,7 +87,7 @@ public class TimeLockServiceTests
     }
 
     [Fact]
-    public async Task StartHourSetterRejectsOutOfRangeValue()
+    public void StartHourSetterRejectsOutOfRangeValue()
     {
         // Arrange
         var service = CreateService();
@@ -98,7 +98,7 @@ public class TimeLockServiceTests
     }
 
     [Fact]
-    public async Task EndHourSetterRejectsOutOfRangeValue()
+    public void EndHourSetterRejectsOutOfRangeValue()
     {
         // Arrange
         var service = CreateService();
