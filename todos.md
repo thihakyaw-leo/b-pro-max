@@ -22,9 +22,10 @@
 | P0-08 xUnit test project | ✅ Done | Tests passing |
 | P0-09 README.md | ✅ Done | Complete documentation |
 
-**Build:** `dotnet build src\b-pro-max.csproj` — 0 errors  
+**Build:** `dotnet build src\b-pro-max.csproj` — 0 errors, 0 warnings  
 **Tests:** `dotnet test tests\b-pro-max.tests.csproj` — 78 passed, 0 failed  
-**App launch:** Blocked by `REGDB_E_CLASSNOTREG` — WinRT activation unavailable in container; requires Windows desktop with WinRT runtime registered
+**App launch:** Blocked by `REGDB_E_CLASSNOTREG` — WinRT activation unavailable in container; requires Windows desktop with WinRT runtime registered  
+**Code review:** `/winui-code-review` fixes applied — Window.Current → App.MainWindowInstance, hardcoded SolidColorBrush → ThemeResource, raw FontSize/FontWeight → Theme styles (19 issues across 15 files)
 
 ---
 
@@ -82,6 +83,7 @@ CREATE TABLE IF NOT EXISTS agents (
 | W3-09 Fix CA1305/CA1848/CA1806 | ✅ Done | Fixed in code, not suppressed |
 | W3-10 Retarget tests to net9.0-windows | ✅ Done | tests + e2e retargeted, root global.json SDK 9.0.321 |
 | W3-11 Add DisablePriGen to test projects | ✅ Done | Same WindowsAppSDK suppression as src project |
+| W3-12 WinUI 3 code review fixes | ✅ Done | Window.Current → App.MainWindowInstance, hardcoded SolidColorBrush → ThemeResource, raw FontSize/FontWeight → Theme styles |
 
 ---
 

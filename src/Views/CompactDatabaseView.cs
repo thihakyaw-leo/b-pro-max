@@ -29,13 +29,12 @@ public sealed partial class CompactDatabaseView : Page
         {
             var ok = await _maintenanceService.CompactDatabaseAsync();
             StatusMessage.Text = ok ? "Database compacted successfully." : "Compaction failed.";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(
-                ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources[ok ? "SystemControlSuccessTextForegroundBrush" : "SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
     }
 }

@@ -19,6 +19,7 @@ public sealed partial class App : Application
     public static IServiceProvider? Services { get; private set; }
     public static IConfiguration? Configuration { get; private set; }
     public static IntPtr MainWindowPtr { get; internal set; }
+    public static MainWindow? MainWindowInstance { get; internal set; }
 
     public App()
     {

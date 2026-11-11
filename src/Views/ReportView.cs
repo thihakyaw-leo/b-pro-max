@@ -30,12 +30,12 @@ public sealed partial class ReportView : Page
         {
             var pdf = await _reportService.GenerateAgentReportAsync();
             StatusMessage.Text = $"Agent report generated ({pdf.Length} bytes).";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
     }
 
@@ -49,18 +49,18 @@ public sealed partial class ReportView : Page
         {
             var pdf = await _reportService.GenerateSalesReportAsync(start, end);
             StatusMessage.Text = $"Sales report generated ({pdf.Length} bytes).";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
     }
 
     private void ExportButton_Click(object sender, RoutedEventArgs e)
     {
         StatusMessage.Text = "Export functionality not yet implemented.";
-        StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
+        StatusMessage.Foreground = (Application.Current.Resources["SystemControlWarningTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
     }
 }

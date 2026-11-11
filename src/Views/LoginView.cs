@@ -32,14 +32,14 @@ public sealed partial class LoginView : Page
         if (ok)
         {
             StatusMessage.Text = $"Welcome, {_auth.CurrentUser}!";
-            StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
-            if (Window.Current is MainWindow mw) mw.UpdateMenuState();
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+            if (App.MainWindowInstance is MainWindow mw) mw.UpdateMenuState();
             _ = this.Frame?.Navigate(typeof(AgentListView));
         }
         else
         {
             StatusMessage.Text = "Invalid username or password.";
-            StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
         }
     }
 }

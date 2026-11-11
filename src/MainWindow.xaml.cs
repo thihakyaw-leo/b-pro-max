@@ -39,6 +39,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         App.MainWindowPtr = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        App.MainWindowInstance = this;
         _auth = App.Services?.GetRequiredService<IAuthService>()
             ?? throw new InvalidOperationException("AuthService not registered.");
         _licensing = App.Services?.GetRequiredService<ILicensingService>()

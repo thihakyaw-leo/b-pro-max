@@ -24,16 +24,14 @@
         <TextBlock
             Grid.Row="0"
             Text="b-pro-max"
-            FontSize="28"
-            FontWeight="SemiBold"
+            Style="{StaticResource TitleTextBlockStyle}"
             HorizontalAlignment="Center"
             Margin="0,0,0,8" />
 
         <TextBlock
             Grid.Row="1"
             Text="Login"
-            FontSize="18"
-            FontWeight="Medium"
+            Style="{StaticResource SubtitleTextBlockStyle}"
             HorizontalAlignment="Center"
             Margin="0,0,0,24"
             AutomationProperties.AutomationId="LoginTitle" />

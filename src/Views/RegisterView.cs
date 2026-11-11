@@ -36,7 +36,7 @@ public sealed partial class RegisterView : Page
             await _licensing.RegisterAsync(key);
             StatusMessage.Text = "Registration successful.";
             StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
-            if (Window.Current is MainWindow mw) mw.UpdateMenuState();
+            if (App.MainWindowInstance is MainWindow mw) mw.UpdateMenuState();
             _ = this.Frame?.Navigate(typeof(LoginView));
         }
         else

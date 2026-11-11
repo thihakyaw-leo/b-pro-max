@@ -61,7 +61,7 @@ public sealed partial class AgentDetailView : Page
             if (agent == null)
             {
                 StatusMessage.Text = "Agent not found.";
-                StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
                 return;
             }
 
@@ -80,7 +80,7 @@ public sealed partial class AgentDetailView : Page
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error loading agent: {ex.Message}";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
     }
 
@@ -95,7 +95,7 @@ public sealed partial class AgentDetailView : Page
             !decimal.TryParse(CurrencyRateBox.Text, out var currencyRate))
         {
             StatusMessage.Text = "Invalid numeric values.";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
             return;
         }
 
@@ -128,13 +128,13 @@ public sealed partial class AgentDetailView : Page
                 StatusMessage.Text = "Agent created.";
             }
 
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
             _ = this.Frame?.Navigate(typeof(AgentListView));
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error saving agent: {ex.Message}";
-            StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
     }
 
@@ -157,13 +157,13 @@ public sealed partial class AgentDetailView : Page
             {
                 await _agentService.DeleteAgentAsync(_agentId.Value);
                 StatusMessage.Text = "Agent deleted.";
-                StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
                 _ = this.Frame?.Navigate(typeof(AgentListView));
             }
             catch (Exception ex)
             {
                 StatusMessage.Text = $"Error deleting agent: {ex.Message}";
-                StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
             }
         }
     }
