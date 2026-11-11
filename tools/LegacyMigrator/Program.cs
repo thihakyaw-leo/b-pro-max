@@ -10,6 +10,7 @@ namespace LegacyMigrator;
 /// One-time migration tool: reads legacy data from xDB2.mdb (Jet OLEDB 4.0, 32-bit)
 /// and writes it into the b-pro-max PostgreSQL database.
 /// </summary>
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 internal static class Program
 {
     private const string MdbPath = @"F:\b\b-pro-max\xDB2.mdb";
@@ -237,21 +238,21 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
         while (reader.Read())
         {
             rowIndex++;
-            var agentName = GetString(reader, ordinals.AgentName);
+            var agentName = GetString(reader, ordinals["AgentName"]);
             if (string.IsNullOrWhiteSpace(agentName)) continue;
 
-            var address = GetStringOrNull(reader, ordinals.Address);
+            var address = GetStringOrNull(reader, ordinals["Address"]);
             if (address == "0") address = null;
 
-            var phone = GetStringOrNull(reader, ordinals.Phone);
+            var phone = GetStringOrNull(reader, ordinals["Phone"]);
             if (phone == "-") phone = null;
 
-            var commission = ParseDecimal(GetString(reader, ordinals.Commision));
-            var rate = ParseDecimal(GetString(reader, ordinals.Rate));
-            var commission1 = ParseDecimal(GetString(reader, ordinals.Commision1));
-            var rate1 = ParseDecimal(GetString(reader, ordinals.Rate1));
-            var currencyType = GetStringOrNull(reader, ordinals.CurType);
-            var currencyRate = ParseDecimal(GetString(reader, ordinals.CurRate));
+            var commission = ParseDecimal(GetString(reader, ordinals["Commision"]));
+            var rate = ParseDecimal(GetString(reader, ordinals["Rate"]));
+            var commission1 = ParseDecimal(GetString(reader, ordinals["Commision1"]));
+            var rate1 = ParseDecimal(GetString(reader, ordinals["Rate1"]));
+            var currencyType = GetStringOrNull(reader, ordinals["CurType"]);
+            var currencyRate = ParseDecimal(GetString(reader, ordinals["CurRate"]));
 
             using var cmd = new NpgsqlCommand(
                 @"INSERT INTO agents (agent_name, address, phone, commission, rate, commission1, rate1, currency_type, currency_rate, updated_at)
@@ -291,10 +292,10 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
 
         while (reader.Read())
         {
-            var username = GetString(reader, ordinals.UserName);
+            var username = GetString(reader, ordinals["UserName"]);
             if (string.IsNullOrWhiteSpace(username)) continue;
 
-            var password = GetString(reader, ordinals.Password);
+            var password = GetString(reader, ordinals["Password"]);
             var (hash, salt) = HashPassword(password);
 
             using var cmd = new NpgsqlCommand(
@@ -332,7 +333,7 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
 
             while (reader.Read())
             {
-                var onCount = GetString(reader, ordinals.OnCount);
+                var onCount = GetString(reader, ordinals["OnCount"]);
                 if (string.IsNullOrWhiteSpace(onCount)) continue;
 
                 var drawDate = ParseMdbDate(onCount);
@@ -344,7 +345,7 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
                 // Ensure 2-digit
                 drawNumber = drawNumber.PadLeft(2, '0').Substring(0, 2);
 
-                var ampm = GetStringOrNull(reader, ordinals.AMPM);
+                var ampm = GetStringOrNull(reader, ordinals["AMPM"]);
                 var drawTime = ParseAmPm(ampm) ?? TimeOnly.MinValue;
 
                 var key = $"{drawDate.Value:yyyy-MM-dd}|{drawTime:hh\\:mm}";
@@ -400,12 +401,12 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
             {
                 sales.Add(new SaleHeader
                 {
-                    OnCount = GetString(reader, ordinals.OnCount),
-                    AgentID = reader.GetInt32(ordinals.AgentID),
-                    SrNo = reader.GetInt32(ordinals.SrNo),
-                    Num = GetString(reader, ordinals.Num),
-                    Commission = ParseDecimal(GetString(reader, ordinals.Commision)),
-                    Commission1 = ParseDecimal(GetString(reader, ordinals.Rate)),
+                    OnCount = GetString(reader, ordinals["OnCount"]),
+                    AgentID = reader.GetInt32(ordinals["AgentID"]),
+                    SrNo = reader.GetInt32(ordinals["SrNo"]),
+                    Num = GetString(reader, ordinals["Num"]),
+                    Commission = ParseDecimal(GetString(reader, ordinals["Commision"])),
+                    Commission1 = ParseDecimal(GetString(reader, ordinals["Rate"])),
                 });
             }
         }
@@ -421,11 +422,11 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
             {
                 details.Add(new SaleDetail
                 {
-                    OnCount = GetString(reader, ordinals.OnCount),
-                    AgentID = reader.GetInt32(ordinals.AgentID),
-                    SrNo = reader.GetInt32(ordinals.SrNo),
-                    Num1 = GetString(reader, ordinals.Num1).PadLeft(2, '0').Substring(0, 2),
-                    Value = ParseDecimal(GetString(reader, ordinals.Value)),
+                    OnCount = GetString(reader, ordinals["OnCount"]),
+                    AgentID = reader.GetInt32(ordinals["AgentID"]),
+                    SrNo = reader.GetInt32(ordinals["SrNo"]),
+                    Num1 = GetString(reader, ordinals["Num1"]).PadLeft(2, '0').Substring(0, 2),
+                    Value = ParseDecimal(GetString(reader, ordinals["Value"])),
                 });
             }
         }
@@ -454,17 +455,30 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
                 ? items.Sum(i => i.Value)
                 : 0m;
 
-            // Look up draw for this sale date
+            // Look up draw for this sale date; create one if none exists
             long? drawId = null;
-            var drawKey = $"{saleDate.Value:yyyy-MM-dd}|12:00"; // Default to noon if no specific draw
             // Try to match any draw on this date
             foreach (var kvp in drawIdMap)
             {
-                if (kvp.Key.StartsWith($"{saleDate.Value:yyyy-MM-dd}|"))
+                if (kvp.Key.StartsWith($"{saleDate.Value:yyyy-MM-dd}|", StringComparison.Ordinal))
                 {
                     drawId = kvp.Value;
                     break;
                 }
+            }
+
+            // If no draw exists for this date, create a default one at noon
+            if (drawId == null)
+            {
+                using var createDraw = new NpgsqlCommand(
+                    @"INSERT INTO draws (draw_date, draw_time, draw_number, status, created_at, updated_at)
+                      VALUES (@draw_date, @draw_time, NULL, 'Open', NOW(), NOW())
+                      RETURNING id", conn);
+                createDraw.Parameters.AddWithValue("@draw_date", saleDate.Value);
+                createDraw.Parameters.AddWithValue("@draw_time", new TimeOnly(12, 0));
+                drawId = (long)createDraw.ExecuteScalar()!;
+                drawIdMap[$"{saleDate.Value:yyyy-MM-dd}|12:00"] = drawId.Value;
+                Console.WriteLine($"    Created draw for {saleDate.Value:yyyy-MM-dd} -> draw id {drawId}");
             }
 
             using var insertSale = new NpgsqlCommand(
@@ -506,8 +520,8 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
 
                     // Insert sale_item_number
                     using var insertNumber = new NpgsqlCommand(
-                        @"INSERT INTO sale_item_numbers (sale_item_id, number, stake, is_reverse, status, payout_amount, created_at)
-                          VALUES (@sale_item_id, @number, @stake, FALSE, 'Pending', 0, NOW())", conn);
+                        @"INSERT INTO sale_item_numbers (sale_item_id, number, stake, is_reverse, status, payout_amount)
+                          VALUES (@sale_item_id, @number, @stake, FALSE, 'Pending', 0)", conn);
                     insertNumber.Parameters.AddWithValue("@sale_item_id", itemId);
                     insertNumber.Parameters.AddWithValue("@number", item.Num1);
                     insertNumber.Parameters.AddWithValue("@stake", item.Value);
@@ -568,13 +582,23 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
     private static string GetString(OleDbDataReader reader, int ordinal)
     {
         if (reader.IsDBNull(ordinal)) return string.Empty;
-        return reader.GetString(ordinal);
+        var value = reader.GetValue(ordinal);
+        return value switch
+        {
+            string s => s,
+            _ => value.ToString() ?? string.Empty,
+        };
     }
 
     private static string? GetStringOrNull(OleDbDataReader reader, int ordinal)
     {
         if (reader.IsDBNull(ordinal)) return null;
-        return reader.GetString(ordinal);
+        var value = reader.GetValue(ordinal);
+        return value switch
+        {
+            string s => s,
+            _ => value.ToString(),
+        };
     }
 
     private static decimal ParseDecimal(string value)
@@ -624,3 +648,4 @@ CREATE TABLE IF NOT EXISTS sale_item_numbers (
         return (hash, salt);
     }
 }
+

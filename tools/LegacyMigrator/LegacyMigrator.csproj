@@ -8,12 +8,12 @@
     <RootNamespace>LegacyMigrator</RootNamespace>
     <AssemblyName>LegacyMigrator</AssemblyName>
     <PlatformTarget>x86</PlatformTarget>
-    <Prefer32Bit>true</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="8.0.4" />
+    <PackageReference Include="System.Data.OleDb" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

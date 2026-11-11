@@ -1,3 +1,4 @@
+using System.IO;
 using BProMax.Models;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -24,6 +25,10 @@ public class DatabaseMigrationService : IDatabaseMigrationService
         LoggerMessage.Define<int>(LogLevel.Information, 4, "Seeded {Count} test agents into local database.");
     private static readonly Action<ILogger, Exception?> _logMigrationFailed =
         LoggerMessage.Define(LogLevel.Warning, 5, "Local database migration check failed.");
+    private static readonly Action<ILogger, string, Exception?> _logLegacyMdbHint =
+        LoggerMessage.Define<string>(LogLevel.Information, 6, "Legacy MDB detected at {MdbPath}. Run tools/LegacyMigrator to import xDB2.mdb data before first use, or test agents will be seeded.");
+
+    private const string LegacyMdbPath = @"F:\b\b-pro-max\xDB2.mdb";
 
     private const string CreateAgentsTableSql = @"
 CREATE TABLE IF NOT EXISTS agents (
@@ -425,6 +430,11 @@ SELECT EXISTS (
         {
             _logSeedSkipped(_logger, agents.Count, null);
             return;
+        }
+
+        if (File.Exists(LegacyMdbPath))
+        {
+            _logLegacyMdbHint(_logger, LegacyMdbPath, null);
         }
 
         var seedAgents = new[]
