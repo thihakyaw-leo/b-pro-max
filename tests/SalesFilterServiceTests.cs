@@ -1,4 +1,7 @@
+using BProMax.Models;
 using BProMax.Services;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace BProMax.Tests;
@@ -6,10 +9,12 @@ namespace BProMax.Tests;
 public class SalesFilterServiceTests
 {
     private readonly SalesFilterService _salesFilterService;
+    private readonly Mock<ISalesService> _mockSalesService;
 
     public SalesFilterServiceTests()
     {
-        _salesFilterService = new SalesFilterService();
+        _mockSalesService = new Mock<ISalesService>();
+        _salesFilterService = new SalesFilterService(_mockSalesService.Object);
     }
 
     [Fact]
@@ -163,5 +168,25 @@ public class SalesFilterServiceTests
         Assert.Equal("Charlie", result[0].AgentName);
         Assert.Equal("Alice", result[2].AgentName);
     }
-}
 
+    [Fact]
+    public async Task GetAllSalesAsyncDelegatesToSalesService()
+    {
+        // Arrange
+        var expected = new List<SaleRecord>
+        {
+            new SaleRecord { Id = 1, AgentName = "Alice", Amount = 100 }
+        };
+        _mockSalesService
+            .Setup(x => x.GetAllSalesAsync())
+            .ReturnsAsync(expected);
+
+        // Act
+        var result = await _salesFilterService.GetAllSalesAsync();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal("Alice", result[0].AgentName);
+        _mockSalesService.Verify(x => x.GetAllSalesAsync(), Times.Once);
+    }
+}

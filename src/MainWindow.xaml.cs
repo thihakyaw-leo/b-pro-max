@@ -27,6 +27,8 @@ public sealed partial class MainWindow : Window
     private NavigationViewItem NavAgents => this.FindChildByName<NavigationViewItem>("NavAgents")!;
     private NavigationViewItem NavSearch => this.FindChildByName<NavigationViewItem>("NavSearch")!;
     private NavigationViewItem NavSales => this.FindChildByName<NavigationViewItem>("NavSales")!;
+    private NavigationViewItem NavDraws => this.FindChildByName<NavigationViewItem>("NavDraws")!;
+    private NavigationViewItem NavNumberWisdom => this.FindChildByName<NavigationViewItem>("NavNumberWisdom")!;
     private NavigationViewItem NavAutoBuy => this.FindChildByName<NavigationViewItem>("NavAutoBuy")!;
     private NavigationViewItem NavReports => this.FindChildByName<NavigationViewItem>("NavReports")!;
     private NavigationViewItem NavMaintenance => this.FindChildByName<NavigationViewItem>("NavMaintenance")!;
@@ -49,6 +51,11 @@ public sealed partial class MainWindow : Window
         NavView.PaneOpened += (_, _) => UpdateMenuState();
 
         SizeWindow();
+
+        // Startup navigation: show login page on first launch.
+        ContentFrame.Navigate(typeof(LoginView));
+        NavView.SelectedItem = NavLogin;
+        UpdateMenuState();
     }
 
     private void SizeWindow()
@@ -101,6 +108,8 @@ public sealed partial class MainWindow : Window
         if (item == NavAgents) NavigateTo(typeof(AgentListView));
         else if (item == NavSearch) NavigateTo(typeof(AgentSearchView));
         else if (item == NavSales) NavigateTo(typeof(SalesFilterView));
+        else if (item == NavDraws) NavigateTo(typeof(DrawsView));
+        else if (item == NavNumberWisdom) NavigateTo(typeof(NumberWisdomView));
         else if (item == NavAutoBuy) NavigateTo(typeof(AutoBuyView));
         else if (item == NavReports) NavigateTo(typeof(ReportView));
         else if (item == NavMaintenance) NavigateTo(typeof(MaintenanceView));
@@ -117,6 +126,12 @@ public sealed partial class MainWindow : Window
         ContentFrame.Navigate(pageType);
     }
 
+    public void NavigateToAuthenticatedHome()
+    {
+        NavView.SelectedItem = NavAgents;
+        ContentFrame.Navigate(typeof(AgentListView));
+    }
+
     public void UpdateMenuState()
     {
         bool authenticated = _auth.IsAuthenticated;
@@ -125,6 +140,8 @@ public sealed partial class MainWindow : Window
         NavAgents.IsEnabled = authenticated;
         NavSearch.IsEnabled = authenticated;
         NavSales.IsEnabled = authenticated;
+        NavDraws.IsEnabled = authenticated;
+        NavNumberWisdom.IsEnabled = authenticated;
         NavAutoBuy.IsEnabled = authenticated;
         NavReports.IsEnabled = authenticated;
         NavMaintenance.IsEnabled = authenticated;

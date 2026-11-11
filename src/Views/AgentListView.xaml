@@ -25,6 +25,8 @@
                         AutomationProperties.AutomationId="AgentSearchButton"/>
                 <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click"
                         AutomationProperties.AutomationId="AgentRefreshButton"/>
+                <Button x:Name="NewAgentButton" Content="New Agent" Click="NewAgentButton_Click"
+                        AutomationProperties.AutomationId="AgentNewButton"/>
             </StackPanel>
         </StackPanel>
 

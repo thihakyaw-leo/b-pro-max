@@ -50,6 +50,16 @@ public class DatabaseService : IDatabaseService
         return await cmd.ExecuteNonQueryAsync();
     }
 
+    /// <summary>
+    /// Executes a query and returns a forward-only reader.
+    /// </summary>
+    /// <remarks>
+    /// The returned reader owns the connection lifetime (<see cref="CommandBehavior.CloseConnection"/>).
+    /// Callers <b>must</b> dispose the reader (e.g. via <c>using await</c> or <c>using</c>); disposing
+    /// the reader closes and disposes the underlying connection. Failing to dispose the reader can leak
+    /// connections. Prefer <see cref="QuerySingleAsync{T}"/> or <see cref="QueryListAsync{T}"/> when possible,
+    /// as they manage reader/connection lifetime automatically.
+    /// </remarks>
     public async Task<NpgsqlDataReader> ExecuteReaderAsync(string sql, params NpgsqlParameter[] parameters)
     {
         var conn = CreateConnection();
@@ -75,6 +85,24 @@ public class DatabaseService : IDatabaseService
         while (await reader.ReadAsync())
             results.Add(map(reader));
         return results;
+    }
+
+    public async Task<T> ExecuteInTransactionAsync<T>(Func<NpgsqlConnection, NpgsqlTransaction, Task<T>> action)
+    {
+        await using var connection = CreateConnection();
+        await connection.OpenAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+        try
+        {
+            var result = await action(connection, transaction);
+            await transaction.CommitAsync();
+            return result;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
 }

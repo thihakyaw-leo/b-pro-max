@@ -1,0 +1,171 @@
+<Page
+    x:Class="BProMax.Views.NumberWisdomView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:BProMax.Models"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="NumberWisdomView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12,12,12,4" Spacing="4">
+            <TextBlock Text="Number Wisdom" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="NumberWisdomTitle"/>
+            <TextBlock Text="Dealer configuration for bet types and fixed number groups. Sale Panel labels and codes are locked."
+                       TextWrapping="Wrap"
+                       AutomationProperties.AutomationId="NumberWisdomSubtitle"/>
+        </StackPanel>
+
+        <Pivot Grid.Row="1" Margin="12,0">
+            <PivotItem Header="Bet Types" AutomationProperties.AutomationId="BetTypesTab">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="320"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ListView x:Name="BetTypesList" SelectionMode="Single"
+                              SelectionChanged="BetTypesList_SelectionChanged"
+                              AutomationProperties.AutomationId="BetTypesList">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:BetTypeRecord">
+                                <StackPanel Margin="0,4">
+                                    <TextBlock Text="{x:Bind NameMy}" FontWeight="SemiBold"
+                                               AutomationProperties.AutomationId="BetTypeRowName"/>
+                                    <TextBlock Text="{x:Bind Code}" FontSize="12" Opacity="0.7"
+                                               AutomationProperties.AutomationId="BetTypeRowCode"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <StackPanel Grid.Column="1" Spacing="10" Margin="0,4">
+                        <TextBlock x:Name="BetTypeHeader" Text="Select a bet type"
+                                   Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.AutomationId="BetTypeHeader"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Code:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeCodeLabel"/>
+                            <TextBlock x:Name="BetTypeCodeText" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeCodeText"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Label (locked):" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeLabelLabel"/>
+                            <TextBlock x:Name="BetTypeLabelText" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeLabelText"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="English name:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeEnglishLabel"/>
+                            <TextBlock x:Name="BetTypeEnglishText" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeEnglishText"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Payout multiplier:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeMultiplierLabel"/>
+                            <TextBox x:Name="BetTypeMultiplierBox" Width="120"
+                                     AutomationProperties.AutomationId="BetTypeMultiplierBox"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Sort order:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="BetTypeSortOrderLabel"/>
+                            <TextBox x:Name="BetTypeSortOrderBox" Width="120"
+                                     AutomationProperties.AutomationId="BetTypeSortOrderBox"/>
+                        </StackPanel>
+                        <CheckBox x:Name="BetTypeActiveCheck" Content="Active"
+                                  AutomationProperties.AutomationId="BetTypeActiveCheck"/>
+                        <Button x:Name="SaveBetTypeButton" Content="Save bet type"
+                                Click="SaveBetTypeButton_Click"
+                                AutomationProperties.AutomationId="SaveBetTypeButton"/>
+                        <TextBlock Text="Multiplier and active flag changes apply to new sales only; existing sale items keep their snapshot."
+                                   TextWrapping="Wrap" Opacity="0.7"
+                                   AutomationProperties.AutomationId="BetTypeNote"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem Header="Fixed Groups" AutomationProperties.AutomationId="FixedGroupsTab">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="320"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ListView x:Name="GroupsList" SelectionMode="Single"
+                              SelectionChanged="GroupsList_SelectionChanged"
+                              AutomationProperties.AutomationId="GroupsList">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:NumberGroupRecord">
+                                <StackPanel Margin="0,4">
+                                    <TextBlock Text="{x:Bind NameMy}" FontWeight="SemiBold"
+                                               AutomationProperties.AutomationId="GroupRowName"/>
+                                    <TextBlock Text="{x:Bind Code}" FontSize="12" Opacity="0.7"
+                                               AutomationProperties.AutomationId="GroupRowCode"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <StackPanel Grid.Column="1" Spacing="10" Margin="0,4">
+                        <TextBlock x:Name="GroupHeader" Text="Select a fixed group"
+                                   Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.AutomationId="GroupHeader"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Code:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupCodeLabel"/>
+                            <TextBlock x:Name="GroupCodeText" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupCodeText"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Label (locked):" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupLabelLabel"/>
+                            <TextBlock x:Name="GroupLabelText" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupLabelText"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="English name:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupEnglishLabel"/>
+                            <TextBlock x:Name="GroupEnglishText" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupEnglishText"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Members:" Width="150" VerticalAlignment="Top" Margin="0,6,0,0"
+                                       AutomationProperties.AutomationId="GroupMembersLabel"/>
+                            <TextBox x:Name="GroupMembersBox" Width="320" Height="120"
+                                     AcceptsReturn="True" TextWrapping="Wrap"
+                                     PlaceholderText="07, 18, 24, 35, 69"
+                                     AutomationProperties.AutomationId="GroupMembersBox"/>
+                        </StackPanel>
+                        <CheckBox x:Name="GroupAllowReverseCheck" Content="Allow R"
+                                  AutomationProperties.AutomationId="GroupAllowReverseCheck"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Sort order:" Width="150" VerticalAlignment="Center"
+                                       AutomationProperties.AutomationId="GroupSortOrderLabel"/>
+                            <TextBox x:Name="GroupSortOrderBox" Width="120"
+                                     AutomationProperties.AutomationId="GroupSortOrderBox"/>
+                        </StackPanel>
+                        <CheckBox x:Name="GroupActiveCheck" Content="Active"
+                                  AutomationProperties.AutomationId="GroupActiveCheck"/>
+                        <Button x:Name="SaveGroupButton" Content="Save fixed group"
+                                Click="SaveGroupButton_Click"
+                                AutomationProperties.AutomationId="SaveGroupButton"/>
+                        <TextBlock Text="Members accept continuous digits (for example 0718243569) or comma-separated numbers."
+                                   TextWrapping="Wrap" Opacity="0.7"
+                                   AutomationProperties.AutomationId="GroupNote"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+
+        <TextBlock x:Name="StatusMessage" Grid.Row="2" Margin="12" TextWrapping="Wrap"
+                   Foreground="Green" AutomationProperties.AutomationId="NumberWisdomStatus"/>
+    </Grid>
+</Page>

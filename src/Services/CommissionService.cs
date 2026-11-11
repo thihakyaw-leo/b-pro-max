@@ -1,14 +1,22 @@
 namespace BProMax.Services;
 
+/// <summary>
+/// Commission calculation service for the DD.exe agent domain.
+/// All monetary results are rounded to two decimal places.
+/// </summary>
 public class CommissionService : ICommissionService
 {
     public decimal CalculateCommission(decimal amount, decimal rate)
     {
+        ValidateAmount(amount);
+        ValidateRate(rate);
         return Math.Round(amount * rate / 100, 2);
     }
 
     public decimal CalculateCommission1(decimal amount, decimal rate1)
     {
+        ValidateAmount(amount);
+        ValidateRate(rate1);
         return Math.Round(amount * rate1 / 100, 2);
     }
 
@@ -20,6 +28,8 @@ public class CommissionService : ICommissionService
     public (decimal totalCommission, decimal totalCommission1) CalculateTotals(
         List<decimal> amounts, List<decimal> rates, List<decimal> rates1)
     {
+        ValidateLists(amounts, rates, rates1);
+
         decimal totalCommission = 0;
         decimal totalCommission1 = 0;
 
@@ -38,8 +48,15 @@ public class CommissionService : ICommissionService
     /// </summary>
     public decimal ConvertCurrency(decimal amount, string fromCurrency, string toCurrency, decimal exchangeRate)
     {
+        ValidateAmount(amount);
+        ValidateExchangeRate(exchangeRate);
+        ValidateCurrency(fromCurrency, nameof(fromCurrency));
+        ValidateCurrency(toCurrency, nameof(toCurrency));
+
         if (string.Equals(fromCurrency, toCurrency, StringComparison.OrdinalIgnoreCase))
+        {
             return Math.Round(amount, 2);
+        }
 
         // Multiply by exchange rate to convert to target currency
         return Math.Round(amount * exchangeRate, 2);
@@ -82,6 +99,10 @@ public class CommissionService : ICommissionService
             List<decimal> amounts, List<decimal> rates, List<decimal> rates1,
             decimal exchangeRate, string targetCurrency)
     {
+        ValidateLists(amounts, rates, rates1);
+        ValidateExchangeRate(exchangeRate);
+        ValidateCurrency(targetCurrency, nameof(targetCurrency));
+
         decimal totalCommission = 0;
         decimal totalCommission1 = 0;
 
@@ -108,6 +129,64 @@ public class CommissionService : ICommissionService
     /// </summary>
     public string FormatCommission(decimal amount, string currencySymbol = "฿")
     {
+        ValidateAmount(amount);
+        ValidateCurrency(currencySymbol, nameof(currencySymbol));
         return $"{currencySymbol}{amount:N2}";
+    }
+
+    private static void ValidateLists(List<decimal> amounts, List<decimal> rates, List<decimal> rates1)
+    {
+        ArgumentNullException.ThrowIfNull(amounts);
+        ArgumentNullException.ThrowIfNull(rates);
+        ArgumentNullException.ThrowIfNull(rates1);
+        if (amounts.Count != rates.Count || amounts.Count != rates1.Count)
+        {
+            throw new ArgumentException(
+                "amounts, rates, and rates1 must have the same length. " +
+                $"Received amounts={amounts.Count}, rates={rates.Count}, rates1={rates1.Count}.",
+                nameof(amounts));
+        }
+        for (int i = 0; i < amounts.Count; i++)
+        {
+            ValidateAmount(amounts[i]);
+            ValidateRate(rates[i]);
+            ValidateRate(rates1[i]);
+        }
+    }
+
+    private static void ValidateAmount(decimal amount)
+    {
+        if (amount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount), amount, "Amount must be non-negative.");
+        }
+    }
+
+    private static void ValidateRate(decimal rate)
+    {
+        if (rate < 0 || rate > 100)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rate), rate, "Rate must be between 0 and 100.");
+        }
+    }
+
+    private static void ValidateExchangeRate(decimal exchangeRate)
+    {
+        if (exchangeRate <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(exchangeRate), exchangeRate, "Exchange rate must be greater than zero.");
+        }
+    }
+
+    private static void ValidateCurrency(string? currency, string paramName)
+    {
+        if (string.IsNullOrWhiteSpace(currency))
+        {
+            throw new ArgumentException("Currency must not be empty or whitespace.", paramName);
+        }
+        if (currency.Length > 10)
+        {
+            throw new ArgumentOutOfRangeException(paramName, currency, "Currency code must not exceed 10 characters.");
+        }
     }
 }

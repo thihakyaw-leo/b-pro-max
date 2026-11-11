@@ -14,7 +14,6 @@ namespace BProMax.Views;
 public sealed partial class AgentListView : Page
 {
     private readonly IAgentService _agentService;
-    private int? _editAgentId;
 
     private TextBox SearchBox => this.FindChildByName<TextBox>("SearchBox")!;
     private ListView AgentList => this.FindChildByName<ListView>("AgentList")!;
@@ -29,8 +28,6 @@ public sealed partial class AgentListView : Page
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (e.Parameter is int agentId)
-            _editAgentId = agentId;
         await LoadAgentsAsync();
     }
 
@@ -73,6 +70,11 @@ public sealed partial class AgentListView : Page
     {
         SearchBox.Text = string.Empty;
         await LoadAgentsAsync();
+    }
+
+    private void NewAgentButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = this.Frame?.Navigate(typeof(AgentDetailView));
     }
 
     private void EditButton_Click(object sender, RoutedEventArgs e)

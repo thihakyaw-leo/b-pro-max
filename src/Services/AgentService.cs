@@ -63,12 +63,13 @@ public class AgentService : IAgentService
     {
         const string sql = @"
             UPDATE agents 
-            SET address = @address, phone = @phone, commission = @commission, rate = @rate,
+            SET agent_name = @agent_name, address = @address, phone = @phone, commission = @commission, rate = @rate,
                 commission1 = @commission1, rate1 = @rate1, currency_type = @currency_type, 
                 currency_rate = @currency_rate, updated_at = @updated_at
             WHERE id = @id";
         return await _db.ExecuteNonQueryAsync(sql,
             new NpgsqlParameter("@id", agent.Id),
+            new NpgsqlParameter("@agent_name", agent.AgentName),
             new NpgsqlParameter("@address", agent.Address ?? (object)DBNull.Value),
             new NpgsqlParameter("@phone", agent.Phone ?? (object)DBNull.Value),
             new NpgsqlParameter("@commission", agent.Commission),

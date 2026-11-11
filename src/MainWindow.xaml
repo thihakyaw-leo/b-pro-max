@@ -36,10 +36,22 @@
                     AutomationProperties.AutomationId="NavSearch" />
                 <NavigationViewItem
                     x:Name="NavSales"
-                    Content="Sales Filter"
+                    Content="Sales"
                     Icon="Calculator"
                     IsEnabled="False"
                     AutomationProperties.AutomationId="NavSales" />
+                <NavigationViewItem
+                    x:Name="NavDraws"
+                    Content="Draws &amp; Results"
+                    Icon="Calendar"
+                    IsEnabled="False"
+                    AutomationProperties.AutomationId="NavDraws" />
+                <NavigationViewItem
+                    x:Name="NavNumberWisdom"
+                    Content="Number Wisdom"
+                    Icon="NumberedList"
+                    IsEnabled="False"
+                    AutomationProperties.AutomationId="NavNumberWisdom" />
                 <NavigationViewItem
                     x:Name="NavAutoBuy"
                     Content="Auto Buy"

@@ -1,0 +1,96 @@
+<Page
+    x:Class="BProMax.Views.DrawsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:BProMax.Models"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="DrawsView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12,12,12,4" Spacing="4">
+            <TextBlock Text="Draws &amp; Results" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="DrawsTitle"/>
+            <TextBlock Text="Open → Closed → Drawn → Settled"
+                       AutomationProperties.AutomationId="DrawsLifecycleText"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="12,4" Spacing="8">
+            <TextBlock Text="Draw date:" VerticalAlignment="Center"
+                       AutomationProperties.AutomationId="DrawDateLabel"/>
+            <CalendarDatePicker x:Name="DrawDatePicker" Width="150"
+                                AutomationProperties.AutomationId="DrawDatePicker"/>
+            <TextBlock Text="Time (HH:mm):" VerticalAlignment="Center"
+                       AutomationProperties.AutomationId="DrawTimeLabel"/>
+            <TextBox x:Name="DrawTimeBox" Width="90" Text="12:00"
+                     AutomationProperties.AutomationId="DrawTimeBox"/>
+            <Button x:Name="CreateDrawButton" Content="Create Draw" Click="CreateDrawButton_Click"
+                    AutomationProperties.AutomationId="CreateDrawButton"/>
+            <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click"
+                    AutomationProperties.AutomationId="DrawsRefreshButton"/>
+        </StackPanel>
+
+        <ListView Grid.Row="2" x:Name="DrawsList" Height="210" Margin="12,4"
+                  SelectionMode="Single" SelectionChanged="DrawsList_SelectionChanged"
+                  AutomationProperties.AutomationId="DrawsList">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:DrawRecord">
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4">
+                        <TextBlock Text="{x:Bind Id}" Width="40" AutomationProperties.AutomationId="DrawId"/>
+                        <TextBlock Text="{x:Bind Display}" Width="150" AutomationProperties.AutomationId="DrawDisplay"/>
+                        <TextBlock Text="{x:Bind Status}" Width="90" AutomationProperties.AutomationId="DrawStatus"/>
+                        <TextBlock Text="{x:Bind DrawNumber}" Width="60" AutomationProperties.AutomationId="DrawNumber"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="12,4" Spacing="8">
+            <TextBlock Text="Result:" VerticalAlignment="Center"
+                       AutomationProperties.AutomationId="DrawResultLabel"/>
+            <TextBox x:Name="ResultBox" Width="80" PlaceholderText="00"
+                     AutomationProperties.AutomationId="DrawResultBox"/>
+            <Button x:Name="CloseDrawButton" Content="Close Draw" Click="CloseDrawButton_Click"
+                    AutomationProperties.AutomationId="CloseDrawButton"/>
+            <Button x:Name="SetResultButton" Content="Set Result" Click="SetResultButton_Click"
+                    AutomationProperties.AutomationId="SetResultButton"/>
+            <Button x:Name="SettleDrawButton" Content="Settle Draw" Click="SettleDrawButton_Click"
+                    AutomationProperties.AutomationId="SettleDrawButton"/>
+            <Button x:Name="CancelDrawButton" Content="Cancel Draw" Click="CancelDrawButton_Click"
+                    AutomationProperties.AutomationId="CancelDrawButton"/>
+            <Button x:Name="MarkPayoutPaidButton" Content="Mark Payout Paid" Click="MarkPayoutPaidButton_Click"
+                    AutomationProperties.AutomationId="MarkPayoutPaidButton"/>
+        </StackPanel>
+
+        <ListView Grid.Row="4" x:Name="PayoutsList" Margin="12,4"
+                  SelectionMode="Single"
+                  AutomationProperties.AutomationId="DrawPayoutsList">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:PayoutDetailRecord">
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4">
+                        <TextBlock Text="{x:Bind PayoutId}" Width="50" AutomationProperties.AutomationId="PayoutId"/>
+                        <TextBlock Text="{x:Bind AgentName}" Width="180" AutomationProperties.AutomationId="PayoutAgent"/>
+                        <TextBlock Text="{x:Bind BetLabel}" Width="110" AutomationProperties.AutomationId="PayoutBetType"/>
+                        <TextBlock Text="{x:Bind Number}" Width="60" AutomationProperties.AutomationId="PayoutNumber"/>
+                        <TextBlock Text="{x:Bind Amount}" Width="100" AutomationProperties.AutomationId="PayoutAmount"/>
+                        <TextBlock Text="{x:Bind Status}" Width="80" AutomationProperties.AutomationId="PayoutStatus"/>
+                        <TextBlock Text="{x:Bind PaidAt}" Width="150" AutomationProperties.AutomationId="PayoutPaidAt"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <TextBlock x:Name="StatusMessage" Grid.Row="5" Margin="12" TextWrapping="Wrap"
+                   Foreground="Green" AutomationProperties.AutomationId="DrawsStatus"/>
+    </Grid>
+</Page>

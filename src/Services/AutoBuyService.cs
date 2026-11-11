@@ -1,3 +1,7 @@
+using BProMax.Models;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+
 namespace BProMax.Services;
 
 public class AutoBuyRule
@@ -14,71 +18,167 @@ public class AutoBuyRule
 
 public class AutoBuyService : IAutoBuyService
 {
-    private readonly List<AutoBuyRule> _rules = new();
-    private int _nextId = 1;
+    private readonly IDatabaseService _db;
+    private readonly ILogger<AutoBuyService> _logger;
 
-    public List<AutoBuyRule> GetAllRules() => _rules.OrderBy(r => r.AgentName).ToList();
-
-    public AutoBuyRule? GetRuleById(int id) => _rules.FirstOrDefault(r => r.Id == id);
-
-    public AutoBuyRule? GetRuleByAgent(string agentName) =>
-        _rules.FirstOrDefault(r => r.AgentName.Equals(agentName, StringComparison.OrdinalIgnoreCase));
-
-    public int CreateRule(AutoBuyRule rule)
+    public AutoBuyService(IDatabaseService db, ILogger<AutoBuyService> logger)
     {
-        rule.Id = _nextId++;
-        rule.CreatedAt = DateTime.UtcNow;
-        _rules.Add(rule);
-        return rule.Id;
+        _db = db;
+        _logger = logger;
     }
 
-    public int UpdateRule(AutoBuyRule rule)
+    public async Task<List<AutoBuyRule>> GetAllRulesAsync()
     {
-        var existing = GetRuleById(rule.Id);
+        const string sql = @"
+SELECT id, agent_name, trigger_amount, auto_buy_amount, is_enabled,
+       created_at, last_executed, execution_count
+FROM auto_buy_rules
+ORDER BY agent_name;";
+
+        return await _db.QueryListAsync(sql, MapRule);
+    }
+
+    public Task<AutoBuyRule?> GetRuleByIdAsync(int id)
+    {
+        const string sql = @"
+SELECT id, agent_name, trigger_amount, auto_buy_amount, is_enabled,
+       created_at, last_executed, execution_count
+FROM auto_buy_rules
+WHERE id = @id;";
+
+        return _db.QuerySingleAsync(sql, MapRule,
+            new NpgsqlParameter("@id", id));
+    }
+
+    public Task<AutoBuyRule?> GetRuleByAgentAsync(string agentName)
+    {
+        const string sql = @"
+SELECT id, agent_name, trigger_amount, auto_buy_amount, is_enabled,
+       created_at, last_executed, execution_count
+FROM auto_buy_rules
+WHERE LOWER(agent_name) = LOWER(@agentName);";
+
+        return _db.QuerySingleAsync(sql, MapRule,
+            new NpgsqlParameter("@agentName", agentName));
+    }
+
+    public async Task<int> CreateRuleAsync(AutoBuyRule rule)
+    {
+        var existing = await GetRuleByAgentAsync(rule.AgentName);
+        if (existing != null)
+        {
+            throw new InvalidOperationException($"Auto-buy rule for '{rule.AgentName}' already exists.");
+        }
+
+        const string sql = @"
+INSERT INTO auto_buy_rules (agent_name, trigger_amount, auto_buy_amount, is_enabled, created_at)
+VALUES (@agent_name, @trigger_amount, @auto_buy_amount, @is_enabled, NOW())
+RETURNING id;";
+
+        return await _db.QuerySingleAsync(sql, r => r.GetInt32(0),
+            new NpgsqlParameter("@agent_name", rule.AgentName),
+            new NpgsqlParameter("@trigger_amount", rule.TriggerAmount),
+            new NpgsqlParameter("@auto_buy_amount", rule.AutoBuyAmount),
+            new NpgsqlParameter("@is_enabled", rule.IsEnabled));
+    }
+
+    public async Task<int> UpdateRuleAsync(AutoBuyRule rule)
+    {
+        var existing = await GetRuleByIdAsync(rule.Id);
         if (existing == null) return 0;
 
-        existing.AgentName = rule.AgentName;
-        existing.TriggerAmount = rule.TriggerAmount;
-        existing.AutoBuyAmount = rule.AutoBuyAmount;
-        existing.IsEnabled = rule.IsEnabled;
-        return 1;
+        // Check for duplicate agent name (different id)
+        var byAgent = await GetRuleByAgentAsync(rule.AgentName);
+        if (byAgent != null && byAgent.Id != rule.Id)
+        {
+            throw new InvalidOperationException($"Auto-buy rule for '{rule.AgentName}' already exists.");
+        }
+
+        const string sql = @"
+UPDATE auto_buy_rules
+SET agent_name = @agent_name, trigger_amount = @trigger_amount,
+    auto_buy_amount = @auto_buy_amount, is_enabled = @is_enabled
+WHERE id = @id;";
+
+        return await _db.ExecuteNonQueryAsync(sql,
+            new NpgsqlParameter("@id", rule.Id),
+            new NpgsqlParameter("@agent_name", rule.AgentName),
+            new NpgsqlParameter("@trigger_amount", rule.TriggerAmount),
+            new NpgsqlParameter("@auto_buy_amount", rule.AutoBuyAmount),
+            new NpgsqlParameter("@is_enabled", rule.IsEnabled));
     }
 
-    public int DeleteRule(int id)
+    public async Task<int> DeleteRuleAsync(int id)
     {
-        var rule = GetRuleById(id);
-        if (rule == null) return 0;
-        _rules.Remove(rule);
-        return 1;
+        const string sql = "DELETE FROM auto_buy_rules WHERE id = @id;";
+        return await _db.ExecuteNonQueryAsync(sql,
+            new NpgsqlParameter("@id", id));
     }
 
-    public int ToggleRule(int id)
+    public async Task<int> ToggleRuleAsync(int id)
     {
-        var rule = GetRuleById(id);
-        if (rule == null) return 0;
-        rule.IsEnabled = !rule.IsEnabled;
-        return 1;
+        const string sql = @"
+UPDATE auto_buy_rules
+SET is_enabled = NOT is_enabled
+WHERE id = @id
+RETURNING is_enabled;";
+
+        var result = await _db.QuerySingleAsync(sql, r => r.GetBoolean(0),
+            new NpgsqlParameter("@id", id));
+        return result ? 1 : 0;
     }
 
-    public List<AutoBuyRule> GetEnabledRules() =>
-        _rules.Where(r => r.IsEnabled).OrderBy(r => r.AgentName).ToList();
+    public List<AutoBuyRule> GetEnabledRules()
+    {
+        // Synchronous snapshot: callers can await GetAllRulesAsync() and filter,
+        // but this method is kept for backward compatibility.
+        var rules = GetAllRulesAsync().GetAwaiter().GetResult();
+        return rules.Where(r => r.IsEnabled).OrderBy(r => r.AgentName).ToList();
+    }
 
     public (bool triggered, AutoBuyRule rule) CheckTrigger(string agentName, decimal currentAmount)
     {
-        var rule = GetRuleByAgent(agentName);
-        if (rule == null || !rule.IsEnabled)
+        // Pure evaluation: callers should load rules via GetAllRulesAsync() first.
+        // This method is kept for backward compatibility with the sales-entry flow.
+        var rules = GetAllRulesAsync().GetAwaiter().GetResult();
+        var rule = rules.FirstOrDefault(r =>
+            r.AgentName.Equals(agentName, StringComparison.OrdinalIgnoreCase) && r.IsEnabled);
+
+        if (rule == null)
+        {
             return (false, null!);
+        }
 
         var triggered = currentAmount >= rule.TriggerAmount;
         return (triggered, rule);
     }
 
-    public int IncrementExecutionCount(int ruleId)
+    public async Task<int> IncrementExecutionCountAsync(int ruleId)
     {
-        var rule = GetRuleById(ruleId);
-        if (rule == null) return 0;
-        rule.ExecutionCount++;
-        rule.LastExecuted = DateTime.UtcNow;
-        return 1;
+        const string sql = @"
+UPDATE auto_buy_rules
+SET execution_count = execution_count + 1,
+    last_executed = NOW()
+WHERE id = @id;";
+
+        return await _db.ExecuteNonQueryAsync(sql,
+            new NpgsqlParameter("@id", ruleId));
+    }
+
+    private static AutoBuyRule MapRule(NpgsqlDataReader reader)
+    {
+        return new AutoBuyRule
+        {
+            Id = reader.GetInt32(reader.GetOrdinal("id")),
+            AgentName = reader.GetString(reader.GetOrdinal("agent_name")),
+            TriggerAmount = reader.GetDecimal(reader.GetOrdinal("trigger_amount")),
+            AutoBuyAmount = reader.GetDecimal(reader.GetOrdinal("auto_buy_amount")),
+            IsEnabled = reader.GetBoolean(reader.GetOrdinal("is_enabled")),
+            CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+            LastExecuted = reader.IsDBNull(reader.GetOrdinal("last_executed"))
+                ? null
+                : reader.GetDateTime(reader.GetOrdinal("last_executed")),
+            ExecutionCount = reader.GetInt32(reader.GetOrdinal("execution_count"))
+        };
     }
 }

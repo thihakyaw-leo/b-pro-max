@@ -1,165 +1,236 @@
+using BProMax.Models;
 using BProMax.Services;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Npgsql;
 using Xunit;
 
 namespace BProMax.Tests;
 
 public class AutoBuyServiceTests
 {
+    private readonly Mock<IDatabaseService> _mockDb;
     private readonly AutoBuyService _autoBuyService;
 
     public AutoBuyServiceTests()
     {
-        _autoBuyService = new AutoBuyService();
+        _mockDb = new Mock<IDatabaseService>();
+        _autoBuyService = new AutoBuyService(_mockDb.Object, new TestLogger<AutoBuyService>());
+    }
+
+    private static AutoBuyRule CreateTestRule(
+        int id = 1,
+        string agentName = "John Doe",
+        decimal triggerAmount = 1000m,
+        decimal autoBuyAmount = 500m,
+        bool isEnabled = true)
+    {
+        return new AutoBuyRule
+        {
+            Id = id,
+            AgentName = agentName,
+            TriggerAmount = triggerAmount,
+            AutoBuyAmount = autoBuyAmount,
+            IsEnabled = isEnabled,
+            CreatedAt = DateTime.UtcNow,
+            ExecutionCount = 0
+        };
     }
 
     [Fact]
-    public void CreateRuleAddsAndReturnsId()
+    public async Task GetAllRulesAsyncReturnsListFromDatabase()
     {
         // Arrange
-        var rule = new AutoBuyRule
+        var expected = new List<AutoBuyRule>
         {
-            AgentName = "John Doe",
-            TriggerAmount = 1000,
-            AutoBuyAmount = 500,
-            IsEnabled = true
+            CreateTestRule(1, "John Doe", 1000m, 500m, true),
+            CreateTestRule(2, "Jane Smith", 2000m, 1000m, false)
         };
+        _mockDb
+            .Setup(x => x.QueryListAsync(
+                It.IsAny<string>(),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(expected);
 
         // Act
-        var id = _autoBuyService.CreateRule(rule);
+        var result = await _autoBuyService.GetAllRulesAsync();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Equal("John Doe", result[0].AgentName);
+        Assert.Equal("Jane Smith", result[1].AgentName);
+    }
+
+    [Fact]
+    public async Task GetRuleByAgentAsyncFoundReturnsRule()
+    {
+        // Arrange
+        var expected = CreateTestRule(1, "John Doe", 1000m, 500m, true);
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("LOWER(agent_name)")),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(expected);
+
+        // Act
+        var result = await _autoBuyService.GetRuleByAgentAsync("John Doe");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("John Doe", result.AgentName);
+    }
+
+    [Fact]
+    public async Task GetRuleByAgentAsyncNotFoundReturnsNull()
+    {
+        // Arrange
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.IsAny<string>(),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync((AutoBuyRule?)null);
+
+        // Act
+        var result = await _autoBuyService.GetRuleByAgentAsync("Unknown");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateRuleAsyncCallsDatabase()
+    {
+        // Arrange
+        var rule = CreateTestRule(0, "New Agent", 1000m, 500m, true);
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("LOWER(agent_name)")),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync((AutoBuyRule?)null);
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("RETURNING id")),
+                It.IsAny<Func<NpgsqlDataReader, int>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var id = await _autoBuyService.CreateRuleAsync(rule);
 
         // Assert
         Assert.Equal(1, id);
-        Assert.Single(_autoBuyService.GetAllRules());
     }
 
     [Fact]
-    public void GetRuleByIdReturnsCorrectRule()
+    public async Task CreateRuleAsyncDuplicateAgentThrows()
     {
         // Arrange
-        var rule = new AutoBuyRule { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500 };
-        var id = _autoBuyService.CreateRule(rule);
+        var rule = CreateTestRule(0, "John Doe", 1000m, 500m, true);
+        var existing = CreateTestRule(1, "John Doe", 1000m, 500m, true);
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("LOWER(agent_name)")),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(existing);
 
-        // Act
-        var result = _autoBuyService.GetRuleById(id);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("John Doe", result!.AgentName);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _autoBuyService.CreateRuleAsync(rule));
     }
 
     [Fact]
-    public void GetRuleByIdInvalidIdReturnsNull()
-    {
-        // Act
-        var result = _autoBuyService.GetRuleById(999);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void GetRuleByAgentReturnsMatchingRule()
+    public async Task UpdateRuleAsyncMissingRuleReturnsZero()
     {
         // Arrange
-        _autoBuyService.CreateRule(new AutoBuyRule { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500 });
-        _autoBuyService.CreateRule(new AutoBuyRule { AgentName = "Jane Smith", TriggerAmount = 2000, AutoBuyAmount = 1000 });
+        var rule = CreateTestRule(999, "Unknown", 1000m, 500m, true);
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("WHERE id = @id")),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync((AutoBuyRule?)null);
 
         // Act
-        var result = _autoBuyService.GetRuleByAgent("john doe");
+        var result = await _autoBuyService.UpdateRuleAsync(rule);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("John Doe", result!.AgentName);
+        Assert.Equal(0, result);
     }
 
     [Fact]
-    public void UpdateRuleUpdatesExistingRule()
+    public async Task DeleteRuleAsyncCallsDatabase()
     {
         // Arrange
-        var id = _autoBuyService.CreateRule(new AutoBuyRule
+        _mockDb
+            .Setup(x => x.ExecuteNonQueryAsync(
+                It.Is<string>(s => s.Contains("DELETE FROM auto_buy_rules")),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _autoBuyService.DeleteRuleAsync(1);
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public async Task ToggleRuleAsyncCallsDatabase()
+    {
+        // Arrange
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("NOT is_enabled")),
+                It.IsAny<Func<NpgsqlDataReader, bool>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _autoBuyService.ToggleRuleAsync(1);
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public async Task IncrementExecutionCountAsyncCallsDatabase()
+    {
+        // Arrange
+        _mockDb
+            .Setup(x => x.ExecuteNonQueryAsync(
+                It.Is<string>(s => s.Contains("execution_count = execution_count + 1")),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _autoBuyService.IncrementExecutionCountAsync(1);
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void CheckTriggerEnabledRuleAboveThresholdReturnsTriggered()
+    {
+        // Arrange
+        var rules = new List<AutoBuyRule>
         {
-            AgentName = "John Doe",
-            TriggerAmount = 1000,
-            AutoBuyAmount = 500,
-            IsEnabled = true
-        });
-
-        // Act
-        var updated = new AutoBuyRule
-        {
-            Id = id,
-            AgentName = "John Doe",
-            TriggerAmount = 2000,
-            AutoBuyAmount = 1000,
-            IsEnabled = false
+            CreateTestRule(1, "John Doe", 1000m, 500m, true)
         };
-        var rowsAffected = _autoBuyService.UpdateRule(updated);
-        var rule = _autoBuyService.GetRuleById(id);
-
-        // Assert
-        Assert.Equal(1, rowsAffected);
-        Assert.Equal(2000, rule!.TriggerAmount);
-        Assert.Equal(1000, rule.AutoBuyAmount);
-        Assert.False(rule.IsEnabled);
-    }
-
-    [Fact]
-    public void DeleteRuleRemovesRule()
-    {
-        // Arrange
-        var id = _autoBuyService.CreateRule(new AutoBuyRule
-        { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500 });
+        _mockDb
+            .Setup(x => x.QueryListAsync(
+                It.IsAny<string>(),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(rules);
 
         // Act
-        var rowsAffected = _autoBuyService.DeleteRule(id);
-        var result = _autoBuyService.GetRuleById(id);
-
-        // Assert
-        Assert.Equal(1, rowsAffected);
-        Assert.Null(result);
-        Assert.Empty(_autoBuyService.GetAllRules());
-    }
-
-    [Fact]
-    public void ToggleRuleChangesEnabledState()
-    {
-        // Arrange
-        var id = _autoBuyService.CreateRule(new AutoBuyRule
-        { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = true });
-
-        // Act
-        var rowsAffected = _autoBuyService.ToggleRule(id);
-        var rule = _autoBuyService.GetRuleById(id);
-
-        // Assert
-        Assert.Equal(1, rowsAffected);
-        Assert.False(rule!.IsEnabled);
-    }
-
-    [Fact]
-    public void GetEnabledRulesReturnsOnlyEnabled()
-    {
-        // Arrange
-        _autoBuyService.CreateRule(new AutoBuyRule { AgentName = "John", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = true });
-        _autoBuyService.CreateRule(new AutoBuyRule { AgentName = "Jane", TriggerAmount = 2000, AutoBuyAmount = 1000, IsEnabled = false });
-
-        // Act
-        var result = _autoBuyService.GetEnabledRules();
-
-        // Assert
-        Assert.Single(result);
-        Assert.Equal("John", result[0].AgentName);
-    }
-
-    [Fact]
-    public void CheckTriggerWhenAmountExceedsThresholdReturnsTriggered()
-    {
-        // Arrange
-        _autoBuyService.CreateRule(new AutoBuyRule
-        { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = true });
-
-        // Act
-        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 1500);
+        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 1500m);
 
         // Assert
         Assert.True(triggered);
@@ -167,48 +238,73 @@ public class AutoBuyServiceTests
     }
 
     [Fact]
-    public void CheckTriggerWhenAmountBelowThresholdReturnsNotTriggered()
-    {
-        // Arrange
-        _autoBuyService.CreateRule(new AutoBuyRule
-        { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = true });
-
-        // Act
-        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 500);
-
-        // Assert
-        Assert.False(triggered);
-    }
-
-    [Fact]
     public void CheckTriggerDisabledRuleReturnsNotTriggered()
     {
         // Arrange
-        _autoBuyService.CreateRule(new AutoBuyRule
-        { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = false });
+        var rules = new List<AutoBuyRule>
+        {
+            CreateTestRule(1, "John Doe", 1000m, 500m, false)
+        };
+        _mockDb
+            .Setup(x => x.QueryListAsync(
+                It.IsAny<string>(),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(rules);
 
         // Act
-        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 1500);
+        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 1500m);
 
         // Assert
         Assert.False(triggered);
+        Assert.Null(rule);
     }
 
     [Fact]
-    public void IncrementExecutionCountIncrementsAndSetsLastExecuted()
+    public void CheckTriggerBelowThresholdReturnsNotTriggered()
     {
         // Arrange
-        var id = _autoBuyService.CreateRule(new AutoBuyRule
-        { AgentName = "John Doe", TriggerAmount = 1000, AutoBuyAmount = 500, IsEnabled = true });
+        var rules = new List<AutoBuyRule>
+        {
+            CreateTestRule(1, "John Doe", 1000m, 500m, true)
+        };
+        _mockDb
+            .Setup(x => x.QueryListAsync(
+                It.IsAny<string>(),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(rules);
 
         // Act
-        var rowsAffected = _autoBuyService.IncrementExecutionCount(id);
-        var rule = _autoBuyService.GetRuleById(id);
+        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 500m);
 
         // Assert
-        Assert.Equal(1, rowsAffected);
-        Assert.Equal(1, rule!.ExecutionCount);
-        Assert.NotNull(rule.LastExecuted);
+        Assert.False(triggered);
+        Assert.NotNull(rule);
+        Assert.Equal("John Doe", rule.AgentName);
+    }
+
+    [Fact]
+    public void GetEnabledRulesReturnsOnlyEnabledRules()
+    {
+        // Arrange
+        var rules = new List<AutoBuyRule>
+        {
+            CreateTestRule(1, "John Doe", 1000m, 500m, true),
+            CreateTestRule(2, "Jane Smith", 2000m, 1000m, false)
+        };
+        _mockDb
+            .Setup(x => x.QueryListAsync(
+                It.IsAny<string>(),
+                It.IsAny<Func<NpgsqlDataReader, AutoBuyRule>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(rules);
+
+        // Act
+        var result = _autoBuyService.GetEnabledRules();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal("John Doe", result[0].AgentName);
     }
 }
-

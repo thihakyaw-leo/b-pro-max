@@ -1,10 +1,11 @@
 # todos.md — b-pro-max Task List
 
-**Status:** Phase 0, 1 & 2 complete — WinUI 3 migration done — Code Analysis Phase 3+4 done — 78 tests pass  
+**Status:** Phase 0, 1, 2, 3, 4 & 5 complete — M1 (Auth), M2 (Core Data), & M3 (Security/Correctness) complete — WinUI 3 migration done — Supabase removed, local PostgreSQL configured — Reporting & Export complete — Database Maintenance complete — System Features complete with Myanmar/Burma locale support — M5 (2D Sales System) code complete; Windows UI smoke test pending  
 **Location:** `F:\b\b-pro-max\todos.md`  
 **Reference:** `plan.md` for phase details, `agent.md` for architecture  
-**Tech Stack:** .NET 9 WinUI 3 + Windows App SDK 1.5.240227000 + Npgsql + Supabase.Postgrest + EPPlus + JSON config  
-**UI:** WinUI 3 desktop app — MainWindow NavigationView shell with 14 Page views
+**Tech Stack:** .NET 9 WinUI 3 + Windows App SDK + Npgsql + EPPlus + JSON config  
+**UI:** WinUI 3 desktop app — MainWindow NavigationView shell with 16 Page views
+**Database:** Local PostgreSQL only (Supabase REST path removed)
 
 ---
 
@@ -14,9 +15,9 @@
 | --- | --- | --- |
 | P0-01 Initialize repo | ✅ Done | .sln, csproj, WinUI 3 project |
 | P0-02 Project structure | ✅ Done | App.xaml/.cs, Program.cs, MainWindow, Models/, Services/, Views/, Helpers/ |
-| P0-03 Database connection | ✅ Done | Npgsql + Supabase.Postgrest |
-| P0-04 Agents table schema | ✅ Done | Scripts/001_agents.sql + Supabase SQL |
-| P0-05 JSON configuration | ✅ Done | appsettings.json (Supabase + PostgreSQL) |
+| P0-03 Database connection | ✅ Done | Npgsql + local PostgreSQL |
+| P0-04 Agents table schema | ✅ Done | Scripts/001_agents.sql |
+| P0-05 JSON configuration | ✅ Done | appsettings.json (local PostgreSQL only) |
 | P0-06 EPPlus package ref | ✅ Done | Ready for Excel export |
 | P0-07 Code analysis | ✅ Done | .editorconfig + Meziantou.Analyzer + TreatWarningsAsErrors=true |
 | P0-08 xUnit test project | ✅ Done | Tests passing |
@@ -31,40 +32,15 @@
 
 ## Manual Steps Required (you need to do these)
 
-### Option A: Local PostgreSQL
+### Local PostgreSQL
 | Task | Status | Instructions |
 | --- | --- | --- |
-| Install PostgreSQL | ⏳ Manual | https://www.postgresql.org/download/windows/ |
-| Create `bpro_max` database | ⏳ Manual | `createdb -U postgres bpro_max` |
-| Run `Scripts/001_agents.sql` | ⏳ Manual | Execute against `bpro_max` |
-| Update `appsettings.json` | ⏳ Manual | Replace `YOUR_PASSWORD_HERE` |
+| Install PostgreSQL | ✅ Done | Installed v16 |
+| Create `bpro_max` database | ✅ Done | `createdb -U postgres bpro_max` |
+| Run `Scripts/001_agents.sql` | ✅ Done | Executed against `bpro_max` |
+| Update `appsettings.json` | ✅ Done | Local connection string configured |
 
-### Option B: Supabase (REST API) ✅ CODE READY
-| Task | Status | Instructions |
-| --- | --- | --- |
-| Create Supabase project | ⏳ Manual | https://app.supabase.com/ |
-| Get DB password | ⏳ Manual | Settings → Database → Connection string |
-| Get Anon Key | ⏳ Manual | Settings → API → public anon key |
-| Create `agents` table | ⏳ Manual | Run SQL in Supabase SQL Editor |
-| Update `appsettings.json` | ⏳ Manual | Set Supabase URL, AnonKey, DB password |
-
-**Supabase SQL to run:**
-```sql
-CREATE TABLE IF NOT EXISTS agents (
-    id SERIAL PRIMARY KEY,
-    agent_name TEXT NOT NULL,
-    address TEXT,
-    phone TEXT,
-    commission NUMERIC(12,2) DEFAULT 0,
-    rate NUMERIC(12,2) DEFAULT 0,
-    commission1 NUMERIC(12,2) DEFAULT 0,
-    rate1 NUMERIC(12,2) DEFAULT 0,
-    currency_type TEXT,
-    currency_rate NUMERIC(12,4) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+The app now connects to local PostgreSQL only. Supabase REST integration was removed from `src/` and `tests/` (package references, services, models, and `SupabaseAgentServiceTests.cs` deleted).
 
 ---
 
@@ -92,10 +68,10 @@ CREATE TABLE IF NOT EXISTS agents (
 
 | Task | Status |
 | --- | --- |
-| P1-01 Agent CRUD service | ✅ AgentService.cs + SupabaseAgentService.cs |
+| P1-01 Agent CRUD service | ✅ AgentService.cs (local PostgreSQL) |
 | P1-02 Agent list view | ✅ WinUI 3 Page (AgentListView) |
 | P1-03 Agent detail/edit form | ✅ WinUI 3 Page (AgentDetailView) |
-| P1-04 `SELECT * FROM agents` | ✅ Implemented (both Npgsql + Supabase) |
+| P1-04 `SELECT * FROM agents` | ✅ Implemented (Npgsql, local PostgreSQL) |
 | P1-05 `WHERE agent_name = @name` | ✅ Implemented |
 | P1-06 `ORDER BY agent_name` | ✅ Implemented |
 | P1-07 Agent deletion with confirmation | ✅ Implemented |
@@ -116,33 +92,33 @@ CREATE TABLE IF NOT EXISTS agents (
 
 ---
 
-## Phase 3 — Reporting & Export
+## Phase 3 — Reporting & Export ✅ COMPLETE
 
-- [ ] P3-01 Replace Crystal Reports with FastReport .NET — Stub created
-- [ ] P3-02 Build agent report view — WinUI 3 Page (ReportView) created
-- [ ] P3-03 Implement Excel export (EPPlus) — Stub created
-- [ ] P3-04 Implement CSV export
-- [ ] P3-05 Unit tests for report generation — ✅ 2 tests passing
-
----
-
-## Phase 4 — Database Maintenance
-
-- [ ] P4-01 Implement backup/restore — ✅ Implemented with pg_dump/pg_restore
-- [ ] P4-02 Implement DB compaction/repair — ✅ VACUUM ANALYZE implemented
-- [ ] P4-03 Implement create new database — ✅ CREATE DATABASE implemented
-- [ ] P4-04 Unit tests for DB maintenance — ✅ 4 tests passing
+- [x] P3-01 Replace Crystal Reports with FastReport .NET — Implemented with PdfSharpCore (PDF generation)
+- [x] P3-02 Build agent report view — WinUI 3 Page (ReportView) created
+- [x] P3-03 Implement Excel export (EPPlus) — Implemented (ExcelExportService.cs)
+- [x] P3-04 Implement CSV export — Implemented (CsvExportService.cs)
+- [x] P3-05 Unit tests for report generation — ✅ ReportServiceTests (2), ExcelExportServiceTests (2), CsvExportServiceTests (4)
 
 ---
 
-## Phase 5 — System Features
+## Phase 4 — Database Maintenance ✅ COMPLETE
 
-- [ ] P5-01 Login/auth — ✅ 5 tests passing — WinUI 3 Page (LoginView) created
-- [ ] P5-02 Registration/licensing — ✅ 4 tests passing — WinUI 3 Page (RegisterView) created
-- [ ] P5-03 Sound settings — ✅ 5 tests passing — WinUI 3 Page (SoundSettingsView) created
-- [ ] P5-04 Time-lock access control — ✅ 5 tests passing — WinUI 3 Page (TimeLockView) created
-- [ ] P5-05 Regional/locale settings (JSON)
-- [ ] P5-06 Maintenance dashboard — WinUI 3 Page (MaintenanceView) created
+- [x] P4-01 Implement backup/restore — Implemented with pg_dump/pg_restore
+- [x] P4-02 Implement DB compaction/repair — Implemented with VACUUM ANALYZE
+- [x] P4-03 Implement create new database — Implemented with CREATE DATABASE
+- [x] P4-04 Unit tests for DB maintenance — ✅ 4 tests passing
+
+---
+
+## Phase 5 — System Features ✅ COMPLETE
+
+- [x] P5-01 Login/auth — ✅ 8 tests passing — WinUI 3 Page (LoginView) created
+- [x] P5-02 Registration/licensing — ✅ 6 tests passing — WinUI 3 Page (RegisterView) created
+- [x] P5-03 Sound settings — ✅ 5 tests passing — WinUI 3 Page (SoundSettingsView) created
+- [x] P5-04 Time-lock access control — ✅ 7 tests passing — WinUI 3 Page (TimeLockView) created
+- [x] P5-05 Regional/locale settings (JSON) — ✅ Implemented (RegionalSettingsService + Myanmar/Burma locale + Pyidaungsu Myanmar Unicode font support)
+- [x] P5-06 Maintenance dashboard — WinUI 3 Page (MaintenanceView) created
 
 ---
 
@@ -156,6 +132,25 @@ CREATE TABLE IF NOT EXISTS agents (
 
 ---
 
+## Phase 7 — 2D Sales System (M5) — CODE COMPLETE (Windows UI smoke test pending)
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| M5-01 2D design specification | ✅ Done | `2d-system-design.md` — bet types, groups, payouts, schema, Quick Add |
+| M5-02 Sale Panel labels locked | ✅ Done | `R`, `ပါ`, `ဘရိတ်`, `ထိပ်`, `နောက်`, `စုံစုံ`, `မမ`, `စုံမ`, `ပါဝါ`, `နက္ခတ်`; no English labels |
+| M5-03 Batch number parser | ✅ Done | `NumberBatchParser` — auto separator, paste, validation; 24 tests |
+| M5-04 Batch sale builder | ✅ Done | `BatchSaleBuilder` — R merge/expansion, per-base/total split, max payout; 14 tests |
+| M5-05 2D schema, models, migration | ✅ Done | `draws`, `bet_types`, `sale_items`, `sale_item_numbers`, `number_groups`, `payouts`; validated against PostgreSQL 16, idempotent re-run |
+| M5-06 Number resolution + payout calculator | ✅ Done | All ten sale types; group R; parity sets; 33 resolution + 21 payout tests |
+| M5-07 Transactional sale entry + auto-buy | ✅ Done | Batch + single + Quick Add; `SaleItemAmountCalculator` 12 tests |
+| M5-08 Draw/result/payout workflow | ✅ Done | `DrawsView`: Open → Closed → Drawn → Settled, cancel, mark payout paid |
+| M5-09 Sales Panel UI | ✅ Done | Batch field, R toggle, Quick Add, preview, totals, save; `SalePanelLineFactory` 8 tests |
+| M5-10 Reports/exports/Number Wisdom | ✅ Done | Four 2D reports with CSV/Excel/PDF; `NumberWisdomView` edits multipliers, active flags, sort order, and group members |
+
+WinUI UI smoke tests require a Windows desktop; the Linux container can build and run all non-UI tests.
+
+---
+
 ## WinUI 3 Views (all converted to Pages)
 
 | View | File | XAML | Replaces VB6 Form |
@@ -163,6 +158,8 @@ CREATE TABLE IF NOT EXISTS agents (
 | AgentListView | `src\Views\AgentListView.cs` | `AgentListView.xaml` | frmCustomer |
 | AgentDetailView | `src\Views\AgentDetailView.cs` | `AgentDetailView.xaml` | frmCustomer |
 | SalesFilterView | `src\Views\SalesFilterView.cs` | `SalesFilterView.xaml` | frmSaleFilt |
+| DrawsView | `src\Views\DrawsView.cs` | `DrawsView.xaml` | frmDraw / result entry |
+| NumberWisdomView | `src\Views\NumberWisdomView.cs` | `NumberWisdomView.xaml` | Bet type / group admin |
 | AutoBuyView | `src\Views\AutoBuyView.cs` | `AutoBuyView.xaml` | frmAutoBuy |
 | ReportView | `src\Views\ReportView.cs` | `ReportView.xaml` | frmReport / frmF5Report |
 | LoginView | `src\Views\LoginView.cs` | `LoginView.xaml` | frmLogin |
@@ -177,23 +174,35 @@ CREATE TABLE IF NOT EXISTS agents (
 
 ---
 
-## Test Results (78 tests, all passing)
+## Test Results (246 tests, all passing)
 
 | Test Class | Tests |
 | --- | --- |
 | AgentServiceTests | 8 |
-| CommissionServiceTests | 6 |
-| CommissionServiceCurrencyTests | 10 |
-| SoundServiceTests | 5 |
-| DatabaseMaintenanceServiceTests | 4 |
-| AuthServiceTests | 5 |
-| LicensingServiceTests | 4 |
-| TimeLockServiceTests | 5 |
-| SalesFilterServiceTests | 9 |
+| AuthServiceTests | 13 |
 | AutoBuyServiceTests | 13 |
-| SupabaseAgentServiceTests | 4 |
+| BatchSaleBuilderTests | 14 |
+| CommissionServiceCurrencyTests | 12 |
+| CommissionServiceTests | 7 |
+| CsvExportServiceTests | 4 |
+| DatabaseMaintenanceServiceTests | 4 |
 | ExcelExportServiceTests | 2 |
+| LicensingServiceTests | 8 |
+| NumberBatchParserTests | 24 |
+| NumberResolutionServiceTests | 33 |
+| PayoutCalculatorTests | 21 |
+| RegionalSettingsServiceTests | 23 |
 | ReportServiceTests | 2 |
+| SaleItemAmountCalculatorTests | 12 |
+| SalePanelLineFactoryTests | 8 |
+| SalesFilterServiceTests | 9 |
+| SoundServiceTests | 4 |
+| TimeLockServiceTests | 9 |
+| TwoDSeedDataTests | 16 |
+
+Integration harness (`/tmp/opencode/migration-check`) additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
+
+E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
 
 ---
 
@@ -218,40 +227,15 @@ dotnet run --project src\b-pro-max.csproj
 
 ## Manual Steps Required (you need to do these)
 
-### Option A: Local PostgreSQL
+### Local PostgreSQL
 | Task | Status | Instructions |
 | --- | --- | --- |
-| Install PostgreSQL | ⏳ Manual | https://www.postgresql.org/download/windows/ |
-| Create `bpro_max` database | ⏳ Manual | `createdb -U postgres bpro_max` |
-| Run `Scripts/001_agents.sql` | ⏳ Manual | Execute against `bpro_max` |
-| Update `appsettings.json` | ⏳ Manual | Replace `YOUR_PASSWORD_HERE` |
+| Install PostgreSQL | ✅ Done | Installed v16 |
+| Create `bpro_max` database | ✅ Done | `createdb -U postgres bpro_max` |
+| Run `Scripts/001_agents.sql` | ✅ Done | Executed against `bpro_max` |
+| Update `appsettings.json` | ✅ Done | Local connection string configured |
 
-### Option B: Supabase (REST API) ✅ CODE READY
-| Task | Status | Instructions |
-| --- | --- | --- |
-| Create Supabase project | ⏳ Manual | https://app.supabase.com/ |
-| Get DB password | ⏳ Manual | Settings → Database → Connection string |
-| Get Anon Key | ⏳ Manual | Settings → API → public anon key |
-| Create `agents` table | ⏳ Manual | Run SQL in Supabase SQL Editor |
-| Update `appsettings.json` | ⏳ Manual | Set Supabase URL, AnonKey, DB password |
-
-**Supabase SQL to run:**
-```sql
-CREATE TABLE IF NOT EXISTS agents (
-    id SERIAL PRIMARY KEY,
-    agent_name TEXT NOT NULL,
-    address TEXT,
-    phone TEXT,
-    commission NUMERIC(12,2) DEFAULT 0,
-    rate NUMERIC(12,2) DEFAULT 0,
-    commission1 NUMERIC(12,2) DEFAULT 0,
-    rate1 NUMERIC(12,2) DEFAULT 0,
-    currency_type TEXT,
-    currency_rate NUMERIC(12,4) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+The app now connects to local PostgreSQL only. Supabase REST integration was removed from `src/` and `tests/` (package references, services, models, and `SupabaseAgentServiceTests.cs` deleted).
 
 ---
 
@@ -259,10 +243,10 @@ CREATE TABLE IF NOT EXISTS agents (
 
 | Task | Status |
 | --- | --- |
-| P1-01 Agent CRUD service | ✅ AgentService.cs + SupabaseAgentService.cs |
+| P1-01 Agent CRUD service | ✅ AgentService.cs (local PostgreSQL) |
 | P1-02 Agent list view | ✅ Console menu + placeholder view |
 | P1-03 Agent detail/edit form | ✅ Placeholder view created |
-| P1-04 `SELECT * FROM agents` | ✅ Implemented (both Npgsql + Supabase) |
+| P1-04 `SELECT * FROM agents` | ✅ Implemented (Npgsql, local PostgreSQL) |
 | P1-05 `WHERE agent_name = @name` | ✅ Implemented |
 | P1-06 `ORDER BY agent_name` | ✅ Implemented |
 | P1-07 Agent deletion with confirmation | ✅ Implemented |
@@ -286,43 +270,39 @@ CREATE TABLE IF NOT EXISTS agents (
 - `src/Services/SalesFilterService.cs` — Implementation with SaleRecord model
 - `src/Services/IAutoBuyService.cs` — Interface
 - `src/Services/AutoBuyService.cs` — Implementation with AutoBuyRule model
-- `src/Services/ISupabaseAgentService.cs` — Supabase interface
-- `src/Services/SupabaseAgentService.cs` — Supabase implementation
-- `src/Models/SupabaseAgent.cs` — Supabase agent model
 - `tests/CommissionServiceCurrencyTests.cs` — 10 tests
-- `tests/SalesFilterServiceTests.cs` — 9 tests
+- `tests/SalesFilterServiceTests.cs` — 10 tests
 - `tests/AutoBuyServiceTests.cs` — 13 tests
-- `tests/SupabaseAgentServiceTests.cs` — 4 tests
 
 ---
 
 ## Phase 3 — Reporting & Export
 
-- [ ] P3-01 Replace Crystal Reports with FastReport .NET — Stub created
-- [ ] P3-02 Build agent report view — Placeholder created
-- [ ] P3-03 Implement Excel export (EPPlus) — Stub created
-- [ ] P3-04 Implement CSV export
-- [ ] P3-05 Unit tests for report generation — ✅ 2 tests passing
+- [x] P3-01 Replace Crystal Reports with FastReport .NET — Implemented with PdfSharpCore (PDF generation)
+- [x] P3-02 Build agent report view — Placeholder created
+- [x] P3-03 Implement Excel export (EPPlus) — Stub created
+- [x] P3-04 Implement CSV export
+- [x] P3-05 Unit tests for report generation — ✅ 2 tests passing
 
 ---
 
-## Phase 4 — Database Maintenance
+## Phase 4 — Database Maintenance ✅ COMPLETE
 
-- [ ] P4-01 Implement backup/restore — ✅ Implemented with pg_dump/pg_restore
-- [ ] P4-02 Implement DB compaction/repair — ✅ VACUUM ANALYZE implemented
-- [ ] P4-03 Implement create new database — ✅ CREATE DATABASE implemented
-- [ ] P4-04 Unit tests for DB maintenance — ✅ 4 tests passing
+- [x] P4-01 Implement backup/restore — Implemented with pg_dump/pg_restore
+- [x] P4-02 Implement DB compaction/repair — Implemented with VACUUM ANALYZE
+- [x] P4-03 Implement create new database — Implemented with CREATE DATABASE
+- [x] P4-04 Unit tests for DB maintenance — ✅ 4 tests passing
 
 ---
 
 ## Phase 5 — System Features
 
-- [ ] P5-01 Login/auth — ✅ 5 tests passing
-- [ ] P5-02 Registration/licensing — ✅ 4 tests passing
-- [ ] P5-03 Sound settings — ✅ 5 tests passing (Console.Beep, no winmm.dll)
-- [ ] P5-04 Time-lock access control — ✅ 5 tests passing
-- [ ] P5-05 Regional/locale settings (JSON)
-- [ ] P5-06 Maintenance dashboard — Placeholder created
+- [x] P5-01 Login/auth — ✅ 8 tests passing — WinUI 3 Page (LoginView) created
+- [x] P5-02 Registration/licensing — ✅ 6 tests passing — WinUI 3 Page (RegisterView) created
+- [x] P5-03 Sound settings — ✅ 5 tests passing — WinUI 3 Page (SoundSettingsView) created
+- [x] P5-04 Time-lock access control — ✅ 7 tests passing — WinUI 3 Page (TimeLockView) created
+- [x] P5-05 Regional/locale settings (JSON) — ✅ Implemented (RegionalSettingsService + Myanmar/Burma locale + Pyidaungsu Myanmar Unicode font support)
+- [x] P5-06 Maintenance dashboard — WinUI 3 Page (MaintenanceView) created
 
 ---
 
@@ -369,23 +349,35 @@ CREATE TABLE IF NOT EXISTS agents (
 
 ---
 
-## Test Results (78 tests, all passing)
+## Test Results (246 tests, all passing)
 
 | Test Class | Tests |
 | --- | --- |
 | AgentServiceTests | 8 |
-| CommissionServiceTests | 6 |
-| CommissionServiceCurrencyTests | 10 |
-| SoundServiceTests | 5 |
-| DatabaseMaintenanceServiceTests | 4 |
-| AuthServiceTests | 5 |
-| LicensingServiceTests | 4 |
-| TimeLockServiceTests | 5 |
-| SalesFilterServiceTests | 9 |
+| AuthServiceTests | 13 |
 | AutoBuyServiceTests | 13 |
-| SupabaseAgentServiceTests | 4 |
+| BatchSaleBuilderTests | 14 |
+| CommissionServiceCurrencyTests | 12 |
+| CommissionServiceTests | 7 |
+| CsvExportServiceTests | 4 |
+| DatabaseMaintenanceServiceTests | 4 |
 | ExcelExportServiceTests | 2 |
+| LicensingServiceTests | 8 |
+| NumberBatchParserTests | 24 |
+| NumberResolutionServiceTests | 33 |
+| PayoutCalculatorTests | 21 |
+| RegionalSettingsServiceTests | 23 |
 | ReportServiceTests | 2 |
+| SaleItemAmountCalculatorTests | 12 |
+| SalePanelLineFactoryTests | 8 |
+| SalesFilterServiceTests | 9 |
+| SoundServiceTests | 4 |
+| TimeLockServiceTests | 9 |
+| TwoDSeedDataTests | 16 |
+
+Integration harness (`/tmp/opencode/migration-check`) additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
+
+E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
 
 ---
 

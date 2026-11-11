@@ -1,6 +1,7 @@
 using BProMax.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Npgsql;
 
 namespace BProMax.Services;
 
@@ -32,25 +33,41 @@ public class DatabaseMaintenanceService : IDatabaseMaintenanceService
     {
         try
         {
-            var connectionString = new Npgsql.NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            var connectionString = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            var env = System.Environment.GetEnvironmentVariables();
+
             var processStartInfo = new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "pg_dump",
-                Arguments = $"-h {connectionString.Host} -p {connectionString.Port} -U {connectionString.Username} -d {connectionString.Database} -f \"{backupPath}\"",
+                Arguments = $"-Fc -h {connectionString.Host} -p {connectionString.Port} -U {connectionString.Username} -d {connectionString.Database} -f \"{backupPath}\" --no-owner --no-privileges",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            // Set PGPASSWORD environment variable for authentication
-            System.Environment.SetEnvironmentVariable("PGPASSWORD", connectionString.Password);
+            // Set PGPASSWORD only for this process, not process-wide.
+            processStartInfo.Environment["PGPASSWORD"] = connectionString.Password;
 
             using var process = System.Diagnostics.Process.Start(processStartInfo);
             if (process == null) return false;
 
             await process.WaitForExitAsync();
-            return process.ExitCode == 0;
+
+            if (process.ExitCode != 0)
+            {
+                _logBackupFailed(_logger, new InvalidOperationException($"pg_dump exited with code {process.ExitCode}"));
+                return false;
+            }
+
+            // Verify the backup file exists and is non-empty.
+            if (!System.IO.File.Exists(backupPath) || new System.IO.FileInfo(backupPath).Length == 0)
+            {
+                _logBackupFailed(_logger, new InvalidOperationException("Backup file is missing or empty."));
+                return false;
+            }
+
+            return true;
         }
         catch (Exception ex)
         {
@@ -63,24 +80,37 @@ public class DatabaseMaintenanceService : IDatabaseMaintenanceService
     {
         try
         {
-            var connectionString = new Npgsql.NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            if (!System.IO.File.Exists(backupPath))
+            {
+                _logRestoreFailed(_logger, new FileNotFoundException("Backup file not found.", backupPath));
+                return false;
+            }
+
+            var connectionString = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             var processStartInfo = new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "pg_restore",
-                Arguments = $"-h {connectionString.Host} -p {connectionString.Port} -U {connectionString.Username} -d {connectionString.Database} -c --if-exists \"{backupPath}\"",
+                Arguments = $"-h {connectionString.Host} -p {connectionString.Port} -U {connectionString.Username} -d {connectionString.Database} -c --if-exists --no-owner --no-privileges \"{backupPath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            System.Environment.SetEnvironmentVariable("PGPASSWORD", connectionString.Password);
+            processStartInfo.Environment["PGPASSWORD"] = connectionString.Password;
 
             using var process = System.Diagnostics.Process.Start(processStartInfo);
             if (process == null) return false;
 
             await process.WaitForExitAsync();
-            return process.ExitCode == 0;
+
+            if (process.ExitCode != 0)
+            {
+                _logRestoreFailed(_logger, new InvalidOperationException($"pg_restore exited with code {process.ExitCode}"));
+                return false;
+            }
+
+            return true;
         }
         catch (Exception ex)
         {
@@ -93,11 +123,11 @@ public class DatabaseMaintenanceService : IDatabaseMaintenanceService
     {
         try
         {
-            using var conn = new Npgsql.NpgsqlConnection(_settings.ConnectionString);
+            using var conn = new NpgsqlConnection(_settings.ConnectionString);
             await conn.OpenAsync();
 
             // VACUUM cannot run inside a transaction, so we execute it directly
-            using var cmd = new Npgsql.NpgsqlCommand("VACUUM ANALYZE", conn);
+            using var cmd = new NpgsqlCommand("VACUUM ANALYZE", conn);
             await cmd.ExecuteNonQueryAsync();
 
             _logCompactionCompleted(_logger, null);
@@ -114,14 +144,21 @@ public class DatabaseMaintenanceService : IDatabaseMaintenanceService
     {
         try
         {
+            // Validate database name before using it in SQL.
+            if (!IsValidDatabaseName(databaseName))
+            {
+                _logCreateDatabaseFailed(_logger, databaseName, new ArgumentException("Invalid database name."));
+                return false;
+            }
+
             // Connect to the default 'postgres' database to create a new one
-            var connectionString = new Npgsql.NpgsqlConnectionStringBuilder(_settings.ConnectionString);
+            var connectionString = new NpgsqlConnectionStringBuilder(_settings.ConnectionString);
             connectionString.Database = "postgres";
 
-            using var conn = new Npgsql.NpgsqlConnection(connectionString.ConnectionString);
+            using var conn = new NpgsqlConnection(connectionString.ConnectionString);
             await conn.OpenAsync();
 
-            using var cmd = new Npgsql.NpgsqlCommand($"CREATE DATABASE \"{databaseName}\"", conn);
+            using var cmd = new NpgsqlCommand($"CREATE DATABASE \"{databaseName}\"", conn);
             await cmd.ExecuteNonQueryAsync();
 
             _logDatabaseCreated(_logger, databaseName, null);
@@ -132,5 +169,42 @@ public class DatabaseMaintenanceService : IDatabaseMaintenanceService
             _logCreateDatabaseFailed(_logger, databaseName, ex);
             return false;
         }
+    }
+
+    private static bool IsValidDatabaseName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        // Reject reserved database names.
+        var lower = name.ToLowerInvariant();
+        if (lower == "postgres" || lower == "template0" || lower == "template1")
+        {
+            return false;
+        }
+
+        // Allow only alphanumeric, underscore, and hyphen; must start with letter or underscore.
+        if (!char.IsLetter(name[0]) && name[0] != '_')
+        {
+            return false;
+        }
+
+        foreach (var c in name)
+        {
+            if (!char.IsLetterOrDigit(c) && c != '_' && c != '-')
+            {
+                return false;
+            }
+        }
+
+        // PostgreSQL identifier length limit is 63 bytes.
+        if (name.Length > 63)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

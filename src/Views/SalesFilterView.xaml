@@ -12,67 +12,227 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="12" Spacing="8">
-            <TextBlock Text="Sales Filter" Style="{StaticResource TitleTextBlockStyle}"
+        <StackPanel Grid.Row="0" Margin="12,12,12,4" Spacing="4">
+            <TextBlock Text="Sales" Style="{StaticResource TitleTextBlockStyle}"
                        AutomationProperties.AutomationId="SalesFilterTitle"/>
+            <TextBlock Text="Sale Panel" Style="{StaticResource SubtitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="SalePanelTitle"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Margin="12" Spacing="12">
+        <StackPanel Grid.Row="1" Margin="12,4,12,8" Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Start Date:" Width="100" VerticalAlignment="Center"
-                           AutomationProperties.AutomationId="SalesStartDateLabel"/>
-                <CalendarDatePicker x:Name="StartDatePicker" Width="150"
-                                    AutomationProperties.AutomationId="SalesStartDatePicker"/>
+                <TextBlock Text="Agent:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="SalePanelAgentLabel"/>
+                <ComboBox x:Name="AgentCombo" Width="220" DisplayMemberPath="AgentName"
+                          SelectionChanged="AgentCombo_SelectionChanged"
+                          AutomationProperties.AutomationId="SalePanelAgentCombo"/>
+                <TextBlock Text="Draw:" Width="50" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="SalePanelDrawLabel"/>
+                <ComboBox x:Name="DrawCombo" Width="220" DisplayMemberPath="Display"
+                          AutomationProperties.AutomationId="SalePanelDrawCombo"/>
+                <Button x:Name="RefreshButton" Content="Refresh" Click="RefreshButton_Click"
+                        AutomationProperties.AutomationId="SalePanelRefreshButton"/>
             </StackPanel>
+
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="End Date:" Width="100" VerticalAlignment="Center"
-                           AutomationProperties.AutomationId="SalesEndDateLabel"/>
-                <CalendarDatePicker x:Name="EndDatePicker" Width="150"
-                                    AutomationProperties.AutomationId="SalesEndDatePicker"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Agent Name:" Width="100" VerticalAlignment="Center"
-                           AutomationProperties.AutomationId="SalesAgentLabel"/>
-                <TextBox x:Name="AgentNameBox" Width="250"
-                         AutomationProperties.AutomationId="SalesAgentBox"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Status:" Width="100" VerticalAlignment="Center"
-                           AutomationProperties.AutomationId="SalesStatusLabel"/>
-                <ComboBox x:Name="StatusCombo" Width="150"
-                          AutomationProperties.AutomationId="SalesStatusCombo">
-                    <ComboBoxItem Content="All"/>
-                    <ComboBoxItem Content="Pending"/>
-                    <ComboBoxItem Content="Paid"/>
-                    <ComboBoxItem Content="Cancelled"/>
+                <TextBlock Text="Base numbers:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="BatchNumbersLabel"/>
+                <TextBox x:Name="BatchNumbersBox" Width="320" PlaceholderText="45, 39, 23, 19, 40"
+                         TextChanged="BatchNumbersBox_TextChanged"
+                         AutomationProperties.AutomationId="BatchNumbersBox"/>
+                <TextBlock Text="Amount:" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="BatchAmountLabel"/>
+                <TextBox x:Name="BatchAmountBox" Width="100" Text="1000"
+                         AutomationProperties.AutomationId="BatchAmountBox"/>
+                <ComboBox x:Name="BatchAmountModeCombo" Width="160" SelectedIndex="0"
+                          AutomationProperties.AutomationId="BatchAmountModeCombo">
+                    <ComboBoxItem Content="Per base number"/>
+                    <ComboBoxItem Content="Total split"/>
                 </ComboBox>
+                <CheckBox x:Name="BatchReverseCheck" Content="R"
+                          AutomationProperties.AutomationId="BatchReverseCheck"/>
+                <Button x:Name="AddBatchButton" Content="Add batch" Click="AddBatchButton_Click"
+                        AutomationProperties.AutomationId="AddBatchButton"/>
             </StackPanel>
+
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Min Amount:" Width="100" VerticalAlignment="Center"
-                           AutomationProperties.AutomationId="SalesMinAmountLabel"/>
-                <TextBox x:Name="MinAmountBox" Width="150" Text="0"
-                         AutomationProperties.AutomationId="SalesMinAmountBox"/>
+                <TextBlock Text="Sale type:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="SaleTypeLabel"/>
+                <ComboBox x:Name="SaleTypeCombo" Width="160" DisplayMemberPath="NameMy"
+                          SelectionChanged="SaleTypeCombo_SelectionChanged"
+                          AutomationProperties.AutomationId="SaleTypeCombo"/>
+                <StackPanel x:Name="SelectionRow" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Number/digit:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SaleSelectionLabel"/>
+                    <TextBox x:Name="SelectionBox" Width="120"
+                             AutomationProperties.AutomationId="SaleSelectionBox"/>
+                </StackPanel>
+                <TextBlock Text="Amount:" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="ManualAmountLabel"/>
+                <TextBox x:Name="ManualAmountBox" Width="100" Text="1000"
+                         AutomationProperties.AutomationId="ManualAmountBox"/>
+                <CheckBox x:Name="ManualReverseCheck" Content="R" IsEnabled="False"
+                          AutomationProperties.AutomationId="ManualReverseCheck"/>
+                <Button x:Name="AddSaleItemButton" Content="Add" Click="AddSaleItemButton_Click"
+                        AutomationProperties.AutomationId="AddSaleItemButton"/>
             </StackPanel>
+
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="Max Amount:" Width="100" VerticalAlignment="Center"
-                           AutomationProperties.AutomationId="SalesMaxAmountLabel"/>
-                <TextBox x:Name="MaxAmountBox" Width="150" Text="0"
-                         AutomationProperties.AutomationId="SalesMaxAmountBox"/>
+                <TextBlock Text="Quick Add:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="QuickAddLabel"/>
+                <ComboBox x:Name="QuickAddGroupCombo" Width="160" DisplayMemberPath="NameMy"
+                          SelectionChanged="QuickAddGroupCombo_SelectionChanged"
+                          AutomationProperties.AutomationId="QuickAddGroupCombo"/>
+                <TextBlock Text="Amount:" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="QuickAddAmountLabel"/>
+                <TextBox x:Name="QuickAddAmountBox" Width="100" Text="1000"
+                         AutomationProperties.AutomationId="QuickAddAmountBox"/>
+                <CheckBox x:Name="QuickAddReverseCheck" Content="R"
+                          AutomationProperties.AutomationId="QuickAddReverseCheck"/>
+                <Button x:Name="QuickAddButton" Content="Add" Click="QuickAddButton_Click"
+                        AutomationProperties.AutomationId="QuickAddButton"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button x:Name="FilterButton" Content="Filter" Click="FilterButton_Click"
-                        AutomationProperties.AutomationId="SalesFilterButton"/>
-                <Button x:Name="ResetButton" Content="Reset" Click="ResetButton_Click"
-                        AutomationProperties.AutomationId="SalesResetButton"/>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="40"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="#" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="1" Text="Sale type" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="2" Text="Numbers" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="3" Text="Amount" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="4" Text="Per number" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="5" Text="Max payout" FontWeight="SemiBold"/>
+            </Grid>
+
+            <ListView x:Name="CurrentSaleList" Height="150"
+                      AutomationProperties.AutomationId="CurrentSaleList">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:SalePanelLine">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="{x:Bind Label}"
+                                       AutomationProperties.AutomationId="CurrentSaleType"/>
+                            <TextBlock Grid.Column="2" Text="{x:Bind NumbersText}"
+                                       TextTrimming="CharacterEllipsis"
+                                       AutomationProperties.AutomationId="CurrentSaleNumbers"/>
+                            <TextBlock Grid.Column="3" Text="{x:Bind Amount}"
+                                       AutomationProperties.AutomationId="CurrentSaleAmount"/>
+                            <TextBlock Grid.Column="4" Text="{x:Bind PerNumberText}"
+                                       AutomationProperties.AutomationId="CurrentSalePerNumber"/>
+                            <TextBlock Grid.Column="5" Text="{x:Bind MaxPayout}"
+                                       AutomationProperties.AutomationId="CurrentSaleMaxPayout"/>
+                            <Button Grid.Column="6" Content="✕" Click="RemoveLine_Click"
+                                    AutomationProperties.AutomationId="CurrentSaleRemoveButton"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="Total stake:" AutomationProperties.AutomationId="CurrentSaleTotalLabel"/>
+                <TextBlock x:Name="CurrentSaleTotalText" Text="0.00"
+                           AutomationProperties.AutomationId="CurrentSaleTotalText"/>
+                <TextBlock Text="Commission:" AutomationProperties.AutomationId="CurrentSaleCommissionLabel"/>
+                <TextBlock x:Name="CurrentSaleCommissionText" Text="0.00"
+                           AutomationProperties.AutomationId="CurrentSaleCommissionText"/>
+                <TextBlock Text="Max payout:" AutomationProperties.AutomationId="CurrentSaleMaxPayoutLabel"/>
+                <TextBlock x:Name="CurrentSaleMaxPayoutText" Text="0.00"
+                           AutomationProperties.AutomationId="CurrentSaleMaxPayoutText"/>
+                <Button x:Name="SaveSaleButton" Content="Save Sale" Click="SaveSaleButton_Click"
+                        AutomationProperties.AutomationId="SaveSaleButton"/>
+                <Button x:Name="ClearSaleButton" Content="Clear" Click="ClearSaleButton_Click"
+                        AutomationProperties.AutomationId="ClearSaleButton"/>
             </StackPanel>
         </StackPanel>
 
-        <ListView Grid.Row="2" x:Name="SalesList" Margin="12"
+        <StackPanel Grid.Row="2" Margin="12,4,12,8" Spacing="6">
+            <TextBlock Text="Sales History" Style="{StaticResource SubtitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="SalesHistoryTitle"/>
+            <Grid ColumnSpacing="12" RowSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="Start Date:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SalesStartDateLabel"/>
+                    <CalendarDatePicker x:Name="StartDatePicker" Width="140"
+                                        AutomationProperties.AutomationId="SalesStartDatePicker"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="End Date:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SalesEndDateLabel"/>
+                    <CalendarDatePicker x:Name="EndDatePicker" Width="140"
+                                        AutomationProperties.AutomationId="SalesEndDatePicker"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="Agent Name:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SalesAgentLabel"/>
+                    <TextBox x:Name="AgentNameBox" Width="180"
+                             AutomationProperties.AutomationId="SalesAgentBox"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="Status:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SalesStatusLabel"/>
+                    <ComboBox x:Name="StatusCombo" Width="130" SelectedIndex="0"
+                              AutomationProperties.AutomationId="SalesStatusCombo">
+                        <ComboBoxItem Content="All"/>
+                        <ComboBoxItem Content="Pending"/>
+                        <ComboBoxItem Content="Paid"/>
+                        <ComboBoxItem Content="Cancelled"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="Min Amount:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SalesMinAmountLabel"/>
+                    <TextBox x:Name="MinAmountBox" Width="120" Text="0"
+                             AutomationProperties.AutomationId="SalesMinAmountBox"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="Max Amount:" VerticalAlignment="Center"
+                               AutomationProperties.AutomationId="SalesMaxAmountLabel"/>
+                    <TextBox x:Name="MaxAmountBox" Width="120" Text="0"
+                             AutomationProperties.AutomationId="SalesMaxAmountBox"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="FilterButton" Content="Filter" Click="FilterButton_Click"
+                            AutomationProperties.AutomationId="SalesFilterButton"/>
+                    <Button x:Name="ResetButton" Content="Reset" Click="ResetButton_Click"
+                            AutomationProperties.AutomationId="SalesResetButton"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+        <ListView Grid.Row="3" x:Name="SalesList" Margin="12,0,12,8"
                   AutomationProperties.AutomationId="SalesList">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:SaleRecord">
@@ -88,8 +248,8 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom"
-                    Margin="12" Spacing="8">
+        <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Bottom"
+                    Margin="12,0,12,4" Spacing="8">
             <TextBlock Text="Total Amount:" AutomationProperties.AutomationId="TotalAmountLabel"/>
             <TextBlock x:Name="TotalAmountText" Text="0" Width="100"
                        AutomationProperties.AutomationId="TotalAmountText"/>
@@ -98,7 +258,8 @@
                        AutomationProperties.AutomationId="TotalCommissionText"/>
         </StackPanel>
 
-        <TextBlock x:Name="StatusMessage" Grid.Row="4" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="SalesFilterStatus"/>
+        <TextBlock x:Name="StatusMessage" Grid.Row="5" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="12" Foreground="Green" TextWrapping="Wrap"
+                   AutomationProperties.AutomationId="SalesFilterStatus"/>
     </Grid>
 </Page>

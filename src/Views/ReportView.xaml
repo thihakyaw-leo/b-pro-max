@@ -22,6 +22,25 @@
 
         <StackPanel Grid.Row="1" Margin="12" Spacing="12">
             <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Report Type:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="ReportTypeLabel"/>
+                <ComboBox x:Name="ReportTypeCombo" Width="220"
+                          AutomationProperties.AutomationId="ReportTypeCombo">
+                    <ComboBoxItem Content="Agents" IsSelected="True"
+                                  AutomationProperties.AutomationId="ReportTypeAgents"/>
+                    <ComboBoxItem Content="Sales"
+                                  AutomationProperties.AutomationId="ReportTypeSales"/>
+                    <ComboBoxItem Content="2D Sales by Draw"
+                                  AutomationProperties.AutomationId="ReportTypeTwoDSalesByDraw"/>
+                    <ComboBoxItem Content="2D Sales by Number"
+                                  AutomationProperties.AutomationId="ReportTypeTwoDSalesByNumber"/>
+                    <ComboBoxItem Content="2D Group Performance"
+                                  AutomationProperties.AutomationId="ReportTypeTwoDGroupPerformance"/>
+                    <ComboBoxItem Content="2D Payout Register"
+                                  AutomationProperties.AutomationId="ReportTypeTwoDPayoutRegister"/>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBlock Text="Start Date:" Width="100" VerticalAlignment="Center"
                            AutomationProperties.AutomationId="ReportStartDateLabel"/>
                 <CalendarDatePicker x:Name="StartDatePicker" Width="150"
@@ -34,11 +53,20 @@
                                     AutomationProperties.AutomationId="ReportEndDatePicker"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button x:Name="AgentReportButton" Content="Agent Report" Click="AgentReportButton_Click"
-                        AutomationProperties.AutomationId="ReportAgentButton"/>
-                <Button x:Name="SalesReportButton" Content="Sales Report" Click="SalesReportButton_Click"
-                        AutomationProperties.AutomationId="ReportSalesButton"/>
-                <Button x:Name="ExportButton" Content="Export" Click="ExportButton_Click"
+                <TextBlock Text="Format:" Width="100" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="ReportFormatLabel"/>
+                <ComboBox x:Name="ExportFormatCombo" Width="150"
+                          AutomationProperties.AutomationId="ReportFormatCombo">
+                    <ComboBoxItem Content="PDF" IsSelected="True"
+                                  AutomationProperties.AutomationId="FormatPdf"/>
+                    <ComboBoxItem Content="Excel"
+                                  AutomationProperties.AutomationId="FormatExcel"/>
+                    <ComboBoxItem Content="CSV"
+                                  AutomationProperties.AutomationId="FormatCsv"/>
+                </ComboBox>
+                <Button x:Name="GenerateButton" Content="Generate" Click="GenerateButton_Click"
+                        AutomationProperties.AutomationId="ReportGenerateButton"/>
+                <Button x:Name="ExportButton" Content="Export to File" Click="ExportButton_Click"
                         AutomationProperties.AutomationId="ReportExportButton"/>
             </StackPanel>
         </StackPanel>

@@ -1,3 +1,4 @@
+using System.Globalization;
 using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,10 @@ namespace BProMax.Views;
 /// </summary>
 public sealed partial class SoundSettingsView : Page
 {
+    private const string VolumeSettingKey = "Sound:Volume";
+
     private readonly ISoundService _soundService;
+    private readonly ISettingsStore _settings;
 
     private CheckBox EnabledCheck => this.FindChildByName<CheckBox>("EnabledCheck")!;
     private Slider VolumeSlider => this.FindChildByName<Slider>("VolumeSlider")!;
@@ -21,13 +25,23 @@ public sealed partial class SoundSettingsView : Page
     {
         _soundService = App.Services?.GetRequiredService<ISoundService>()
             ?? throw new InvalidOperationException("SoundService not registered.");
+        _settings = App.Services?.GetRequiredService<ISettingsStore>()
+            ?? throw new InvalidOperationException("SettingsStore not registered.");
     }
 
-    protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
         EnabledCheck.IsChecked = _soundService.IsEnabled;
-        VolumeSlider.Value = _soundService.IsEnabled ? 0.5 : 0;
+
+        // Load persisted volume; default to 0.5.
+        var volumeStr = await _settings.GetAsync(VolumeSettingKey);
+        double volume = 0.5;
+        if (!string.IsNullOrEmpty(volumeStr) && double.TryParse(volumeStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
+        {
+            volume = Math.Clamp(parsed, 0, 1);
+        }
+        VolumeSlider.Value = volume;
     }
 
     private async void TestAlertButton_Click(object sender, RoutedEventArgs e)
@@ -62,11 +76,16 @@ public sealed partial class SoundSettingsView : Page
         }
     }
 
-    private void SaveButton_Click(object sender, RoutedEventArgs e)
+    private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         StatusMessage.Text = string.Empty;
         _soundService.IsEnabled = EnabledCheck.IsChecked == true;
-        _soundService.SetVolume(VolumeSlider.Value);
+        var volume = VolumeSlider.Value;
+        _soundService.SetVolume(volume);
+
+        // Persist volume.
+        await _settings.SetAsync(VolumeSettingKey, volume.ToString(CultureInfo.InvariantCulture));
+
         StatusMessage.Text = "Sound settings saved.";
         StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
     }

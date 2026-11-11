@@ -27,24 +27,24 @@ public sealed partial class AutoBuyView : Page
             ?? throw new InvalidOperationException("AutoBuyService not registered.");
     }
 
-    protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        LoadRules();
+        await LoadRulesAsync();
     }
 
-    private void LoadRules()
+    private async Task LoadRulesAsync()
     {
-        var rules = _autoBuyService.GetAllRules();
+        var rules = await _autoBuyService.GetAllRulesAsync();
         RulesList.ItemsSource = rules;
     }
 
-    private void CreateButton_Click(object sender, RoutedEventArgs e)
+    private async void CreateButton_Click(object sender, RoutedEventArgs e)
     {
         StatusMessage.Text = string.Empty;
 
-        if (!decimal.TryParse(TriggerAmountBox.Text, out var triggerAmt) ||
-            !decimal.TryParse(AutoBuyAmountBox.Text, out var autoBuyAmt))
+        if (!decimal.TryParse(TriggerAmountBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var triggerAmt) ||
+            !decimal.TryParse(AutoBuyAmountBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var autoBuyAmt))
         {
             StatusMessage.Text = "Invalid numeric values.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
@@ -61,10 +61,15 @@ public sealed partial class AutoBuyView : Page
 
         try
         {
-            _autoBuyService.CreateRule(rule);
-            LoadRules();
+            await _autoBuyService.CreateRuleAsync(rule);
+            await LoadRulesAsync();
             StatusMessage.Text = "Rule created.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage.Text = ex.Message;
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
         catch (Exception ex)
         {
@@ -73,12 +78,12 @@ public sealed partial class AutoBuyView : Page
         }
     }
 
-    private void UpdateButton_Click(object sender, RoutedEventArgs e)
+    private async void UpdateButton_Click(object sender, RoutedEventArgs e)
     {
         StatusMessage.Text = string.Empty;
 
-        if (!decimal.TryParse(TriggerAmountBox.Text, out var triggerAmt) ||
-            !decimal.TryParse(AutoBuyAmountBox.Text, out var autoBuyAmt))
+        if (!decimal.TryParse(TriggerAmountBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var triggerAmt) ||
+            !decimal.TryParse(AutoBuyAmountBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var autoBuyAmt))
         {
             StatusMessage.Text = "Invalid numeric values.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
@@ -86,7 +91,7 @@ public sealed partial class AutoBuyView : Page
         }
 
         var agentName = AgentNameBox.Text ?? string.Empty;
-        var existing = _autoBuyService.GetRuleByAgent(agentName);
+        var existing = await _autoBuyService.GetRuleByAgentAsync(agentName);
         if (existing == null)
         {
             StatusMessage.Text = "No rule found for this agent.";
@@ -101,10 +106,15 @@ public sealed partial class AutoBuyView : Page
 
         try
         {
-            _autoBuyService.UpdateRule(existing);
-            LoadRules();
+            await _autoBuyService.UpdateRuleAsync(existing);
+            await LoadRulesAsync();
             StatusMessage.Text = "Rule updated.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+        }
+        catch (InvalidOperationException ex)
+        {
+            StatusMessage.Text = ex.Message;
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
         }
         catch (Exception ex)
         {
@@ -113,12 +123,12 @@ public sealed partial class AutoBuyView : Page
         }
     }
 
-    private void DeleteButton_Click(object sender, RoutedEventArgs e)
+    private async void DeleteButton_Click(object sender, RoutedEventArgs e)
     {
         StatusMessage.Text = string.Empty;
 
         var agentName = AgentNameBox.Text ?? string.Empty;
-        var rule = _autoBuyService.GetRuleByAgent(agentName);
+        var rule = await _autoBuyService.GetRuleByAgentAsync(agentName);
         if (rule == null)
         {
             StatusMessage.Text = "No rule found for this agent.";
@@ -128,8 +138,8 @@ public sealed partial class AutoBuyView : Page
 
         try
         {
-            _autoBuyService.DeleteRule(rule.Id);
-            LoadRules();
+            await _autoBuyService.DeleteRuleAsync(rule.Id);
+            await LoadRulesAsync();
             StatusMessage.Text = "Rule deleted.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
         }
@@ -140,18 +150,18 @@ public sealed partial class AutoBuyView : Page
         }
     }
 
-    private void RefreshButton_Click(object sender, RoutedEventArgs e)
+    private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
-        LoadRules();
+        await LoadRulesAsync();
         StatusMessage.Text = string.Empty;
     }
 
-    private void ToggleButton_Click(object sender, RoutedEventArgs e)
+    private async void ToggleButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is int ruleId)
         {
-            _autoBuyService.ToggleRule(ruleId);
-            LoadRules();
+            await _autoBuyService.ToggleRuleAsync(ruleId);
+            await LoadRulesAsync();
         }
     }
 }

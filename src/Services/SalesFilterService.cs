@@ -2,21 +2,15 @@ using BProMax.Models;
 
 namespace BProMax.Services;
 
-public class SaleRecord
-{
-    public int Id { get; set; }
-    public DateTime SaleDate { get; set; }
-    public string AgentName { get; set; } = string.Empty;
-    public decimal Amount { get; set; }
-    public decimal Commission { get; set; }
-    public decimal Commission1 { get; set; }
-    public string CurrencyType { get; set; } = string.Empty;
-    public decimal CurrencyRate { get; set; } = 1;
-    public string Status { get; set; } = string.Empty; // "Pending", "Paid", "Cancelled"
-}
-
 public class SalesFilterService : ISalesFilterService
 {
+    private readonly ISalesService _salesService;
+
+    public SalesFilterService(ISalesService salesService)
+    {
+        _salesService = salesService;
+    }
+
     public List<SaleRecord> FilterByDateRange(List<SaleRecord> sales, DateTime startDate, DateTime endDate)
     {
         return sales.Where(s => s.SaleDate >= startDate && s.SaleDate <= endDate).ToList();
@@ -85,10 +79,8 @@ public class SalesFilterService : ISalesFilterService
             : sales.OrderByDescending(s => s.Amount).ToList();
     }
 
-    public Task<List<SaleRecord>> GetAllSalesAsync()
+    public async Task<List<SaleRecord>> GetAllSalesAsync()
     {
-        // TODO: Implement when sales table exists in Supabase
-        // For now, return empty list
-        return Task.FromResult(new List<SaleRecord>());
+        return await _salesService.GetAllSalesAsync();
     }
 }

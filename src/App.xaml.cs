@@ -34,9 +34,6 @@ public sealed partial class App : Application
         // Build configuration: .env values > appsettings.json > environment variables
         var envConfig = new Dictionary<string, string?>
         {
-            ["Supabase:Url"] = Environment.GetEnvironmentVariable("SUPABASE_URL"),
-            ["Supabase:AnonKey"] = Environment.GetEnvironmentVariable("SUPABASE_PUBLISHABLE_KEY"),
-            ["Supabase:ServiceRoleKey"] = Environment.GetEnvironmentVariable("SUPABASE_SECRET_KEY"),
             ["Database:ConnectionString"] = Environment.GetEnvironmentVariable("DATABASE_URL")
                 ?? Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"),
         };
@@ -56,25 +53,38 @@ public sealed partial class App : Application
             services.AddSingleton(Configuration);
             services.Configure<AppSettings>(Configuration.GetSection("App"));
             services.Configure<DatabaseSettings>(Configuration.GetSection("Database"));
-            services.Configure<SupabaseSettings>(Configuration.GetSection("Supabase"));
             services.Configure<SoundSettings>(Configuration.GetSection("Sound"));
-            services.Configure<TimeLockSettings>(Configuration.GetSection("TimeLock"));
+            services.Configure<RegionalSettings>(Configuration.GetSection("Regional"));
             services.AddLogging(builder => builder.AddConsole());
         }
 
-        // Services
+        // Services (local PostgreSQL via Npgsql)
         services.AddSingleton<IDatabaseService, DatabaseService>();
-        services.AddSingleton<ISupabaseAgentService, SupabaseAgentService>();
-        services.AddSingleton<IAgentService, AgentServiceAdapter>();
+        services.AddSingleton<ISettingsStore, SettingsStore>();
+        services.AddSingleton<IAgentService, AgentService>();
         services.AddSingleton<IDatabaseMigrationService, DatabaseMigrationService>();
         services.AddSingleton<ICommissionService, CommissionService>();
         services.AddSingleton<ISalesFilterService, SalesFilterService>();
+        services.AddSingleton<ISalesService, SalesService>();
         services.AddSingleton<IAutoBuyService, AutoBuyService>();
+        services.AddSingleton<INumberBatchParser, NumberBatchParser>();
+        services.AddSingleton<IBatchSaleBuilder, BatchSaleBuilder>();
+        services.AddSingleton<INumberResolutionService, NumberResolutionService>();
+        services.AddSingleton<IPayoutCalculator, PayoutCalculator>();
+        services.AddSingleton<ISaleItemAmountCalculator, SaleItemAmountCalculator>();
+        services.AddSingleton<ISalePanelLineFactory, SalePanelLineFactory>();
+        services.AddSingleton<IBetTypeService, BetTypeService>();
+        services.AddSingleton<IDrawService, DrawService>();
+        services.AddSingleton<ISaleEntryService, SaleEntryService>();
+        services.AddSingleton<IPayoutService, PayoutService>();
+        services.AddSingleton<ITwoDReportService, TwoDReportService>();
+        services.AddSingleton<ITwoDExportService, TwoDExportService>();
         services.AddSingleton<IReportService, ReportService>();
         services.AddSingleton<IExcelExportService, ExcelExportService>();
         services.AddSingleton<ICsvExportService, CsvExportService>();
         services.AddSingleton<IDatabaseMaintenanceService, DatabaseMaintenanceService>();
         services.AddSingleton<ISoundService, SoundService>();
+        services.AddSingleton<IRegionalSettingsService, RegionalSettingsService>();
         services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<ILicensingService, LicensingService>();
         services.AddSingleton<ITimeLockService, TimeLockService>();
@@ -98,6 +108,7 @@ public sealed partial class App : Application
             var migration = Services?.GetRequiredService<IDatabaseMigrationService>();
             if (migration != null)
             {
+                await migration.EnsureTablesCreatedAsync();
                 var (tableExists, agentCount) = await migration.GetStatusAsync();
 
                 if (!tableExists)

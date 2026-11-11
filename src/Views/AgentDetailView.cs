@@ -88,20 +88,50 @@ public sealed partial class AgentDetailView : Page
     {
         StatusMessage.Text = string.Empty;
 
-        if (!decimal.TryParse(CommissionBox.Text, out var commission) ||
-            !decimal.TryParse(RateBox.Text, out var rate) ||
-            !decimal.TryParse(Commission1Box.Text, out var commission1) ||
-            !decimal.TryParse(Rate1Box.Text, out var rate1) ||
-            !decimal.TryParse(CurrencyRateBox.Text, out var currencyRate))
+        // Validate agent name.
+        var agentName = AgentNameBox.Text?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(agentName))
+        {
+            StatusMessage.Text = "Agent name is required.";
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            return;
+        }
+        if (agentName.Length > 200)
+        {
+            StatusMessage.Text = "Agent name must be 200 characters or less.";
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            return;
+        }
+
+        // Validate numeric fields.
+        if (!decimal.TryParse(CommissionBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var commission) ||
+            !decimal.TryParse(RateBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var rate) ||
+            !decimal.TryParse(Commission1Box.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var commission1) ||
+            !decimal.TryParse(Rate1Box.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var rate1) ||
+            !decimal.TryParse(CurrencyRateBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var currencyRate))
         {
             StatusMessage.Text = "Invalid numeric values.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
             return;
         }
 
+        if (commission < 0 || commission1 < 0 || currencyRate < 0)
+        {
+            StatusMessage.Text = "Commission and currency rate must be non-negative.";
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            return;
+        }
+
+        if (rate < 0 || rate > 100 || rate1 < 0 || rate1 > 100)
+        {
+            StatusMessage.Text = "Rate must be between 0 and 100.";
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            return;
+        }
+
         var agent = new Agent
         {
-            AgentName = AgentNameBox.Text ?? string.Empty,
+            AgentName = agentName,
             Address = AddressBox.Text,
             Phone = PhoneBox.Text,
             Commission = commission,
@@ -119,7 +149,13 @@ public sealed partial class AgentDetailView : Page
             if (_agentId.HasValue)
             {
                 agent.Id = _agentId.Value;
-                await _agentService.UpdateAgentAsync(agent);
+                var affected = await _agentService.UpdateAgentAsync(agent);
+                if (affected == 0)
+                {
+                    StatusMessage.Text = "Agent not found. It may have been deleted by another user.";
+                    StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                    return;
+                }
                 StatusMessage.Text = "Agent updated.";
             }
             else
@@ -155,7 +191,13 @@ public sealed partial class AgentDetailView : Page
         {
             try
             {
-                await _agentService.DeleteAgentAsync(_agentId.Value);
+                var affected = await _agentService.DeleteAgentAsync(_agentId.Value);
+                if (affected == 0)
+                {
+                    StatusMessage.Text = "Agent not found. It may have been deleted by another user.";
+                    StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                    return;
+                }
                 StatusMessage.Text = "Agent deleted.";
                 StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
                 _ = this.Frame?.Navigate(typeof(AgentListView));
