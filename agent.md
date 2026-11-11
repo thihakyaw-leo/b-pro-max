@@ -24,12 +24,12 @@ Build a modern, enhanced version of **DD.exe** — a Visual Basic 6 lottery/agen
 | Language/runtime | Visual Basic 6 + MSVBVM60.DLL | C# + WinUI 3 (.NET) |
 | UI | VB6 forms + ActiveX (MSFlexGrid, Crystal OCX, DTPicker, CommonDialog) | WinUI XAML + Modern Controls |
 | Database | ADO + AgentThai table (Jet/Access or SQL Server) | PostgreSQL |
-| Reporting | Crystal Reports | FastReport .NET |
+| Reporting | Crystal Reports | PdfSharpCore (PDF) + QuestPDF |
 | Sound | winmm.dll sndPlaySoundA | .NET SoundPlayer / MediaPlayer |
 | Excel | OLE automation (modExcel) | EPPlus |
 | Config | Registry (`*\AD:\SOFT\Xerus_ADO\bsql\bsql.vbp`) + INI | JSON + appsettings |
 | Date Picker | DTPicker (ActiveX) | Native WinUI DatePicker |
-| Data Grid | MSFlexGrid (ActiveX) | WinUI Data Grid |
+| Data Grid | MSFlexGrid (ActiveX) | WinUI `ListView` |
 | Paths | Hardcoded `D:\WINDOWS\system32\...`, `D:\Program Files\...` | Relative paths + app config |
 
 ### 2.2 Core database schema (AgentThai → must be preserved)
@@ -63,13 +63,13 @@ CREATE TABLE agents (
 | VB6 Module | Responsibility | Modern C# Replacement |
 |------------|---------------|----------------------|
 | `modMain` | App entry point, global init | `App.xaml.cs`, `Program.cs` |
-| `modGlobal` | Global variables, constants | `Models/Constants.cs`, `Services/GlobalService.cs` |
-| `modImExPort` | Import/Export data | `Services/ImportExportService.cs` (EPPlus) |
+| `modGlobal` | Global variables, constants | `Models/`, `Configuration/` |
+| `modImExPort` | Import/Export data | `Services/ExcelExportService.cs`, `Services/CsvExportService.cs` |
 | `modReg` | Registration/licensing | `Services/LicensingService.cs` |
-| `modINI` | INI file config | `Configuration/appsettings.json` |
-| `modExcel` | Excel OLE automation | `Services/ExcelService.cs` (EPPlus) |
+| `modINI` | INI file config | `appsettings.json` + `.env` |
+| `modExcel` | Excel OLE automation | `Services/ExcelExportService.cs` (EPPlus) |
 | `modCompactDB` | DB compaction/repair | `Services/DatabaseMaintenanceService.cs` |
-| `modRegional` | Regional/locale settings | `Configuration/Localization/` |
+| `modRegional` | Regional/locale settings | `Services/RegionalSettingsService.cs` |
 
 ### 2.5 Form map (VB6 → WinUI XAML views)
 
@@ -85,7 +85,7 @@ CREATE TABLE agents (
 | `frmCompactMsg` | DB compaction UI | `Views/CompactDatabaseView.xaml` |
 | `frmSearch` | Search agents | `Views/AgentSearchView.xaml` |
 | `frmCustomer` | Customer management | `Views/AgentDetailView.xaml` |
-| `frmReport` / `frmF5Report` | Reporting | `Views/ReportView.xaml` (FastReport .NET) |
+| `frmReport` / `frmF5Report` | Reporting | `Views/ReportView.xaml` (PdfSharpCore) |
 | `frmSoundSetting` | Sound config | `Views/SoundSettingsView.xaml` |
 | `frmTimeLock` | Time-based access control | `Views/TimeLockView.xaml` |
 
@@ -101,10 +101,10 @@ CREATE TABLE agents (
 - **Preserve all business logic** — agent CRUD, commission calculation, sales filtering, backup/compact, reporting, sound alerts, time-lock access.
 - **Use WinUI 3 (Windows App SDK)** — not WPF, not WinForms, not Electron.
 - **Use PostgreSQL** — not SQLite, not SQL Server, not Access.
-- **Use FastReport .NET** — not Crystal Reports.
+- **Use PdfSharpCore (PDF generation)** — not Crystal Reports, not FastReport.
 - **Use EPPlus** — not OLE automation, not closed XML.
 - **Use native WinUI DatePicker** — not third-party date pickers.
-- **Use WinUI Data Grid** — not third-party grids.
+- **Use the native WinUI `ListView`** — not third-party grids. (The WinUI Data Grid package is not referenced.)
 
 ---
 
@@ -123,29 +123,30 @@ CREATE TABLE agents (
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | WinUI 3 / Windows App SDK |
-| Language | C# (.NET 6/7/8) |
+| Framework | WinUI 3 / Windows App SDK 1.7 |
+| Language | C# (.NET 9) |
 | UI | XAML + Modern Controls (WinUI) |
 | Database | PostgreSQL (Npgsql provider) |
-| Reporting | FastReport .NET |
+| Reporting | PdfSharpCore (PDF) + QuestPDF |
 | Excel | EPPlus |
-| Configuration | JSON (appsettings.json) |
+| Configuration | JSON (appsettings.json) + `.env` (DotNetEnv) |
 | Date Picker | Native WinUI DatePicker |
-| Data Grid | WinUI Data Grid (Microsoft.UI.Xaml.Controls.DataGrid) |
+| Data Grid | WinUI `ListView` |
 | Sound | System.Media.SoundPlayer / MediaElement |
-| Testing | xUnit / MSTest |
+| Testing | xUnit |
 
 ---
 
 ## 6. How to Work in This Repo
 
-- This is a **new project** — no git history yet. Initialize git on first commit.
+- The repo is already under git on branch `main` (`F:\b\b-pro-max\.git`); do not re-initialize it.
 - All source goes under `F:\b\b-pro-max\src\`.
-- Tests go under `F:\b\b-pro-max\tests\`.
+- Tests go under `F:\b\b-pro-max\tests\` (unit) and `F:\b\b-pro-max\tests\e2e\` (e2e).
 - Solution file: `F:\b\b-pro-max\b-pro-max.sln`
-- Project: `F:\b\b-pro-max\b-pro-max.csproj` (WinUI 3 / Windows App SDK)
-- Config at repo root: `appsettings.json`
-- Do not modify `AGENTS.md`, `plan.md`, or `todos.md` without updating the other two to stay in sync.
+- App project: `F:\b\b-pro-max\src\b-pro-max.csproj` (WinUI 3 / Windows App SDK)
+- Config at repo root: `appsettings.json` (plus optional gitignored `.env`)
+- Quality gate mirrors CI: `dotnet format --verify-no-changes` → `dotnet build b-pro-max.sln -c Release` → unit tests → e2e tests.
+- Do not modify `AGENTS.md`, `agent.md`, `plan.md`, or `todos.md` without updating the others to stay in sync.
 
 ---
 
@@ -154,10 +155,12 @@ CREATE TABLE agents (
 | Package | Purpose |
 |---------|---------|
 | Microsoft.WindowsAppSDK | WinUI 3 framework |
-| Microsoft.UI.Xaml | WinUI controls |
 | Npgsql | PostgreSQL ADO.NET provider |
-| FastReport | FastReport .NET reporting |
+| PdfSharpCore | PDF report generation |
+| QuestPDF | PDF composition (reference reserved for report work) |
 | EPPlus | Excel file generation |
+| CsvHelper | CSV import/export |
 | Microsoft.Extensions.Configuration | JSON config binding |
 | Microsoft.Extensions.Configuration.Json | JSON config provider |
-| xUnit / MSTest | Unit testing |
+| DotNetEnv | `.env` secret overrides |
+| xUnit | Unit testing |

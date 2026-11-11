@@ -3,7 +3,7 @@
 **Status:** Phase 0, 1, 2, 3, 4 & 5 complete — M1 (Auth), M2 (Core Data), & M3 (Security/Correctness) complete — WinUI 3 migration done — Supabase removed, local PostgreSQL configured — Reporting & Export complete — Database Maintenance complete — System Features complete with Myanmar/Burma locale support — M5 (2D Sales System) code complete; Windows UI smoke test pending  
 **Location:** `F:\b\b-pro-max\todos.md`  
 **Reference:** `plan.md` for phase details, `agent.md` for architecture  
-**Tech Stack:** .NET 9 WinUI 3 + Windows App SDK + Npgsql + EPPlus + JSON config  
+**Tech Stack:** .NET 9 WinUI 3 + Windows App SDK + Npgsql + EPPlus/CsvHelper + PdfSharpCore + JSON config  
 **UI:** WinUI 3 desktop app — MainWindow NavigationView shell with 16 Page views
 **Database:** Local PostgreSQL only (Supabase REST path removed)
 
@@ -23,8 +23,9 @@
 | P0-08 xUnit test project | ✅ Done | Tests passing |
 | P0-09 README.md | ✅ Done | Complete documentation |
 
-**Build:** `dotnet build src\b-pro-max.csproj` — 0 errors, 0 warnings  
-**Tests:** `dotnet test tests\b-pro-max.tests.csproj` — 78 passed, 0 failed  
+**Build:** `dotnet build b-pro-max.sln -c Release` — 0 errors, 0 warnings  
+**Tests:** `dotnet test tests\b-pro-max.tests.csproj` — 246 passed, 0 failed (unit); `dotnet test tests\e2e\b-pro-max.e2e.csproj` — 19 passed, 0 failed (e2e)  
+**Format:** `dotnet format --verify-no-changes` — clean (required by the CI gate)  
 **App launch:** Blocked by `REGDB_E_CLASSNOTREG` — WinRT activation unavailable in container; requires Windows desktop with WinRT runtime registered  
 **Code review:** `/winui-code-review` fixes applied — Window.Current → App.MainWindowInstance, hardcoded SolidColorBrush → ThemeResource, raw FontSize/FontWeight → Theme styles (19 issues across 15 files)
 
@@ -94,7 +95,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 
 ## Phase 3 — Reporting & Export ✅ COMPLETE
 
-- [x] P3-01 Replace Crystal Reports with FastReport .NET — Implemented with PdfSharpCore (PDF generation)
+- [x] P3-01 Replace Crystal Reports with PdfSharpCore PDF generation — Implemented with PdfSharpCore (PDF generation)
 - [x] P3-02 Build agent report view — WinUI 3 Page (ReportView) created
 - [x] P3-03 Implement Excel export (EPPlus) — Implemented (ExcelExportService.cs)
 - [x] P3-04 Implement CSV export — Implemented (CsvExportService.cs)
@@ -147,7 +148,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 | M5-09 Sales Panel UI | ✅ Done | Batch field, R toggle, Quick Add, preview, totals, save; `SalePanelLineFactory` 8 tests |
 | M5-10 Reports/exports/Number Wisdom | ✅ Done | Four 2D reports with CSV/Excel/PDF; `NumberWisdomView` edits multipliers, active flags, sort order, and group members |
 
-WinUI UI smoke tests require a Windows desktop; the Linux container can build and run all non-UI tests.
+WinUI UI smoke tests require a Windows desktop with the WinRT runtime registered; non-UI tests build and run on any platform.
 
 ---
 
@@ -200,7 +201,7 @@ WinUI UI smoke tests require a Windows desktop; the Linux container can build an
 | TimeLockServiceTests | 9 |
 | TwoDSeedDataTests | 16 |
 
-Integration harness (`/tmp/opencode/migration-check`) additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
+Integration harness additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
 
 E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
 
@@ -209,17 +210,13 @@ E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`
 ## Commands
 
 ```cmd
-# Build (from repo root)
-cd F:\b\b-pro-max
-dotnet build src\b-pro-max.csproj
+# Quality pass (mirrors CI) — run from repo root F:\b\b-pro-max
+dotnet format --verify-no-changes
+dotnet build b-pro-max.sln -c Release
+dotnet test tests\b-pro-max.tests.csproj -c Release --no-build
+dotnet test tests\e2e\b-pro-max.e2e.csproj -c Release --no-build
 
-# Build tests
-dotnet build tests\b-pro-max.tests.csproj
-
-# Test
-dotnet test tests\b-pro-max.tests.csproj
-
-# Run (blocked in container — REGDB_E_CLASSNOTREG)
+# Run (requires a Windows desktop with the WinRT runtime registered)
 dotnet run --project src\b-pro-max.csproj
 ```
 
@@ -278,7 +275,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 
 ## Phase 3 — Reporting & Export
 
-- [x] P3-01 Replace Crystal Reports with FastReport .NET — Implemented with PdfSharpCore (PDF generation)
+- [x] P3-01 Replace Crystal Reports with PdfSharpCore PDF generation — Implemented with PdfSharpCore (PDF generation)
 - [x] P3-02 Build agent report view — Placeholder created
 - [x] P3-03 Implement Excel export (EPPlus) — Stub created
 - [x] P3-04 Implement CSV export
@@ -314,7 +311,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 | CA-02 Fix resulting src warnings | ✅ Done | 0 CA warnings in src after promotion — all clean |
 | CA-03 Phase 4: TreatWarningsAsErrors=true | ✅ Done | Already set in Directory.Build.props |
 | CA-04 WarningsNotAsErrors=CA1707 | ✅ Done | Added to Directory.Build.props (tests: 148 occurrences) |
-| CA-05 Validate full build + tests | ✅ Done | src 0 errors, tests 0 errors, 78/78 pass |
+| CA-05 Validate full build + tests | ✅ Done | src 0 errors/0 warnings, tests 0 errors, 246/246 unit + 19/19 e2e pass |
 
 ---
 
@@ -329,7 +326,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 
 ---
 
-## View Placeholders Created (WinUI 3 — to be implemented in Visual Studio)
+## View Placeholders Created (historical — superseded by "WinUI 3 Views" above)
 
 | View | File | Replaces VB6 Form |
 | --- | --- | --- |
@@ -375,7 +372,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 | TimeLockServiceTests | 9 |
 | TwoDSeedDataTests | 16 |
 
-Integration harness (`/tmp/opencode/migration-check`) additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
+Integration harness additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
 
 E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
 
@@ -384,12 +381,11 @@ E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`
 ## Commands
 
 ```cmd
-# Build
-cd F:\b\b-pro-max
-dotnet build src\b-pro-max.csproj
-
-# Test
-dotnet test tests\b-pro-max.tests.csproj
+# Quality pass (mirrors CI) — run from repo root F:\b\b-pro-max
+dotnet format --verify-no-changes
+dotnet build b-pro-max.sln -c Release
+dotnet test tests\b-pro-max.tests.csproj -c Release --no-build
+dotnet test tests\e2e\b-pro-max.e2e.csproj -c Release --no-build
 
 # Run (from repo root)
 dotnet run --project src\b-pro-max.csproj

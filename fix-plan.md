@@ -512,7 +512,7 @@
 1. Update `README.md`: first-run setup, users, license, time lock, backup/restore, Myanmar font.
 2. Add `scripts/setup-db.ps1`, `scripts/backup.ps1`, `scripts/restore.ps1`.
 3. Add a deployment checklist (publish, prerequisites, PostgreSQL service).
-4. Run the final audit: no VB6, ActiveX, Registry, FastReport, Supabase, or original-binary dependencies.
+4. Run the final audit: no VB6, ActiveX, Registry, or original-binary dependencies (and no FastReport/Crystal Reports packages).
 5. Update `todos.md` and close Phase 6.
 
 **Acceptance:** A clean Windows machine can be set up by following the docs only; audit checklist is complete.

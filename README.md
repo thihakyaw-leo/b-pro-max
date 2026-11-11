@@ -40,7 +40,7 @@ Schema: `Scripts/001_agents.sql` (PostgreSQL).
 | Language | C# |
 | UI | WinUI 3 XAML (Windows desktop) |
 | Database | PostgreSQL (Npgsql) — local |
-| Reporting | FastReport .NET |
+| Reporting | PdfSharpCore (PDF) + QuestPDF |
 | Excel | EPPlus |
 | Configuration | JSON (appsettings.json) |
 | Sound | .NET Console.Beep (no winmm.dll) |
@@ -53,67 +53,37 @@ Schema: `Scripts/001_agents.sql` (PostgreSQL).
 b-pro-max/
 ├── b-pro-max.sln
 ├── appsettings.json          # Configuration (local PostgreSQL connection string)
-├── .editorconfig
+├── .env.example              # Template for optional local overrides (copy to .env)
+├── .editorconfig             # Formatting + analyzer severity (source of truth)
+├── .gitattributes            # Forces LF line endings (CI format gate)
 ├── .gitignore
-├── global.json               # Pins .NET SDK 9.0.321
+├── global.json               # Pins .NET SDK 9.0.x (resolves to 9.0.321)
 ├── README.md                 # This file
 ├── AGENTS.md                 # Repo-native quality baseline + build commands
+├── agent.md / plan.md / todos.md  # Architecture, phases, and task tracker (keep in sync)
 ├── Scripts/
-│   └── 001_agents.sql        # PostgreSQL agents table schema
+│   ├── 001_agents.sql            # PostgreSQL agents table schema
+│   ├── 002_users.sql
+│   ├── 003_sales.sql
+│   ├── 004_autobuy.sql
+│   ├── 005_settings.sql
+│   └── 006_access_requests.sql
 ├── src\
 │   ├── b-pro-max.csproj
 │   ├── App.cs                # (superseded) former DI/config, now App.xaml.cs
 │   ├── App.xaml.cs           # DI container + configuration + app startup
 │   ├── Program.cs            # WinUI 3 entry point ([STAThread] Main)
 │   ├── InteractiveMenu.cs    # Console UI for testing
-│   ├── Models/
-│   │   └── Agent.cs
-│   ├── Configuration/
-│   │   └── AppSettings.cs
-│   ├── Services/
-│   │   ├── IDatabaseService.cs
-│   │   ├── DatabaseService.cs
-│   │   ├── IAgentService.cs
-│   │   ├── AgentService.cs
-│   │   ├── ICommissionService.cs
-│   │   ├── CommissionService.cs
-│   │   ├── IReportService.cs
-│   │   ├── ReportService.cs
-│   │   ├── IExcelExportService.cs
-│   │   ├── ExcelExportService.cs
-│   │   ├── ICsvExportService.cs
-│   │   ├── CsvExportService.cs
-│   │   ├── IDatabaseMaintenanceService.cs
-│   │   ├── DatabaseMaintenanceService.cs
-│   │   ├── IDatabaseMigrationService.cs
-│   │   ├── DatabaseMigrationService.cs
-│   │   ├── ISoundService.cs
-│   │   ├── SoundService.cs
-│   │   ├── IAuthService.cs
-│   │   ├── AuthService.cs
-│   │   ├── ILicensingService.cs
-│   │   ├── LicensingService.cs
-│   │   ├── ITimeLockService.cs
-│   │   ├── ITimeLockService.cs
-│   │   ├── ISalesFilterService.cs
-│   │   ├── SalesFilterService.cs
-│   │   ├── IAutoBuyService.cs
-│   │   └── AutoBuyService.cs
-│   └── Views/                # WinUI 3 placeholders (13 files)
+│   ├── Models/               # Agent, SaleRecord, Payout, TwoD, batch-sale models
+│   ├── Configuration/        # AppSettings, RegionalSettings
+│   ├── Services/             # 61 service files (database, agents, sales, reports,
+│   │                         #   exports, auth, licensing, time lock, regional, 2D)
+│   └── Views/                # 16 WinUI 3 Page views (.xaml + .xaml.cs)
 └── tests\
     ├── b-pro-max.tests.csproj
-    ├── AgentServiceTests.cs      (8 tests)
-    ├── CommissionServiceTests.cs (6 tests)
-    ├── CommissionServiceCurrencyTests.cs (10 tests)
-    ├── SoundServiceTests.cs      (5 tests)
-    ├── DatabaseMaintenanceServiceTests.cs (4 tests)
-    ├── AuthServiceTests.cs       (7 tests)
-    ├── LicensingServiceTests.cs  (5 tests)
-    ├── TimeLockServiceTests.cs   (7 tests)
-    ├── SalesFilterServiceTests.cs (9 tests)
-    ├── AutoBuyServiceTests.cs    (13 tests)
-    ├── ExcelExportServiceTests.cs (2 tests)
-    └── ReportServiceTests.cs     (2 tests)
+    ├── ...                    # 21 unit test classes — 246 tests
+    └── e2e\
+        └── b-pro-max.e2e.csproj  # 19 e2e tests against PostgreSQL
 ```
 
 **Database path:** local PostgreSQL only. Supabase REST integration was removed; the app now connects to a local `bpro_max` database via `IDatabaseService` → `DatabaseService` (Npgsql). Supabase settings were removed from `appsettings.json` and `.env`.
@@ -157,7 +127,7 @@ Without the Pyidaungsu font installed, Myanmar Unicode text may display as boxes
      }
    }
    ```
-   Alternatively override via environment variable `DATABASE_URL` or `DATABASE_CONNECTION_STRING` (takes precedence). See `.env` for commented examples.
+   Alternatively override via environment variable `DATABASE_URL` or `DATABASE_CONNECTION_STRING` (takes precedence). Copy `.env.example` to `.env` (gitignored) and fill in the values — the app starts without it.
 
 4. **Build**:
    ```cmd
@@ -181,8 +151,6 @@ See `AGENTS.md` for the full ordered command list:
 ```cmd
 dotnet format --verify-no-changes
 dotnet build b-pro-max.sln -c Release
-dotnet build src\b-pro-max.csproj
-dotnet build tests\b-pro-max.tests.csproj
 dotnet test tests\b-pro-max.tests.csproj --no-build
 dotnet test tests\b-pro-max.tests.csproj --collect:"XPlat Code Coverage" --results-directory:.\coverage
 dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
@@ -202,14 +170,17 @@ The console application provides a temporary interface for testing:
 | 6 | Show configuration |
 | 0 | Exit |
 
-## WinUI 3 Migration
+## WinUI 3 Views
 
-The console app is a temporary test harness. The final UI will be WinUI 3 XAML. Placeholder classes exist in `src\Views\`:
+The console app is a temporary test harness. The UI is WinUI 3 XAML: 16 Page views live in `src\Views\` as `.xaml` + `.xaml.cs` pairs.
 
 | View | Replaces VB6 Form |
 | --- | --- |
+| AgentListView | frmCustomer |
 | AgentDetailView | frmCustomer |
 | SalesFilterView | frmSaleFilt |
+| DrawsView | frmDraw / result entry |
+| NumberWisdomView | Bet type / group admin |
 | AutoBuyView | frmAutoBuy |
 | ReportView | frmReport / frmF5Report |
 | LoginView | frmLogin |
@@ -222,7 +193,7 @@ The console app is a temporary test harness. The final UI will be WinUI 3 XAML. 
 | SoundSettingsView | frmSoundSetting |
 | TimeLockView | frmTimeLock |
 
-Replace each `.cs` placeholder with `.xaml` + `.xaml.cs` in Visual Studio.
+> **Known limitation:** XAML compilation is currently disabled in `src\b-pro-max.csproj` (`MarkupCompilePass1`/`2` are no-op'd and `.xaml` files are excluded from compilation) because the XAML compiler cannot run against .NET 9 on this machine. Controls are resolved at runtime via `FindChildByName<T>()`, and there are no `InitializeComponent()` calls yet — restoring the XAML compiler or hand-writing the code-behind is required before the UI is fully renderable.
 
 ## Hard Constraints
 
@@ -233,18 +204,18 @@ Replace each `.cs` placeholder with `.xaml` + `.xaml.cs` in Visual Studio.
 - No original binary code copied from DD.exe
 - WinUI 3 only (no WPF, no WinForms)
 - PostgreSQL only (no SQLite, no SQL Server)
-- FastReport .NET only (no Crystal Reports)
+- PdfSharpCore for PDF generation (no Crystal Reports, no FastReport)
 - EPPlus only (no OLE automation)
 - Native WinUI DatePicker only
 
 ## Commands
 
 ```cmd
-# Build
-dotnet build src\b-pro-max.csproj
-
-# Test
-dotnet test tests\b-pro-max.tests.csproj
+# Quality pass (mirrors CI)
+dotnet format --verify-no-changes
+dotnet build b-pro-max.sln -c Release
+dotnet test tests\b-pro-max.tests.csproj --no-build
+dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 
 # Run
 dotnet run --project src\b-pro-max.csproj

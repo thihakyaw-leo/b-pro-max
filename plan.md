@@ -4,7 +4,7 @@
 **Location:** `F:\b\b-pro-max\`  
 **Source:** `F:\b\DD.exe` (VB6 lottery/agent management system)  
 **Date:** 2026-11-10  
-**Tech Stack:** WinUI 3 + C# + PostgreSQL + FastReport .NET + EPPlus + JSON config
+**Tech Stack:** WinUI 3 + C# (.NET 9) + PostgreSQL + PdfSharpCore/QuestPDF + EPPlus + JSON config
 
 ---
 
@@ -20,10 +20,10 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 |------|-------------|-------------|
 | P0-01 | Initialize repo (git, .sln, csproj, WinUI 3 template) | `F:\b\b-pro-max\b-pro-max.sln` |
 | P0-02 | Set up WinUI 3 + C# project structure | `App.xaml.cs`, `MainWindow.xaml`, `Views/`, `Models/`, `Services/` |
-| P0-03 | Configure PostgreSQL connection (Npgsql) | `Services/DatabaseConnection.cs` |
+| P0-03 | Configure PostgreSQL connection (Npgsql) | `Services/DatabaseService.cs` |
 | P0-04 | Create `agents` table schema (matching AgentThai fields) | `Scripts/001_agents.sql` |
 | P0-05 | Set up JSON configuration (appsettings.json) | `appsettings.json` |
-| P0-06 | Configure EPPlus, FastReport .NET package references | `.csproj` PackageReference entries |
+| P0-06 | Configure EPPlus, PdfSharpCore, QuestPDF package references | `.csproj` PackageReference entries |
 | P0-07 | Configure code analysis (.editorconfig, warnings as errors) | `.editorconfig` |
 
 **Exit criteria:** App launches, PostgreSQL connects, config loads from JSON, WinUI window displays.
@@ -35,13 +35,13 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 | Task | Description | Deliverable |
 |------|-------------|-------------|
 | P1-01 | Implement agent CRUD service (C# + Npgsql) | `Services/AgentService.cs` |
-| P1-02 | Build agent list view with search/filter (WinUI Data Grid) | `Views/AgentListView.xaml` |
+| P1-02 | Build agent list view with search/filter (WinUI `ListView`) | `Views/AgentListView.xaml` |
 | P1-03 | Build agent detail/edit form (XAML) | `Views/AgentDetailView.xaml` |
 | P1-04 | Implement `SELECT * FROM agents` query | `Services/AgentService.cs` |
 | P1-05 | Implement `WHERE agent_name = @name` filtered query | `Services/AgentService.cs` |
 | P1-06 | Implement `ORDER BY agent_name` sorted query | `Services/AgentService.cs` |
 | P1-07 | Add agent deletion with confirmation dialog (XAML ContentDialog) | `Views/AgentListView.xaml` |
-| P1-08 | Unit tests for agent service (xUnit/MSTest) | `tests/AgentServiceTests.cs` |
+| P1-08 | Unit tests for agent service (xUnit) | `tests/AgentServiceTests.cs` |
 
 **Exit criteria:** Full agent CRUD works through WinUI UI, data persists in PostgreSQL.
 
@@ -52,7 +52,7 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 | Task | Description | Deliverable |
 |------|-------------|-------------|
 | P2-01 | Implement commission/rate calculation logic | `Services/CommissionService.cs` |
-| P2-02 | Build sales filtering UI (WinUI Data Grid + DatePicker) | `Views/SalesFilterView.xaml` |
+| P2-02 | Build sales filtering UI (WinUI `ListView` + DatePicker) | `Views/SalesFilterView.xaml` |
 | P2-03 | Build auto-purchase feature | `Views/AutoBuyView.xaml` |
 | P2-04 | Add currency type/rate fields (CurType, CurRate) | `Scripts/002_currency.sql` + UI |
 | P2-05 | Implement commission payment/receive tracking | `Services/PaymentService.cs` |
@@ -66,13 +66,13 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 
 | Task | Description | Deliverable |
 |------|-------------|-------------|
-| P3-01 | Replace Crystal Reports with FastReport .NET | `Services/ReportService.cs` (FastReport) |
+| P3-01 | Replace Crystal Reports with PdfSharpCore PDF generation | `Services/ReportService.cs` (PdfSharpCore) |
 | P3-02 | Build agent report view | `Views/ReportView.xaml` |
 | P3-03 | Implement Excel export (EPPlus) | `Services/ExcelExportService.cs` |
 | P3-04 | Implement CSV export | `Services/CsvExportService.cs` |
 | P3-05 | Unit tests for report generation | `tests/ReportServiceTests.cs` |
 
-**Exit criteria:** Reports generate via FastReport, Excel/CSV export works.
+**Exit criteria:** Reports generate via PdfSharpCore, Excel/CSV export works.
 
 ---
 
@@ -97,7 +97,7 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 | P5-02 | Implement registration/licensing | `Services/LicensingService.cs` |
 | P5-03 | Implement sound settings (.NET SoundPlayer, no winmm.dll) | `Services/SoundService.cs`, `Views/SoundSettingsView.xaml` |
 | P5-04 | Implement time-lock access control | `Services/TimeLockService.cs`, `Views/TimeLockView.xaml` |
-| P5-05 | Implement regional/locale settings (JSON resx) | `Configuration/Localization/` |
+| P5-05 | Implement regional/locale settings (JSON config) | `Services/RegionalSettingsService.cs`, `appsettings.json` (`Regional` / `RegionalPresets`) |
 | P5-06 | Implement maintenance dashboard | `Views/MaintenanceView.xaml` |
 
 **Exit criteria:** Auth, licensing, sound, time-lock, regional all functional.
@@ -109,10 +109,10 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 | Task | Description | Deliverable |
 |------|-------------|-------------|
 | P6-01 | End-to-end testing against original DD.exe behavior | `tests/e2e/` |
-| P6-02 | Performance benchmarking (compare to 4.3 MB .text section app) | `benchmarks/` |
+| P6-02 | Performance benchmarking (compare to 4.3 MB .text section app) | Local scratch under `benchmarks/` (gitignored — do not commit) |
 | P6-03 | UI/UX polish (Modern Controls, responsive layout) | `Views/` |
 | P6-04 | Documentation and deployment scripts | `docs/`, `scripts/` |
-| P6-05 | Final audit: no VB6/ActiveX/Registry/FastReport/.NET dependencies remain | Audit checklist |
+| P6-05 | Final audit: no VB6/ActiveX/Registry dependencies remain | Audit checklist |
 
 **Exit criteria:** Feature parity with DD.exe, zero original-binary dependencies, app passes e2e tests.
 
@@ -133,7 +133,7 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 
 ## 10. Testing Strategy
 
-- **Unit tests:** xUnit or MSTest — agent service, commission logic, report generation, DB maintenance
+- **Unit tests:** xUnit — agent service, commission logic, report generation, DB maintenance
 - **Integration tests:** PostgreSQL queries against test database
 - **E2E tests:** WinAppDriver or similar against WinUI 3 app — full agent CRUD flow, report export, backup/restore
 - **Test database:** Separate PostgreSQL test database (not production)
@@ -149,7 +149,7 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 - [ ] Sales filtering with native DatePicker
 - [ ] Auto-purchase
 - [ ] Currency type/rate support
-- [ ] FastReport .NET report generation
+- [ ] PdfSharpCore report generation
 - [ ] EPPlus Excel export
 - [ ] CSV export
 - [ ] PostgreSQL backup
@@ -173,7 +173,7 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 | Risk | Mitigation |
 |------|------------|
 | Commission logic differs from original | Compare output side-by-side with DD.exe on same test data |
-| Crystal Reports formatting lost | FastReport .NET templates can replicate layout |
+| Crystal Reports formatting lost | PdfSharpCore report templates can replicate the layout |
 | ActiveX-only features (date picker, common dialog) | WinUI native DatePicker and FilePicker replace them |
 | Registry-based licensing | Move to JSON license file + online activation |
 | Large .text section (4.3 MB) implies complex logic | Prioritize core agent/sales features first, add edge cases incrementally |
