@@ -13,6 +13,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="12" Spacing="8">
@@ -73,7 +74,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+        <TextBlock x:Name="StatusMessage" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                    Margin="12" Foreground="Green" AutomationProperties.AutomationId="AutoBuyStatus"/>
     </Grid>
 </Page>
