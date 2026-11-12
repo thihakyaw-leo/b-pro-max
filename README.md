@@ -70,7 +70,6 @@ b-pro-max/
 │   └── 006_access_requests.sql
 ├── src\
 │   ├── b-pro-max.csproj
-│   ├── App.cs                # (superseded) former DI/config, now App.xaml.cs
 │   ├── App.xaml.cs           # DI container + configuration + app startup
 │   ├── Program.cs            # WinUI 3 entry point ([STAThread] Main)
 │   ├── InteractiveMenu.cs    # Console UI for testing
