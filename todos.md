@@ -210,7 +210,7 @@ WinUI UI smoke tests require a Windows desktop with the WinRT runtime registered
 
 Integration harness additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
 
-E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
+E2E suite: 40 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
 
 ---
 
@@ -318,17 +318,10 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 | CA-02 Fix resulting src warnings | ✅ Done | 0 CA warnings in src after promotion — all clean |
 | CA-03 Phase 4: TreatWarningsAsErrors=true | ✅ Done | Already set in Directory.Build.props |
 | CA-04 WarningsNotAsErrors=CA1707 | ✅ Done | Added to Directory.Build.props (tests: 148 occurrences) |
-| CA-05 Validate full build + tests | ✅ Done | src 0 errors/0 warnings, tests 0 errors, 246/246 unit + 19/19 e2e pass |
+| CA-05 Validate full build + tests | ✅ Done | src 0 errors/0 warnings, tests 0 errors, 246/246 unit + 40/40 e2e pass |
 
 ---
 
-## Phase 6 — Polish & Verification
-
-- [ ] P6-01 End-to-end testing against original DD.exe behavior
-- [ ] P6-02 Performance benchmarking
-- [ ] P6-03 UI/UX polish (WinUI 3 XAML views in Visual Studio)
-- [ ] P6-04 Documentation and deployment scripts — README.md done
-- [ ] P6-05 Final audit: no VB6/ActiveX/Registry dependencies remain
 
 
 ---
@@ -381,7 +374,7 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 
 Integration harness additionally validated migration, transactional sale entry, settlement, reports/exports, and Number Wisdom config round-trips against PostgreSQL 16.
 
-E2E suite: 19 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
+E2E suite: 40 tests passing against PostgreSQL (`tests/e2e/b-pro-max.e2e.csproj`).
 
 ---
 

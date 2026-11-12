@@ -1,7 +1,7 @@
 # Implementation Plan: Phase 6 — Polish & Verification
 
 ## Overview
-b-pro-max (WinUI 3 reimplementation of DD.exe) has Phases 0–5 complete and verified (246 unit + 19 e2e tests passing, quality gate clean). Phase 6 polish/verification remains: e2e behavior parity vs DD.exe, performance benchmarking, UI/UX polish, documentation/deployment, and a final dependency audit to confirm zero VB6/ActiveX/Registry/MSVBVM60 dependencies.
+b-pro-max (WinUI 3 reimplementation of DD.exe) has Phases 0–5 complete and verified (246 unit + 40 e2e tests passing, quality gate clean). Phase 6 polish/verification remains: e2e behavior parity vs DD.exe, performance benchmarking, UI/UX polish, documentation/deployment, and a final dependency audit to confirm zero VB6/ActiveX/Registry/MSVBVM60 dependencies.
 
 ## Architecture Decisions
 - Keep Phase 6 work scoped to verification/polish — no new feature development.
