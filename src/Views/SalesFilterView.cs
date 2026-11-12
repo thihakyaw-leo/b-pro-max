@@ -4,6 +4,7 @@ using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -26,6 +27,7 @@ public sealed partial class SalesFilterView : Page
     private readonly INumberBatchParser _batchParser;
     private readonly IBatchSaleBuilder _batchBuilder;
     private readonly ICommissionService _commissionService;
+    private readonly ILogger<SalesFilterView> _logger;
     private readonly ObservableCollection<SalePanelLine> _saleLines = [];
 
     private List<BetTypeRecord> _betTypes = [];
@@ -84,6 +86,8 @@ public sealed partial class SalesFilterView : Page
             ?? throw new InvalidOperationException("BatchSaleBuilder not registered.");
         _commissionService = App.Services?.GetRequiredService<ICommissionService>()
             ?? throw new InvalidOperationException("CommissionService not registered.");
+        _logger = App.Services?.GetRequiredService<ILogger<SalesFilterView>>()
+            ?? throw new InvalidOperationException("ILogger<SalesFilterView> not registered.");
 
         CurrentSaleList.ItemsSource = _saleLines;
         UpdateCurrentSaleTotals();
@@ -138,6 +142,10 @@ public sealed partial class SalesFilterView : Page
         {
             QuickAddGroupCombo.SelectedIndex = 0;
         }
+
+        _referenceDataLoadedLog(_logger,
+            $"agents={agents.Count}, draws={draws.Count}, saleTypes={saleTypes.Count}, groups={_groups.Count}",
+            null);
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -321,12 +329,14 @@ public sealed partial class SalesFilterView : Page
         ShowStatus(
             $"Added {lines.Count} line(s), total {FormatMoney(preview.TotalStake)}.{warning}",
             isError: false);
+
+        _batchAddedLog(_logger, lines.Count, preview.TotalStake.ToString("N2", CultureInfo.InvariantCulture), null);
     }
 
     private void SaleTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var betType = SaleTypeCombo.SelectedItem as BetTypeRecord;
-        if (betType is null || SelectionRow is null)
+        if (betType is null)
         {
             return;
         }
@@ -348,13 +358,23 @@ public sealed partial class SalesFilterView : Page
     private void QuickAddGroupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var group = QuickAddGroupCombo.SelectedItem as NumberGroupRecord;
-        if (QuickAddReverseCheck is null)
-        {
-            return;
-        }
 
         QuickAddReverseCheck.IsEnabled = group?.AllowReverse == true;
         QuickAddReverseCheck.IsChecked = false;
+    }
+
+    private bool TryAddSaleLine(SaleEntryItemRequest request, BetTypeRecord betType, NumberGroupRecord? group, string invalidMessage, out SalePanelLine line)
+    {
+        if (!_lineFactory.TryCreate(request, betType, group, out line, out var validationError))
+        {
+            ShowStatus(validationError ?? invalidMessage, isError: true);
+            return false;
+        }
+
+        _saleLines.Add(line);
+        UpdateCurrentSaleTotals();
+        _lineAddedLog(_logger, line.Label, null);
+        return true;
     }
 
     private void AddSaleItemButton_Click(object sender, RoutedEventArgs e)
@@ -387,14 +407,11 @@ public sealed partial class SalesFilterView : Page
             NumberGroupCode = group?.Code
         };
 
-        if (!_lineFactory.TryCreate(request, betType, group, out var line, out var validationError))
+        if (!TryAddSaleLine(request, betType, group, "The sale line is invalid.", out var line))
         {
-            ShowStatus(validationError ?? "The sale line is invalid.", isError: true);
             return;
         }
 
-        _saleLines.Add(line);
-        UpdateCurrentSaleTotals();
         SelectionBox.Text = string.Empty;
         ShowStatus($"Added {line.Label} ({FormatMoney(line.Amount)}).", isError: false);
     }
@@ -437,14 +454,11 @@ public sealed partial class SalesFilterView : Page
             IncludeReverse = includeReverse
         };
 
-        if (!_lineFactory.TryCreate(request, betType, group, out var line, out var validationError))
+        if (!TryAddSaleLine(request, betType, group, "The Quick Add line is invalid.", out var line))
         {
-            ShowStatus(validationError ?? "The Quick Add line is invalid.", isError: true);
             return;
         }
 
-        _saleLines.Add(line);
-        UpdateCurrentSaleTotals();
         ShowStatus($"Added {line.Label} ({FormatMoney(line.Amount)}).", isError: false);
     }
 
@@ -499,12 +513,15 @@ public sealed partial class SalesFilterView : Page
                 + $"commission {FormatMoney(result.Commission + result.Commission1)}.{autoBuy}",
                 isError: false);
 
+            _saleSavedLog(_logger, result.SaleId.ToString(CultureInfo.InvariantCulture), result.TotalStake, result.Commission + result.Commission1, null);
+
             _saleLines.Clear();
             UpdateCurrentSaleTotals();
             await LoadSalesAsync();
         }
         catch (Exception ex)
         {
+            _saleSaveFailedLog(_logger, agent.Id.ToString(CultureInfo.InvariantCulture), ex);
             ShowStatus($"Save failed: {ex.Message}", isError: true);
         }
         finally
@@ -573,6 +590,8 @@ public sealed partial class SalesFilterView : Page
         TotalAmountText.Text = totals.totalAmount.ToString("N2", CultureInfo.InvariantCulture);
         TotalCommissionText.Text =
             (totals.totalCommission + totals.totalCommission1).ToString("N2", CultureInfo.InvariantCulture);
+
+        _salesLoadedLog(_logger, filtered.Count, null);
     }
 
     private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -647,6 +666,24 @@ public sealed partial class SalesFilterView : Page
     {
         return amount.ToString("N2", CultureInfo.InvariantCulture);
     }
+
+    private static readonly Action<ILogger, string, decimal, decimal, Exception?> _saleSavedLog =
+        LoggerMessage.Define<string, decimal, decimal>(LogLevel.Information, new EventId(1, "SaleSaved"), "Sale {SaleId} saved: stake {Stake}, commission {Commission}.");
+
+    private static readonly Action<ILogger, string, Exception?> _saleSaveFailedLog =
+        LoggerMessage.Define<string>(LogLevel.Error, new EventId(2, "SaleSaveFailed"), "Sale save failed for agent {AgentId}.");
+
+    private static readonly Action<ILogger, int, string, Exception?> _batchAddedLog =
+        LoggerMessage.Define<int, string>(LogLevel.Information, new EventId(3, "BatchAdded"), "Batch added: {LineCount} line(s), total {TotalStake}.");
+
+    private static readonly Action<ILogger, string, Exception?> _lineAddedLog =
+        LoggerMessage.Define<string>(LogLevel.Information, new EventId(4, "SaleLineAdded"), "Sale line added: {LineLabel}.");
+
+    private static readonly Action<ILogger, int, Exception?> _salesLoadedLog =
+        LoggerMessage.Define<int>(LogLevel.Information, new EventId(5, "SalesLoaded"), "Loaded {SalesCount} sales.");
+
+    private static readonly Action<ILogger, string, Exception?> _referenceDataLoadedLog =
+        LoggerMessage.Define<string>(LogLevel.Debug, new EventId(6, "ReferenceDataLoaded"), "Reference data loaded: {Details}.");
 
     private void ShowStatus(string message, bool isError)
     {

@@ -1,4 +1,6 @@
 using BProMax.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 
 namespace BProMax.Services;
@@ -12,27 +14,56 @@ public class SaleEntryService : ISaleEntryService
     private readonly INumberResolutionService _resolutionService;
     private readonly ISaleItemAmountCalculator _amountCalculator;
     private readonly ICommissionService _commissionService;
+    private readonly ILogger<SaleEntryService> _logger;
+
+    private static readonly Action<ILogger, int, long, int, Exception?> _saleCreatingLog =
+        LoggerMessage.Define<int, long, int>(LogLevel.Information, new EventId(1, "SaleCreating"), "Creating sale for agent {AgentId}, draw {DrawId}, {ItemCount} item(s).");
+
+    private static readonly Action<ILogger, long, decimal, decimal, Exception?> _saleCreatedLog =
+        LoggerMessage.Define<long, decimal, decimal>(LogLevel.Information, new EventId(2, "SaleCreated"), "Sale {SaleId} created: stake {TotalStake}, commission {Commission}.");
+
+    private static readonly Action<ILogger, int, Exception?> _saleCreateFailedLog =
+        LoggerMessage.Define<int>(LogLevel.Error, new EventId(3, "SaleCreateFailed"), "Sale creation failed for agent {AgentId}.");
+
+    private static readonly Action<ILogger, long, int?, decimal?, Exception?> _autoBuyTriggeredLog =
+        LoggerMessage.Define<long, int?, decimal?>(LogLevel.Information, new EventId(4, "AutoBuyTriggered"), "Auto-buy triggered for sale {SaleId}: rule {RuleId}, amount {Amount}.");
 
     public SaleEntryService(
         IDatabaseService db,
         INumberResolutionService resolutionService,
         ISaleItemAmountCalculator amountCalculator,
-        ICommissionService commissionService)
+        ICommissionService commissionService,
+        ILogger<SaleEntryService>? logger = null)
     {
         _db = db;
         _resolutionService = resolutionService;
         _amountCalculator = amountCalculator;
         _commissionService = commissionService;
+        _logger = logger ?? NullLogger<SaleEntryService>.Instance;
     }
 
-    public Task<SaleEntryResult> CreateSaleAsync(
+    public async Task<SaleEntryResult> CreateSaleAsync(
         SaleEntryRequest request,
         CancellationToken cancellationToken = default)
     {
         ValidateRequest(request);
 
-        return _db.ExecuteInTransactionAsync(
-            (connection, transaction) => CreateSaleCoreAsync(connection, transaction, request, cancellationToken));
+        _saleCreatingLog(_logger, request.AgentId, request.DrawId, request.Items.Count, null);
+
+        try
+        {
+            var result = await _db.ExecuteInTransactionAsync(
+                (connection, transaction) => CreateSaleCoreAsync(connection, transaction, request, cancellationToken));
+
+            _saleCreatedLog(_logger, result.SaleId, result.TotalStake, result.Commission + result.Commission1, null);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _saleCreateFailedLog(_logger, request.AgentId, ex);
+            throw;
+        }
     }
 
     private async Task<SaleEntryResult> CreateSaleCoreAsync(
@@ -81,6 +112,11 @@ public class SaleEntryService : ISaleEntryService
         }
 
         var autoBuy = await EvaluateAutoBuyAsync(connection, transaction, agent.AgentName, totalStake, cancellationToken);
+
+        if (autoBuy.Triggered)
+        {
+            _autoBuyTriggeredLog(_logger, saleId, autoBuy.RuleId, autoBuy.Amount, null);
+        }
 
         return new SaleEntryResult
         {
