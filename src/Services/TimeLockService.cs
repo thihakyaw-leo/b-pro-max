@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 

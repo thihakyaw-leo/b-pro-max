@@ -1,4 +1,3 @@
-using BProMax.Models;
 using BProMax.Services;
 using Xunit;
 

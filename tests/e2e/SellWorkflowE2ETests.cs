@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.Logging.Abstractions;

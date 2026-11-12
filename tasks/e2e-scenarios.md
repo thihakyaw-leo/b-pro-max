@@ -88,14 +88,18 @@ Mirrors DD.exe sale panel: batch number entry, R toggle, Quick Add, per-base/tot
 
 | Step | DD.exe behavior | b-pro-max equivalent | Expected result |
 |---|---|---|---|
-| Batch sale | Parse batch, expand R, insert sale_items | `SaleEntryService.EnterBatchSale(...)` | sale items created, totals correct |
-| Single sale | Insert single sale item | `SaleEntryService.EnterSingleSale(...)` | one sale item |
-| Quick Add | Pre-defined number set | `SaleEntryService.QuickAdd(...)` | sale item with preset numbers |
-| Payout calculation | commission/rate-based payout | `PayoutCalculator.Calculate(...)` | payout matches DD.exe |
+| Batch sale | Parse batch, expand R, insert sale_items | `SaleEntryService.CreateSaleAsync()` with `NumberStakes` | sale items created, totals correct |
+| Single sale | Insert single sale item | `SaleEntryService.CreateSaleAsync()` with `Selection` | one sale item |
+| Quick Add | Pre-defined number set | `SaleEntryService.CreateSaleAsync()` with `NumberGroupCode` | sale item with preset numbers |
+| Payout calculation | commission/rate-based payout | `CommissionService.CalculateCommission()` + 80x multiplier | payout matches DD.exe |
+| Auto-buy trigger | Auto-purchase when total >= trigger | `AutoBuyService` + `SaleEntryService.EvaluateAutoBuyAsync()` | auto-buy rule triggered |
 
-**Coverage:** None — new `SaleEntryE2ETests.cs` needed.
+**Coverage:** ✅ Covered by `tests/e2e/SellWorkflowE2ETests.cs`:
+- `CompleteSellWorkflowSavesSaleAndAppearsInHistory` — batch + single + Quick Add + auto-buy + sales-history verification
+- `SellWorkflowRejectsClosedDraw` — closed draw rejection
+- `SellWorkflowBatchWithPreResolvedStakes` — batch pre-resolved stakes path
 
-**Files:** `tests/e2e/SaleEntryE2ETests.cs` (new).
+**Files:** `tests/e2e/SellWorkflowE2ETests.cs` (new).
 
 ---
 

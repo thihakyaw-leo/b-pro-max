@@ -1,7 +1,5 @@
 using System.Globalization;
-using BProMax.Configuration;
 using BProMax.Models;
-using BProMax.Services;
 using Microsoft.Extensions.Logging;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;

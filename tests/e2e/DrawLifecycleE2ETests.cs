@@ -2,7 +2,6 @@ namespace BProMax.E2ETests;
 
 using BProMax.Models;
 using BProMax.Services;
-using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 using Xunit;
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>BProMax.Benchmarks.CommissionServiceBenchmarks-20261112-235842</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.9711)
+Unknown processor
+.NET SDK 9.0.321
+  [Host]     : .NET 9.0.23 (9.0.2326.52216), X64 RyuJIT AVX2
+  Job-SQTCOV : .NET 9.0.23 (9.0.2326.52216), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>IterationCount=3  WarmupCount=1  
+</code></pre>
+
+<table>
+<thead><tr><th>Method                    </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>CalculateCommission</td><td>35.68 ns</td><td>5.367 ns</td><td>0.294 ns</td><td>1.00</td><td>0.01</td><td>-</td><td>NA</td>
+</tr><tr><td>CalculateCommission1</td><td>35.51 ns</td><td>1.237 ns</td><td>0.068 ns</td><td>1.00</td><td>0.01</td><td>-</td><td>NA</td>
+</tr><tr><td>CalculateNetCommission</td><td>81.39 ns</td><td>2.624 ns</td><td>0.144 ns</td><td>2.28</td><td>0.02</td><td>-</td><td>NA</td>
+</tr><tr><td>CalculateTotals</td><td>643.47 ns</td><td>148.425 ns</td><td>8.136 ns</td><td>18.04</td><td>0.24</td><td>816 B</td><td>NA</td>
+</tr><tr><td>ConvertCurrency</td><td>44.34 ns</td><td>4.931 ns</td><td>0.270 ns</td><td>1.24</td><td>0.01</td><td>-</td><td>NA</td>
+</tr><tr><td>CalculateCommissionInCurrency</td><td>76.85 ns</td><td>4.409 ns</td><td>0.242 ns</td><td>2.15</td><td>0.02</td><td>-</td><td>NA</td>
+</tr><tr><td>CalculateNetCommissionInCurrency</td><td>163.61 ns</td><td>20.262 ns</td><td>1.111 ns</td><td>4.59</td><td>0.04</td><td>-</td><td>NA</td>
+</tr></tbody></table>
+</body>
+</html>

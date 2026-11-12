@@ -41,6 +41,6 @@
         </StackPanel>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="SoundSettingsStatus"/>
+                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="SoundSettingsStatus"/>
     </Grid>
 </Page>

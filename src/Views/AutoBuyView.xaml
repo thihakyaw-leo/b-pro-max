@@ -75,6 +75,6 @@
         </ListView>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="Green" AutomationProperties.AutomationId="AutoBuyStatus"/>
+                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="AutoBuyStatus"/>
     </Grid>
 </Page>

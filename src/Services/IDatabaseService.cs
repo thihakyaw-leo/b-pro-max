@@ -1,5 +1,3 @@
-using BProMax.Configuration;
-
 namespace BProMax.Services;
 
 public interface IDatabaseService

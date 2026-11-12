@@ -199,9 +199,9 @@ try {
     # Report flow
     Test-UI 'Reports view accessible' {
         Invoke-Ui @('invoke', 'NavReports')
-        Invoke-Ui @('wait-for', 'ReportAgentButton', '-t', '3000')
-        Invoke-Ui @('wait-for', 'ReportSalesButton', '-t', '2000')
+        Invoke-Ui @('wait-for', 'ReportGenerateButton', '-t', '3000')
         Invoke-Ui @('wait-for', 'ReportExportButton', '-t', '2000')
+        Invoke-Ui @('wait-for', 'ReportOutput', '-t', '2000')
     }
 
     # Agent search flow

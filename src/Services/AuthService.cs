@@ -1,9 +1,6 @@
 using System.Security.Cryptography;
-using System.Text;
-using BProMax.Configuration;
 using BProMax.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace BProMax.Services;

@@ -1,6 +1,5 @@
 using BProMax.Models;
 using BProMax.Services;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 

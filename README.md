@@ -83,7 +83,9 @@ b-pro-max/
     ├── b-pro-max.tests.csproj
     ├── ...                    # 21 unit test classes — 246 tests
     └── e2e\
-        └── b-pro-max.e2e.csproj  # 19 e2e tests against PostgreSQL
+        └── b-pro-max.e2e.csproj  # 40 e2e tests against PostgreSQL
+├── docs\
+│   └── deployment.md          # MSIX packaging + deployment guide
 ```
 
 **Database path:** local PostgreSQL only. Supabase REST integration was removed; the app now connects to a local `bpro_max` database via `IDatabaseService` → `DatabaseService` (Npgsql). Supabase settings were removed from `appsettings.json` and `.env`.
@@ -220,6 +222,17 @@ dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 # Run
 dotnet run --project src\b-pro-max.csproj
 ```
+
+## Deployment
+
+Packaging and deployment use MSIX for Windows desktop distribution. Full instructions are in [`docs/deployment.md`](docs/deployment.md):
+
+1. Build: `dotnet build b-pro-max.sln -c Release`
+2. Package: `msbuild b-pro-max.sln -p:Configuration=Release -p:Platform=x64 -t:Publish`
+3. Install the `.msix` on the target machine (Developer Mode enabled, PostgreSQL + Pyidaungsu font installed)
+4. Configure `appsettings.json` or `DATABASE_URL`/`DATABASE_CONNECTION_STRING`
+
+See `docs/deployment.md` for package identity, capabilities (`internetClient`, `runFullTrust`), code signing, and WinRT runtime prerequisites.
 
 ## License
 

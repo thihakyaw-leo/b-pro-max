@@ -1,4 +1,3 @@
-using BProMax.Models;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 

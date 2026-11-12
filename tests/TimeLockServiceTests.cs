@@ -1,6 +1,5 @@
 using System.Globalization;
 using BProMax.Services;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Npgsql;
 using Xunit;
