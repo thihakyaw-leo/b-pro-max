@@ -52,6 +52,7 @@ src/test.txt
 # Local tooling / data
 # Root-anchored: a future src/Benchmarks/ project must stay trackable.
 /benchmarks
+/BenchmarkDotNet.Artifacts/
 /benchmarks.tmp
 test-winui3/
 test-xaml/
