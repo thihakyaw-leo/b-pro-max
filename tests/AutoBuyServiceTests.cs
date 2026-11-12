@@ -215,7 +215,7 @@ public class AutoBuyServiceTests
     }
 
     [Fact]
-    public void CheckTriggerEnabledRuleAboveThresholdReturnsTriggered()
+    public async Task CheckTriggerEnabledRuleAboveThresholdReturnsTriggered()
     {
         // Arrange
         var rules = new List<AutoBuyRule>
@@ -230,7 +230,7 @@ public class AutoBuyServiceTests
             .ReturnsAsync(rules);
 
         // Act
-        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 1500m);
+        var (triggered, rule) = await _autoBuyService.CheckTriggerAsync("John Doe", 1500m);
 
         // Assert
         Assert.True(triggered);
@@ -238,7 +238,7 @@ public class AutoBuyServiceTests
     }
 
     [Fact]
-    public void CheckTriggerDisabledRuleReturnsNotTriggered()
+    public async Task CheckTriggerDisabledRuleReturnsNotTriggered()
     {
         // Arrange
         var rules = new List<AutoBuyRule>
@@ -253,7 +253,7 @@ public class AutoBuyServiceTests
             .ReturnsAsync(rules);
 
         // Act
-        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 1500m);
+        var (triggered, rule) = await _autoBuyService.CheckTriggerAsync("John Doe", 1500m);
 
         // Assert
         Assert.False(triggered);
@@ -261,7 +261,7 @@ public class AutoBuyServiceTests
     }
 
     [Fact]
-    public void CheckTriggerBelowThresholdReturnsNotTriggered()
+    public async Task CheckTriggerBelowThresholdReturnsNotTriggered()
     {
         // Arrange
         var rules = new List<AutoBuyRule>
@@ -276,7 +276,7 @@ public class AutoBuyServiceTests
             .ReturnsAsync(rules);
 
         // Act
-        var (triggered, rule) = _autoBuyService.CheckTrigger("John Doe", 500m);
+        var (triggered, rule) = await _autoBuyService.CheckTriggerAsync("John Doe", 500m);
 
         // Assert
         Assert.False(triggered);
@@ -285,7 +285,7 @@ public class AutoBuyServiceTests
     }
 
     [Fact]
-    public void GetEnabledRulesReturnsOnlyEnabledRules()
+    public async Task GetEnabledRulesReturnsOnlyEnabledRules()
     {
         // Arrange
         var rules = new List<AutoBuyRule>
@@ -301,7 +301,7 @@ public class AutoBuyServiceTests
             .ReturnsAsync(rules);
 
         // Act
-        var result = _autoBuyService.GetEnabledRules();
+        var result = await _autoBuyService.GetEnabledRulesAsync();
 
         // Assert
         Assert.Single(result);

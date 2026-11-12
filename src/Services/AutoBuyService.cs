@@ -128,19 +128,15 @@ RETURNING is_enabled;";
         return result ? 1 : 0;
     }
 
-    public List<AutoBuyRule> GetEnabledRules()
+    public async Task<List<AutoBuyRule>> GetEnabledRulesAsync()
     {
-        // Synchronous snapshot: callers can await GetAllRulesAsync() and filter,
-        // but this method is kept for backward compatibility.
-        var rules = GetAllRulesAsync().GetAwaiter().GetResult();
+        var rules = await GetAllRulesAsync();
         return rules.Where(r => r.IsEnabled).OrderBy(r => r.AgentName).ToList();
     }
 
-    public (bool triggered, AutoBuyRule rule) CheckTrigger(string agentName, decimal currentAmount)
+    public async Task<(bool triggered, AutoBuyRule rule)> CheckTriggerAsync(string agentName, decimal currentAmount)
     {
-        // Pure evaluation: callers should load rules via GetAllRulesAsync() first.
-        // This method is kept for backward compatibility with the sales-entry flow.
-        var rules = GetAllRulesAsync().GetAwaiter().GetResult();
+        var rules = await GetAllRulesAsync();
         var rule = rules.FirstOrDefault(r =>
             r.AgentName.Equals(agentName, StringComparison.OrdinalIgnoreCase) && r.IsEnabled);
 

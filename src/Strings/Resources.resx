@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- Application title -->
+  <data name="AppTitle" xml:space="preserve">
+    <value>b-pro-max</value>
+  </data>
+
+  <!-- MainWindow navigation items -->
+  <data name="NavLogin" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="NavAgents" xml:space="preserve">
+    <value>Agents</value>
+  </data>
+  <data name="NavSearchAgents" xml:space="preserve">
+    <value>Search Agents</value>
+  </data>
+  <data name="NavSales" xml:space="preserve">
+    <value>Sales</value>
+  </data>
+  <data name="NavDraws" xml:space="preserve">
+    <value>Draws &amp; Results</value>
+  </data>
+  <data name="NavNumberWisdom" xml:space="preserve">
+    <value>Number Wisdom</value>
+  </data>
+  <data name="NavAutoBuy" xml:space="preserve">
+    <value>Auto Buy</value>
+  </data>
+  <data name="NavReports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="NavMaintenance" xml:space="preserve">
+    <value>Maintenance</value>
+  </data>
+  <data name="NavBackup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="NavCreateDatabase" xml:space="preserve">
+    <value>Create Database</value>
+  </data>
+  <data name="NavCompactDatabase" xml:space="preserve">
+    <value>Compact Database</value>
+  </data>
+  <data name="NavSoundSettings" xml:space="preserve">
+    <value>Sound Settings</value>
+  </data>
+  <data name="NavTimeLock" xml:space="preserve">
+    <value>Time Lock</value>
+  </data>
+  <data name="NavRegister" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="NavLogout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+
+  <!-- LoginView -->
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginUsername" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="LoginUsernamePlaceholder" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="LoginPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="LoginPasswordPlaceholder" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Login</value>
+  </data>
+
+  <!-- Common buttons -->
+  <data name="BtnSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="BtnCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="BtnDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="BtnRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="BtnSearch" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="BtnCreate" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="BtnUpdate" xml:space="preserve">
+    <value>Update</value>
+  </data>
+
+  <!-- Status messages -->
+  <data name="MsgInvalidInput" xml:space="preserve">
+    <value>Invalid input.</value>
+  </data>
+  <data name="MsgRequired" xml:space="preserve">
+    <value>This field is required.</value>
+  </data>
+  <data name="MsgError" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+
+  <!-- AutoBuyView -->
+  <data name="AutoBuyTitle" xml:space="preserve">
+    <value>Auto Buy Rules</value>
+  </data>
+  <data name="AutoBuyAgentNameLabel" xml:space="preserve">
+    <value>Agent Name</value>
+  </data>
+  <data name="AutoBuyTriggerAmountLabel" xml:space="preserve">
+    <value>Trigger Amount</value>
+  </data>
+  <data name="AutoBuyAutoBuyAmountLabel" xml:space="preserve">
+    <value>Auto Buy Amount</value>
+  </data>
+  <data name="AutoBuyEnabledLabel" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="AutoBuyRuleCreated" xml:space="preserve">
+    <value>Rule created.</value>
+  </data>
+  <data name="AutoBuyRuleUpdated" xml:space="preserve">
+    <value>Rule updated.</value>
+  </data>
+  <data name="AutoBuyRuleDeleted" xml:space="preserve">
+    <value>Rule deleted.</value>
+  </data>
+  <data name="AutoBuyNoRuleFound" xml:space="preserve">
+    <value>No rule found for this agent.</value>
+  </data>
+
+  <!-- DrawsView -->
+  <data name="DrawsTitle" xml:space="preserve">
+    <value>Draws &amp; Results</value>
+  </data>
+  <data name="DrawsStatusFlow" xml:space="preserve">
+    <value>Open → Closed → Drawn → Settled</value>
+  </data>
+  <data name="DrawDateLabel" xml:space="preserve">
+    <value>Draw date:</value>
+  </data>
+  <data name="DrawTimeLabel" xml:space="preserve">
+    <value>Time (HH:mm):</value>
+  </data>
+  <data name="DrawResultLabel" xml:space="preserve">
+    <value>Result:</value>
+  </data>
+  <data name="BtnCreateDraw" xml:space="preserve">
+    <value>Create Draw</value>
+  </data>
+  <data name="BtnCloseDraw" xml:space="preserve">
+    <value>Close Draw</value>
+  </data>
+  <data name="BtnSetResult" xml:space="preserve">
+    <value>Set Result</value>
+  </data>
+  <data name="BtnSettleDraw" xml:space="preserve">
+    <value>Settle Draw</value>
+  </data>
+  <data name="BtnCancelDraw" xml:space="preserve">
+    <value>Cancel Draw</value>
+  </data>
+  <data name="BtnMarkPayoutPaid" xml:space="preserve">
+    <value>Mark Payout Paid</value>
+  </data>
+</root>

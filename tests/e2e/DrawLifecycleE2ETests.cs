@@ -1,6 +1,10 @@
-using Xunit;
+namespace BProMax.E2ETests;
+
 using BProMax.Models;
 using BProMax.Services;
+using Microsoft.Extensions.Logging.Abstractions;
+using Npgsql;
+using Xunit;
 
 /// <summary>
 /// E2E tests for the draw lifecycle service (SC-04):
@@ -40,7 +44,8 @@ public class DrawLifecycleE2ETests : E2ETestBase
         Assert.Equal(1, closed);
 
         draw = await drawService.GetDrawByIdAsync(drawId);
-        Assert.Equal(DrawStatuses.Closed, draw.Status);
+        Assert.NotNull(draw);
+        Assert.Equal(DrawStatuses.Closed, draw!.Status);
 
         // GET OPEN DRAWS — no longer includes this draw
         openDraws = await drawService.GetOpenDrawsAsync();
@@ -51,7 +56,8 @@ public class DrawLifecycleE2ETests : E2ETestBase
         Assert.Equal(1, set);
 
         draw = await drawService.GetDrawByIdAsync(drawId);
-        Assert.Equal(DrawStatuses.Drawn, draw.Status);
+        Assert.NotNull(draw);
+        Assert.Equal(DrawStatuses.Drawn, draw!.Status);
         Assert.Equal("42", draw.DrawNumber);
 
         // CLOSE again should be a no-op (already Drawn, not Open)
@@ -115,7 +121,9 @@ public class DrawLifecycleE2ETests : E2ETestBase
             createdBy: 1);
         var cancelled = await drawService.CancelDrawAsync(openId);
         Assert.Equal(1, cancelled);
-        Assert.Equal(DrawStatuses.Cancelled, (await drawService.GetDrawByIdAsync(openId))!.Status);
+        var cancelledDraw = await drawService.GetDrawByIdAsync(openId);
+        Assert.NotNull(cancelledDraw);
+        Assert.Equal(DrawStatuses.Cancelled, cancelledDraw.Status);
 
         // Cancel a Closed draw
         var closedId = await drawService.CreateDrawAsync(
@@ -125,7 +133,9 @@ public class DrawLifecycleE2ETests : E2ETestBase
         await drawService.CloseDrawAsync(closedId);
         cancelled = await drawService.CancelDrawAsync(closedId);
         Assert.Equal(1, cancelled);
-        Assert.Equal(DrawStatuses.Cancelled, (await drawService.GetDrawByIdAsync(closedId))!.Status);
+        cancelledDraw = await drawService.GetDrawByIdAsync(closedId);
+        Assert.NotNull(cancelledDraw);
+        Assert.Equal(DrawStatuses.Cancelled, cancelledDraw.Status);
 
         // Cancel a Drawn draw should be a no-op (status not Open or Closed)
         var drawnId = await drawService.CreateDrawAsync(
@@ -136,7 +146,9 @@ public class DrawLifecycleE2ETests : E2ETestBase
         await drawService.SetResultAsync(drawnId, "42");
         cancelled = await drawService.CancelDrawAsync(drawnId);
         Assert.Equal(0, cancelled);
-        Assert.Equal(DrawStatuses.Drawn, (await drawService.GetDrawByIdAsync(drawnId))!.Status);
+        cancelledDraw = await drawService.GetDrawByIdAsync(drawnId);
+        Assert.NotNull(cancelledDraw);
+        Assert.Equal(DrawStatuses.Drawn, cancelledDraw.Status);
     }
 
     private async Task CleanDrawsTableAsync()

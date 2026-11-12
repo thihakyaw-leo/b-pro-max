@@ -9,7 +9,7 @@ public interface IAutoBuyService
     Task<int> UpdateRuleAsync(AutoBuyRule rule);
     Task<int> DeleteRuleAsync(int id);
     Task<int> ToggleRuleAsync(int id);
-    List<AutoBuyRule> GetEnabledRules();
-    (bool triggered, AutoBuyRule rule) CheckTrigger(string agentName, decimal currentAmount);
+    Task<List<AutoBuyRule>> GetEnabledRulesAsync();
+    Task<(bool triggered, AutoBuyRule rule)> CheckTriggerAsync(string agentName, decimal currentAmount);
     Task<int> IncrementExecutionCountAsync(int ruleId);
 }

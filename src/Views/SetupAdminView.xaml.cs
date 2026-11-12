@@ -2,6 +2,7 @@ using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 
@@ -14,6 +15,9 @@ namespace BProMax.Views;
 public sealed partial class SetupAdminView : Page
 {
     private readonly IAuthService _auth;
+
+    private static Brush ErrorBrush => (Brush)Application.Current.Resources["SystemControlErrorTextForegroundBrush"];
+    private static Brush SuccessBrush => (Brush)Application.Current.Resources["SystemControlSuccessTextForegroundBrush"];
 
     private TextBox UsernameBox { get; set; } = null!;
     private PasswordBox PasswordBox { get; set; } = null!;
@@ -54,9 +58,7 @@ public sealed partial class SetupAdminView : Page
             Margin = new Thickness(0, 0, 0, 8)
         };
         title.SetValue(Grid.RowProperty, 0);
-        // TitleTextBlockStyle is a XAML resource; use plain styling in code
-        title.FontSize = 24;
-        title.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+        title.Style = (Style)Application.Current.Resources["TitleTextBlockStyle"];
         root.Children.Add(title);
 
         var subtitle = new TextBlock
@@ -65,8 +67,7 @@ public sealed partial class SetupAdminView : Page
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 0, 0, 24),
         };
-        subtitle.FontSize = 18;
-        subtitle.FontWeight = Microsoft.UI.Text.FontWeights.Medium;
+        subtitle.Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"];
         subtitle.SetValue(Grid.RowProperty, 1);
         root.Children.Add(subtitle);
 
@@ -80,6 +81,9 @@ public sealed partial class SetupAdminView : Page
             Margin = new Thickness(0, 22, 0, 0),
         };
         UsernameBox.SetValue(Grid.RowProperty, 2);
+        AutomationProperties.SetAutomationId(UsernameBox, "UsernameBox");
+        AutomationProperties.SetName(UsernameBox, "Username");
+        AutomationProperties.SetLabeledBy(UsernameBox, usernameLabel);
         root.Children.Add(UsernameBox);
 
         var passwordLabel = new TextBlock { Text = "Password", Margin = new Thickness(0, 0, 0, 6) };
@@ -92,6 +96,9 @@ public sealed partial class SetupAdminView : Page
             Margin = new Thickness(0, 22, 0, 0),
         };
         PasswordBox.SetValue(Grid.RowProperty, 3);
+        AutomationProperties.SetAutomationId(PasswordBox, "PasswordBox");
+        AutomationProperties.SetName(PasswordBox, "Password");
+        AutomationProperties.SetLabeledBy(PasswordBox, passwordLabel);
         root.Children.Add(PasswordBox);
 
         var confirmLabel = new TextBlock { Text = "Confirm Password", Margin = new Thickness(0, 0, 0, 6) };
@@ -104,6 +111,9 @@ public sealed partial class SetupAdminView : Page
             Margin = new Thickness(0, 22, 0, 24),
         };
         ConfirmPasswordBox.SetValue(Grid.RowProperty, 4);
+        AutomationProperties.SetAutomationId(ConfirmPasswordBox, "ConfirmPasswordBox");
+        AutomationProperties.SetName(ConfirmPasswordBox, "Confirm password");
+        AutomationProperties.SetLabeledBy(ConfirmPasswordBox, confirmLabel);
         root.Children.Add(ConfirmPasswordBox);
 
         CreateButton = new Button
@@ -115,6 +125,8 @@ public sealed partial class SetupAdminView : Page
         };
         CreateButton.Click += CreateButton_Click;
         CreateButton.SetValue(Grid.RowProperty, 5);
+        AutomationProperties.SetAutomationId(CreateButton, "CreateButton");
+        AutomationProperties.SetName(CreateButton, "Create Account");
         root.Children.Add(CreateButton);
 
         StatusMessage = new TextBlock
@@ -123,6 +135,8 @@ public sealed partial class SetupAdminView : Page
             Margin = new Thickness(0, 12, 0, 0),
         };
         StatusMessage.SetValue(Grid.RowProperty, 6);
+        AutomationProperties.SetAutomationId(StatusMessage, "StatusMessage");
+        AutomationProperties.SetName(StatusMessage, "Status message");
         root.Children.Add(StatusMessage);
 
         this.Content = root;
@@ -142,19 +156,19 @@ public sealed partial class SetupAdminView : Page
             if (string.IsNullOrWhiteSpace(username))
             {
                 StatusMessage.Text = "Username is required.";
-                StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ErrorBrush;
                 return;
             }
             if (string.IsNullOrWhiteSpace(password))
             {
                 StatusMessage.Text = "Password is required.";
-                StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ErrorBrush;
                 return;
             }
             if (password != confirm)
             {
                 StatusMessage.Text = "Passwords do not match.";
-                StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ErrorBrush;
                 return;
             }
 
@@ -162,14 +176,14 @@ public sealed partial class SetupAdminView : Page
             {
                 await _auth.RegisterCredentialAsync(username, password);
                 StatusMessage.Text = "Account created successfully. Please log in.";
-                StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = SuccessBrush;
 
                 _ = this.Frame?.Navigate(typeof(LoginView));
             }
             catch (InvalidOperationException ex)
             {
                 StatusMessage.Text = ex.Message;
-                StatusMessage.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ErrorBrush;
             }
         }
         finally

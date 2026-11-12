@@ -5,9 +5,9 @@
 
     <Application.Resources>
         <ResourceDictionary>
-            <SolidColorBrush x:Key="BrandColor" Color="#0078D4" />
-            <SolidColorBrush x:Key="SurfaceColor" Color="#FAFAFA" />
-            <SolidColorBrush x:Key="ErrorColor" Color="#C42B1C" />
+            <SolidColorBrush x:Key="BrandColor" Color="{ThemeResource SystemAccentColor}" />
+            <SolidColorBrush x:Key="SurfaceColor" Color="{ThemeResource SystemAccentColorLight2}" />
+            <SolidColorBrush x:Key="ErrorColor" Color="{ThemeResource SystemAccentColorDark1}" />
         </ResourceDictionary>
     </Application.Resources>
 
