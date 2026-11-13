@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -15,11 +14,9 @@ public sealed partial class BackupView : Page
 {
     private readonly IDatabaseMaintenanceService _maintenanceService;
 
-    private TextBox BackupPathBox => this.FindChildByName<TextBox>("BackupPathBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public BackupView()
     {
+        InitializeComponent();
         _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
             ?? throw new InvalidOperationException("DatabaseMaintenanceService not registered.");
     }

@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,16 +19,9 @@ public sealed partial class ReportView : Page
     private readonly ICsvExportService _csvExportService;
     private readonly ITwoDExportService _twoDExportService;
 
-    private ComboBox ReportTypeCombo => this.FindChildByName<ComboBox>("ReportTypeCombo")!;
-    private ComboBox ExportFormatCombo => this.FindChildByName<ComboBox>("ExportFormatCombo")!;
-    private CalendarDatePicker StartDatePicker => this.FindChildByName<CalendarDatePicker>("StartDatePicker")!;
-    private CalendarDatePicker EndDatePicker => this.FindChildByName<CalendarDatePicker>("EndDatePicker")!;
-    private Button GenerateButton => this.FindChildByName<Button>("GenerateButton")!;
-    private Button ExportButton => this.FindChildByName<Button>("ExportButton")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public ReportView()
     {
+        InitializeComponent();
         _reportService = App.Services?.GetRequiredService<IReportService>()
             ?? throw new InvalidOperationException("ReportService not registered.");
         _excelExportService = App.Services?.GetRequiredService<IExcelExportService>()

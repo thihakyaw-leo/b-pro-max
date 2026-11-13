@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,31 +17,9 @@ public sealed partial class NumberWisdomView : Page
     private readonly IBetTypeService _betTypeService;
     private readonly INumberBatchParser _batchParser;
 
-    private TextBlock BetTypeHeader => this.FindChildByName<TextBlock>("BetTypeHeader")!;
-    private TextBlock BetTypeCodeText => this.FindChildByName<TextBlock>("BetTypeCodeText")!;
-    private TextBlock BetTypeLabelText => this.FindChildByName<TextBlock>("BetTypeLabelText")!;
-    private TextBlock BetTypeEnglishText => this.FindChildByName<TextBlock>("BetTypeEnglishText")!;
-    private TextBox BetTypeMultiplierBox => this.FindChildByName<TextBox>("BetTypeMultiplierBox")!;
-    private TextBox BetTypeSortOrderBox => this.FindChildByName<TextBox>("BetTypeSortOrderBox")!;
-    private CheckBox BetTypeActiveCheck => this.FindChildByName<CheckBox>("BetTypeActiveCheck")!;
-    private Button SaveBetTypeButton => this.FindChildByName<Button>("SaveBetTypeButton")!;
-    private ListView BetTypesList => this.FindChildByName<ListView>("BetTypesList")!;
-
-    private TextBlock GroupHeader => this.FindChildByName<TextBlock>("GroupHeader")!;
-    private TextBlock GroupCodeText => this.FindChildByName<TextBlock>("GroupCodeText")!;
-    private TextBlock GroupLabelText => this.FindChildByName<TextBlock>("GroupLabelText")!;
-    private TextBlock GroupEnglishText => this.FindChildByName<TextBlock>("GroupEnglishText")!;
-    private TextBox GroupMembersBox => this.FindChildByName<TextBox>("GroupMembersBox")!;
-    private CheckBox GroupAllowReverseCheck => this.FindChildByName<CheckBox>("GroupAllowReverseCheck")!;
-    private TextBox GroupSortOrderBox => this.FindChildByName<TextBox>("GroupSortOrderBox")!;
-    private CheckBox GroupActiveCheck => this.FindChildByName<CheckBox>("GroupActiveCheck")!;
-    private Button SaveGroupButton => this.FindChildByName<Button>("SaveGroupButton")!;
-    private ListView GroupsList => this.FindChildByName<ListView>("GroupsList")!;
-
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public NumberWisdomView()
     {
+        InitializeComponent();
         _betTypeService = App.Services?.GetRequiredService<IBetTypeService>()
             ?? throw new InvalidOperationException("BetTypeService not registered.");
         _batchParser = App.Services?.GetRequiredService<INumberBatchParser>()

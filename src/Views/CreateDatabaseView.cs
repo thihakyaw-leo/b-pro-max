@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -13,11 +12,9 @@ public sealed partial class CreateDatabaseView : Page
 {
     private readonly IDatabaseMaintenanceService _maintenanceService;
 
-    private TextBox DatabaseNameBox => this.FindChildByName<TextBox>("DatabaseNameBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public CreateDatabaseView()
     {
+        InitializeComponent();
         _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
             ?? throw new InvalidOperationException("DatabaseMaintenanceService not registered.");
     }

@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -17,12 +16,9 @@ public sealed partial class SoundSettingsView : Page
     private readonly ISoundService _soundService;
     private readonly ISettingsStore _settings;
 
-    private CheckBox EnabledCheck => this.FindChildByName<CheckBox>("EnabledCheck")!;
-    private Slider VolumeSlider => this.FindChildByName<Slider>("VolumeSlider")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public SoundSettingsView()
     {
+        InitializeComponent();
         _soundService = App.Services?.GetRequiredService<ISoundService>()
             ?? throw new InvalidOperationException("SoundService not registered.");
         _settings = App.Services?.GetRequiredService<ISettingsStore>()

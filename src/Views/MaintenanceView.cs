@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -14,10 +13,9 @@ public sealed partial class MaintenanceView : Page
     private readonly IDatabaseMigrationService _migrationService;
     private readonly IDatabaseMaintenanceService _maintenanceService;
 
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public MaintenanceView()
     {
+        InitializeComponent();
         _migrationService = App.Services?.GetRequiredService<IDatabaseMigrationService>()
             ?? throw new InvalidOperationException("DatabaseMigrationService not registered.");
         _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()

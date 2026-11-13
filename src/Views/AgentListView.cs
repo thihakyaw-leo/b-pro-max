@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -14,12 +13,9 @@ public sealed partial class AgentListView : Page
 {
     private readonly IAgentService _agentService;
 
-    private TextBox SearchBox => this.FindChildByName<TextBox>("SearchBox")!;
-    private ListView AgentList => this.FindChildByName<ListView>("AgentList")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public AgentListView()
     {
+        InitializeComponent();
         _agentService = App.Services?.GetRequiredService<IAgentService>()
             ?? throw new InvalidOperationException("AgentService not registered.");
     }

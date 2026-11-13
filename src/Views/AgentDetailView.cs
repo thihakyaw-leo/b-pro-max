@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,20 +16,9 @@ public sealed partial class AgentDetailView : Page
     private readonly IAgentService _agentService;
     private int? _agentId;
 
-    private TextBlock IdLabel => this.FindChildByName<TextBlock>("IdLabel")!;
-    private TextBox AgentNameBox => this.FindChildByName<TextBox>("AgentNameBox")!;
-    private TextBox AddressBox => this.FindChildByName<TextBox>("AddressBox")!;
-    private TextBox PhoneBox => this.FindChildByName<TextBox>("PhoneBox")!;
-    private TextBox CommissionBox => this.FindChildByName<TextBox>("CommissionBox")!;
-    private TextBox RateBox => this.FindChildByName<TextBox>("RateBox")!;
-    private TextBox Commission1Box => this.FindChildByName<TextBox>("Commission1Box")!;
-    private TextBox Rate1Box => this.FindChildByName<TextBox>("Rate1Box")!;
-    private TextBox CurrencyTypeBox => this.FindChildByName<TextBox>("CurrencyTypeBox")!;
-    private TextBox CurrencyRateBox => this.FindChildByName<TextBox>("CurrencyRateBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public AgentDetailView()
     {
+        InitializeComponent();
         _agentService = App.Services?.GetRequiredService<IAgentService>()
             ?? throw new InvalidOperationException("AgentService not registered.");
     }

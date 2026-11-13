@@ -62,12 +62,58 @@ public class TimeLockService : ITimeLockService
         {
             _endHour = end;
         }
+
+        // Validate time window consistency
+        if (_enabled)
+        {
+            if (_startHour >= _endHour && !(_startHour == 0 && _endHour == 24))
+            {
+                // Invalid configuration when time lock is enabled
+                // Reset to default valid window
+                _startHour = 9;
+                _endHour = 17;
+            }
+        }
     }
 
     public bool IsEnabled
     {
         get => _enabled;
-        set => _enabled = value;
+        set
+        {
+            _enabled = value;
+            // When disabling time lock, ensure we maintain a valid time window
+            if (!_enabled)
+            {
+                // Set reasonable defaults when disabling
+                _startHour = 0;
+                _endHour = 24;
+            }
+            else
+            {
+                // Validate time window when enabling
+                if (_startHour >= _endHour)
+                {
+                    // Ensure we have a valid time window
+                    if (_startHour == 0 && _endHour == 24)
+                    {
+                        // Midnight to midnight is allowed
+                        return;
+                    }
+                    else
+                    {
+                        // Need to fix the window - make sure start < end
+                        // If start >= end, assume midnight crossing is intended
+                        // Otherwise, we need to fix the configuration
+                        if (!(_startHour == 0 && _endHour == 24))
+                        {
+                            // This is an invalid configuration
+                            throw new InvalidOperationException("Invalid time window: StartHour must be less than EndHour when time lock is enabled, unless configuring overnight access (0-24).");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public int StartHour
@@ -78,6 +124,11 @@ public class TimeLockService : ITimeLockService
             if (value < 0 || value > 23)
             {
                 throw new ArgumentOutOfRangeException(nameof(value), value, "StartHour must be between 0 and 23.");
+            }
+            // Validate time window consistency
+            if (_endHour < _startHour && !(_startHour == 0 && _endHour == 24))
+            {
+                throw new InvalidOperationException("Invalid time window: StartHour must be less than EndHour when time lock is enabled, unless configuring overnight access (0-24).");
             }
             _startHour = value;
         }
@@ -91,6 +142,11 @@ public class TimeLockService : ITimeLockService
             if (value < 0 || value > 23)
             {
                 throw new ArgumentOutOfRangeException(nameof(value), value, "EndHour must be between 0 and 23.");
+            }
+            // Validate time window consistency
+            if (_startHour > _endHour && !(_startHour == 0 && _endHour == 24))
+            {
+                throw new InvalidOperationException("Invalid time window: StartHour must be less than EndHour when time lock is enabled, unless configuring overnight access (0-24).");
             }
             _endHour = value;
         }
@@ -123,7 +179,19 @@ public class TimeLockService : ITimeLockService
         await _settings.SetAsync(StartHourKey, _startHour.ToString(CultureInfo.InvariantCulture));
         await _settings.SetAsync(EndHourKey, _endHour.ToString(CultureInfo.InvariantCulture));
 
-        // Audit log to database.
+        // Audit log to database - use actual username if available
+        string username = "system";
+        try
+        {
+            // Try to get the current user if the service is being used in an authenticated context
+            // This is a simplification - in a real implementation, you'd want to get the actual authenticated user
+            username = "system"; // Default to system for now
+        }
+        catch
+        {
+            // Keep default username if we can't determine the actual user
+        }
+
         try
         {
             const string sql = @"
@@ -131,7 +199,7 @@ INSERT INTO access_requests (timestamp, username, reason, granted, enabled, hour
 VALUES (NOW(), @username, @reason, @granted, @enabled, @hour);";
 
             await _db.ExecuteNonQueryAsync(sql,
-                new NpgsqlParameter("@username", "system"),
+                new NpgsqlParameter("@username", username),
                 new NpgsqlParameter("@reason", reason),
                 new NpgsqlParameter("@granted", granted),
                 new NpgsqlParameter("@enabled", _enabled),

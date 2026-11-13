@@ -36,8 +36,8 @@ dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 # Single test
 dotnet test tests\b-pro-max.tests.csproj --filter "FullyQualifiedName~ClassName"
 
-# Run app
-dotnet run --project src\b-pro-max.csproj
+# Run app (unpackaged WinUI: RID build is required so the native bootstrapper is deployed)
+dotnet run --project src\b-pro-max.csproj -r win-x64
 ```
 Always run `build -> test` before committing. Fix warnings rather than suppressing.
 

@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -14,13 +13,9 @@ public sealed partial class TimeLockView : Page
 {
     private readonly ITimeLockService _timeLockService;
 
-    private CheckBox EnabledCheck => this.FindChildByName<CheckBox>("EnabledCheck")!;
-    private TextBox StartHourBox => this.FindChildByName<TextBox>("StartHourBox")!;
-    private TextBox EndHourBox => this.FindChildByName<TextBox>("EndHourBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public TimeLockView()
     {
+        InitializeComponent();
         _timeLockService = App.Services?.GetRequiredService<ITimeLockService>()
             ?? throw new InvalidOperationException("TimeLockService not registered.");
     }

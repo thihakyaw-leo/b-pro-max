@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -14,13 +13,9 @@ public sealed partial class RegisterView : Page
 {
     private readonly ILicensingService _licensing;
 
-    private TextBox LicenseKeyBox => this.FindChildByName<TextBox>("LicenseKeyBox")!;
-    private TextBox CompanyBox => this.FindChildByName<TextBox>("CompanyBox")!;
-    private TextBox EmailBox => this.FindChildByName<TextBox>("EmailBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public RegisterView()
     {
+        InitializeComponent();
         _licensing = App.Services?.GetRequiredService<ILicensingService>()
             ?? throw new InvalidOperationException("LicensingService not registered.");
     }

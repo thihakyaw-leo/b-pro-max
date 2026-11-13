@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -13,15 +12,9 @@ public sealed partial class AutoBuyView : Page
 {
     private readonly IAutoBuyService _autoBuyService;
 
-    private TextBox AgentNameBox => this.FindChildByName<TextBox>("AgentNameBox")!;
-    private TextBox TriggerAmountBox => this.FindChildByName<TextBox>("TriggerAmountBox")!;
-    private TextBox AutoBuyAmountBox => this.FindChildByName<TextBox>("AutoBuyAmountBox")!;
-    private CheckBox EnabledCheck => this.FindChildByName<CheckBox>("EnabledCheck")!;
-    private ListView RulesList => this.FindChildByName<ListView>("RulesList")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public AutoBuyView()
     {
+        InitializeComponent();
         _autoBuyService = App.Services?.GetRequiredService<IAutoBuyService>()
             ?? throw new InvalidOperationException("AutoBuyService not registered.");
     }

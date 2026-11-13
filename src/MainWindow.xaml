@@ -49,7 +49,7 @@
                 <NavigationViewItem
                     x:Name="NavNumberWisdom"
                     Content="Number Wisdom"
-                    Icon="NumberedList"
+                    Icon="List"
                     IsEnabled="False"
                     AutomationProperties.AutomationId="NavNumberWisdom" />
                 <NavigationViewItem
@@ -91,7 +91,7 @@
                 <NavigationViewItem
                     x:Name="NavSound"
                     Content="Sound Settings"
-                    Icon="Speaker"
+                    Icon="Volume"
                     IsEnabled="False"
                     AutomationProperties.AutomationId="NavSound" />
                 <NavigationViewItem
@@ -103,12 +103,12 @@
                 <NavigationViewItem
                     x:Name="NavRegister"
                     Content="Register"
-                    Icon="Key"
+                    Icon="Account"
                     AutomationProperties.AutomationId="NavRegister" />
                 <NavigationViewItem
                     x:Name="NavLogout"
                     Content="Logout"
-                    Icon="SignOut"
+                    Icon="LeaveChat"
                     IsEnabled="False"
                     Visibility="Collapsed"
                     AutomationProperties.AutomationId="NavLogout" />
