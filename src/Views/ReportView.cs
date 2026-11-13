@@ -82,7 +82,7 @@ public sealed partial class ReportView : Page
                         description = "Sales report";
                         break;
                     case "Excel":
-                        data = await _excelExportService.ExportSalesToExcelAsync();
+                        data = await _excelExportService.ExportSalesToExcelAsync(start, end);
                         extension = ".xlsx";
                         description = "Sales Excel export";
                         break;

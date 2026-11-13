@@ -1,6 +1,6 @@
 # AGENTS.md — b-pro-max
 
-WinUI 3 (.NET 9) desktop reimplementation of a VB6 lottery/agent app. Local PostgreSQL only (Npgsql); Windows desktop only — WinRT activation (`REGDB_E_CLASSNOTREG`) fails outside Windows.
+WinUI 3 (.NET 9) desktop reimplementation of a VB6 lottery/agent app. Local PostgreSQL only (Npgsql); Windows desktop only — WinRT activation requires a registered Windows App Runtime.
 
 ## Toolchain (verified in global.json / Directory.Build.props / csproj)
 - `global.json` pins .NET SDK `9.0.100` with `rollForward: latestFeature` (resolves to 9.0.321 here). Do **not** switch to `latestMajor` — preview SDKs (e.g. 11.0-rc) fail with `NETSDK1057`. Only the root `global.json` is tracked; never add `src/global.json` (gitignored).
@@ -11,7 +11,7 @@ WinUI 3 (.NET 9) desktop reimplementation of a VB6 lottery/agent app. Local Post
 - Transient `CS2012` file-lock errors (Microsoft Defender) can occur mid-build; retry.
 
 ## XAML
-XAML compilation is disabled: `MarkupCompilePass1`/`2` are no-ops, `**\*.xaml` is removed from compilation, and pre-generated `.g.cs` files are used (`System.Security.Permissions` v6 is missing on .NET 9; `XamlCompiler.exe` crashes silently). **Do not add new XAML pages expecting normal compilation.** Controls are resolved at runtime via `FindChildByName<T>()` — there are no `InitializeComponent()` calls yet.
+XAML compilation is enabled. Every XAML view uses `InitializeComponent()` in its constructor; controls are resolved via `FindChildByName<T>()` and carry `AutomationProperties.AutomationId` for UI automation.
 
 ## Line endings
 Working tree must be **LF** (`.gitattributes` + `.editorconfig` enforce `eol=lf`). `core.autocrlf=true` without `.gitattributes` checks out CRLF and fails `dotnet format --verify-no-changes` with `ENDOFLINE`. If endings drift: `git add --renormalize .`.

@@ -40,11 +40,6 @@
     <PackageReference Include="CsvHelper" Version="33.0.1" />
   </ItemGroup>
 
-<ItemGroup>
-    <Page Remove="Views/MainContentView.xaml" />
-    <None Include="Views/MainContentView.xaml" />
-</ItemGroup>
-
   <ItemGroup>
     <Content Include="Package.appxmanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

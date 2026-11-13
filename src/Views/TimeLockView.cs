@@ -53,10 +53,22 @@ public sealed partial class TimeLockView : Page
             _timeLockService.StartHour = startHour;
             _timeLockService.EndHour = endHour;
 
+            if (_timeLockService.IsEnabled && _timeLockService.StartHour >= _timeLockService.EndHour)
+            {
+                StatusMessage.Text = "Start hour must be less than end hour.";
+                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                return;
+            }
+
             StatusMessage.Text = "Time lock settings saved.";
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
         }
         catch (ArgumentOutOfRangeException ex)
+        {
+            StatusMessage.Text = ex.Message;
+            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
+        catch (InvalidOperationException ex)
         {
             StatusMessage.Text = ex.Message;
             StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);

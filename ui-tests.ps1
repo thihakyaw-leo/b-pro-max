@@ -1,8 +1,7 @@
 # ui-tests.ps1 — WinUI 3 UI Automation test batch for b-pro-max
 #
 # Requires: WinApp CLI 0.7+ (winapp), Windows desktop with WinRT runtime registered.
-#           Live execution is BLOCKED in this container (REGDB_E_CLASSNOTREG).
-#           Run on a Windows host: .\ui-tests.ps1 -Target sandbox
+#           Live execution: .\ui-tests.ps1 -Target local
 #
 # AutomationIds referenced here match src\Views\*.xaml and src\MainWindow.xaml.
 

@@ -63,16 +63,10 @@ public class TimeLockService : ITimeLockService
             _endHour = end;
         }
 
-        // Validate time window consistency
+        // Validate time window consistency once loaded.
         if (_enabled)
         {
-            if (_startHour >= _endHour && !(_startHour == 0 && _endHour == 24))
-            {
-                // Invalid configuration when time lock is enabled
-                // Reset to default valid window
-                _startHour = 9;
-                _endHour = 17;
-            }
+            ValidateWindow();
         }
     }
 
@@ -82,36 +76,10 @@ public class TimeLockService : ITimeLockService
         set
         {
             _enabled = value;
-            // When disabling time lock, ensure we maintain a valid time window
-            if (!_enabled)
+            // Disabling must never clobber the configured hours.
+            if (value)
             {
-                // Set reasonable defaults when disabling
-                _startHour = 0;
-                _endHour = 24;
-            }
-            else
-            {
-                // Validate time window when enabling
-                if (_startHour >= _endHour)
-                {
-                    // Ensure we have a valid time window
-                    if (_startHour == 0 && _endHour == 24)
-                    {
-                        // Midnight to midnight is allowed
-                        return;
-                    }
-                    else
-                    {
-                        // Need to fix the window - make sure start < end
-                        // If start >= end, assume midnight crossing is intended
-                        // Otherwise, we need to fix the configuration
-                        if (!(_startHour == 0 && _endHour == 24))
-                        {
-                            // This is an invalid configuration
-                            throw new InvalidOperationException("Invalid time window: StartHour must be less than EndHour when time lock is enabled, unless configuring overnight access (0-24).");
-                        }
-                    }
-                }
+                ValidateWindow();
             }
         }
     }
@@ -124,11 +92,6 @@ public class TimeLockService : ITimeLockService
             if (value < 0 || value > 23)
             {
                 throw new ArgumentOutOfRangeException(nameof(value), value, "StartHour must be between 0 and 23.");
-            }
-            // Validate time window consistency
-            if (_endHour < _startHour && !(_startHour == 0 && _endHour == 24))
-            {
-                throw new InvalidOperationException("Invalid time window: StartHour must be less than EndHour when time lock is enabled, unless configuring overnight access (0-24).");
             }
             _startHour = value;
         }
@@ -143,12 +106,21 @@ public class TimeLockService : ITimeLockService
             {
                 throw new ArgumentOutOfRangeException(nameof(value), value, "EndHour must be between 0 and 23.");
             }
-            // Validate time window consistency
-            if (_startHour > _endHour && !(_startHour == 0 && _endHour == 24))
-            {
-                throw new InvalidOperationException("Invalid time window: StartHour must be less than EndHour when time lock is enabled, unless configuring overnight access (0-24).");
-            }
             _endHour = value;
+        }
+    }
+
+    /// <summary>
+    /// Throws when the time lock is enabled but the window is invalid
+    /// (start must be strictly less than end). EndHour is capped at 23 by the
+    /// setters, so a full-day 0-24 window is not representable here.
+    /// </summary>
+    private void ValidateWindow()
+    {
+        if (_startHour >= _endHour)
+        {
+            throw new InvalidOperationException(
+                "Invalid time window: StartHour must be less than EndHour when time lock is enabled.");
         }
     }
 

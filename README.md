@@ -81,7 +81,7 @@ b-pro-max/
 │   └── Views/                # 16 WinUI 3 Page views (.xaml + .xaml.cs)
 └── tests\
     ├── b-pro-max.tests.csproj
-    ├── ...                    # 21 unit test classes — 246 tests
+    ├── ...                    # unit test classes — 255 tests
     └── e2e\
         └── b-pro-max.e2e.csproj  # 40 e2e tests against PostgreSQL
 ├── docs\
