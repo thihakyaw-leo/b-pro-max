@@ -158,6 +158,18 @@ dotnet test tests\b-pro-max.tests.csproj --collect:"XPlat Code Coverage" --resul
 dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 ```
 
+### Live UI checks (Windows desktop, WinApp CLI)
+
+```cmd
+.\ui-tests.ps1 -Target local                ; 20/20 UI automation checks
+.\smoke-report-sales-excel.ps1              ; Report -> Sales -> Excel against the real DB
+```
+
+`ui-tests.ps1` drives the app with UI Automation and expects a `testuser` / `testpass`
+account in the local `bpro_max` database. The smoke script seeds and then removes one
+sale row, so it leaves the database as it found it. If the app dies without a message,
+check `%LOCALAPPDATA%\b-pro-max\crash.log`.
+
 ## WinUI 3 Views
 
 The UI is WinUI 3 XAML: 16 Page views live in `src\Views\` as `.xaml` + `.xaml.cs` pairs.
