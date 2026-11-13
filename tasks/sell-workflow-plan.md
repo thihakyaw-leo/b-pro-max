@@ -420,7 +420,7 @@ Phases B, C, D, E, F, G are all independent of each other (except B1→B2, C1→
 These are tracked in `tasks/plan.md` and are **not** part of this sell workflow plan:
 - MVVM migration (ViewModel, `ObservableProperty`, `RelayCommand`)
 - Globalization (`Resources.resw`, `x:Uid`, `ResourceLoader`)
-- XAML compilation enablement (`MarkupCompilePass1/2`)
+- XAML compilation enablement (`MarkupCompilePass1/2`) — done
 - Performance benchmarking
 - Final dependency audit (VB6/ActiveX/MSVBVM60)
 - Documentation/deployment guide

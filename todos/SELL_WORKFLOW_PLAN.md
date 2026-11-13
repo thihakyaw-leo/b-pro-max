@@ -60,7 +60,7 @@ The 2-digit (၂လုံးထီ) selling workflow is fully implemented, teste
 - **SELL-04 SalesFilterView unit tests for private methods**: Underlying logic already covered by existing service tests. Private methods are UI-coupled and not independently testable without refactoring.
 - **MVVM migration (Fix #2)**: Deferred to Phase 6.
 - **Globalization migration (Fix #3)**: `StringResources` helper created; views not yet migrated.
-- **XAML compilation**: Remains disabled (Phase 6 polish item).
+- **XAML compilation**: Enabled (Phase 6 polish complete).
 
 ---
 

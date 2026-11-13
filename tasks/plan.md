@@ -7,7 +7,7 @@ b-pro-max (WinUI 3 reimplementation of DD.exe) has Phases 0–5 complete and ver
 - Keep Phase 6 work scoped to verification/polish — no new feature development.
 - Benchmark scratch lives under `benchmarks/` (gitignored — never commit).
 - E2E tests continue to run against local PostgreSQL; behavior is compared side-by-side with DD.exe on identical test data.
-- XAML compilation remains disabled (MarkupCompilePass1/2 no-op'd); UI polish is limited to code-behind styling/AutomationId, not new XAML pages.
+- XAML compilation enabled; all views use `InitializeComponent()`; controls resolved via `FindChildByName<T>()` with `AutomationProperties.AutomationId`.
 
 ## Task List
 

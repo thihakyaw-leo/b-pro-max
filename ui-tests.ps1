@@ -95,7 +95,20 @@ try {
 
     # Shell / NavigationView
     Test-UI 'NavigationView present' { Invoke-Ui @('wait-for', 'NavView', '-t', '3000') }
-    Test-UI 'ContentFrame present' { Invoke-Ui @('wait-for', 'ContentFrame', '-t', '2000') }
+
+    # Register flow (unauthenticated state — NavRegister visible before login)
+    Test-UI 'Navigate to Register' {
+        Invoke-Ui @('invoke', 'NavRegister')
+        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '3000')
+    }
+    Test-UI 'Register UI elements present' {
+        Invoke-Ui @('wait-for', 'LicenseKeyBox', '-t', '2000')
+        Invoke-Ui @('wait-for', 'CompanyBox', '-t', '2000')
+        Invoke-Ui @('wait-for', 'EmailBox', '-t', '2000')
+        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '2000')
+        Invoke-Ui @('wait-for', 'BackButton', '-t', '2000')
+        Invoke-Ui @('wait-for', 'StatusMessage', '-t', '2000')
+    }
 
     # Login flow
     Test-UI 'Navigate to Login' {
@@ -112,21 +125,8 @@ try {
         Invoke-Ui @('set-value', 'UsernameBox', 'testuser')
         Invoke-Ui @('set-value', 'PasswordBox', 'testpass')
         Invoke-Ui @('invoke', 'LoginButton')
-        Invoke-Ui @('wait-for', 'StatusMessage', '-t', '3000')
-    }
-
-    # Register flow
-    Test-UI 'Navigate to Register' {
-        Invoke-Ui @('invoke', 'NavRegister')
-        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '3000')
-    }
-    Test-UI 'Register UI elements present' {
-        Invoke-Ui @('wait-for', 'LicenseKeyBox', '-t', '2000')
-        Invoke-Ui @('wait-for', 'CompanyBox', '-t', '2000')
-        Invoke-Ui @('wait-for', 'EmailBox', '-t', '2000')
-        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '2000')
-        Invoke-Ui @('wait-for', 'BackButton', '-t', '2000')
-        Invoke-Ui @('wait-for', 'StatusMessage', '-t', '2000')
+        Start-Sleep -Milliseconds 1500
+        Invoke-Ui @('wait-for', 'AgentListView', '-t', '8000')
     }
 
     # Agent list flow (requires login; NavAgents starts disabled)

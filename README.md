@@ -81,7 +81,7 @@ b-pro-max/
 │   └── Views/                # 16 WinUI 3 Page views (.xaml + .xaml.cs)
 └── tests\
     ├── b-pro-max.tests.csproj
-    ├── ...                    # unit test classes — 255 tests
+    ├── ...                    # 21 unit test classes — 255 tests
     └── e2e\
         └── b-pro-max.e2e.csproj  # 40 e2e tests against PostgreSQL
 ├── docs\
@@ -195,7 +195,7 @@ The console app is a temporary test harness. The UI is WinUI 3 XAML: 16 Page vie
 | SoundSettingsView | frmSoundSetting |
 | TimeLockView | frmTimeLock |
 
-> **Known limitation:** XAML compilation is currently disabled in `src\b-pro-max.csproj` (`MarkupCompilePass1`/`2` are no-op'd and `.xaml` files are excluded from compilation) because the XAML compiler cannot run against .NET 9 on this machine. Controls are resolved at runtime via `FindChildByName<T>()`, and there are no `InitializeComponent()` calls yet — restoring the XAML compiler or hand-writing the code-behind is required before the UI is fully renderable.
+> **Note:** XAML compilation is enabled in `src\b-pro-max.csproj`. All views use `InitializeComponent()` in their constructors and controls are resolved via `FindChildByName<T>()` with `AutomationProperties.AutomationId` set for UI automation.
 
 ## Hard Constraints
 
