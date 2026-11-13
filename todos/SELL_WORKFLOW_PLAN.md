@@ -45,8 +45,8 @@ The 2-digit (၂လုံးထီ) selling workflow is fully implemented, teste
 |-------|--------|
 | `dotnet format --verify-no-changes` | Clean |
 | `dotnet build b-pro-max.sln -c Release` | 0 warnings, 0 errors |
-| `dotnet test tests\b-pro-max.tests.csproj` | 246 passed |
-| `dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build` | 37 passed |
+| `dotnet test tests\b-pro-max.tests.csproj` | 255 passed |
+| `dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build` | 40 passed |
 
 ### Fix #4 (Theming) — SalesFilterView
 
@@ -56,11 +56,11 @@ The 2-digit (၂လုံးထီ) selling workflow is fully implemented, teste
 
 ## What was NOT done (out of scope for this task)
 
-- **SELL-02 SalesFilterView integration tests**: Not feasible without XAML rendering (compilation disabled in Phase 6). Business logic already covered by service-layer tests.
+- **SELL-02 SalesFilterView integration tests**: Not feasible as UI-level integration tests. Business logic is covered by service-layer tests (`SalesFilterServiceTests`).
 - **SELL-04 SalesFilterView unit tests for private methods**: Underlying logic already covered by existing service tests. Private methods are UI-coupled and not independently testable without refactoring.
 - **MVVM migration (Fix #2)**: Deferred to Phase 6.
 - **Globalization migration (Fix #3)**: `StringResources` helper created; views not yet migrated.
-- **XAML compilation**: Remains disabled (Phase 6 polish item).
+- **XAML compilation**: Enabled (Phase 6 polish complete).
 
 ---
 

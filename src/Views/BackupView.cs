@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -15,11 +14,9 @@ public sealed partial class BackupView : Page
 {
     private readonly IDatabaseMaintenanceService _maintenanceService;
 
-    private TextBox BackupPathBox => this.FindChildByName<TextBox>("BackupPathBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public BackupView()
     {
+        InitializeComponent();
         _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
             ?? throw new InvalidOperationException("DatabaseMaintenanceService not registered.");
     }
@@ -48,7 +45,7 @@ public sealed partial class BackupView : Page
         if (string.IsNullOrWhiteSpace(path))
         {
             StatusMessage.Text = "Please specify a backup path.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -56,12 +53,12 @@ public sealed partial class BackupView : Page
         {
             var ok = await _maintenanceService.BackupDatabaseAsync(path);
             StatusMessage.Text = ok ? "Backup completed successfully." : "Backup failed.";
-            StatusMessage.Foreground = (Application.Current.Resources[ok ? "SystemControlSuccessTextForegroundBrush" : "SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ok ? ThemeBrush.Success : ThemeBrush.Error;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -72,7 +69,7 @@ public sealed partial class BackupView : Page
         if (string.IsNullOrWhiteSpace(path))
         {
             StatusMessage.Text = "Please specify a backup path.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -91,12 +88,12 @@ public sealed partial class BackupView : Page
             {
                 var ok = await _maintenanceService.RestoreDatabaseAsync(path);
                 StatusMessage.Text = ok ? "Restore completed successfully." : "Restore failed.";
-                StatusMessage.Foreground = (Application.Current.Resources[ok ? "SystemControlSuccessTextForegroundBrush" : "SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ok ? ThemeBrush.Success : ThemeBrush.Error;
             }
             catch (Exception ex)
             {
                 StatusMessage.Text = $"Error: {ex.Message}";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ThemeBrush.Error;
             }
         }
     }

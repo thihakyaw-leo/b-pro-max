@@ -31,6 +31,6 @@
         </StackPanel>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="MaintenanceStatus"/>
+                   Margin="12" Foreground="{ThemeResource SuccessTextBrush}" AutomationProperties.AutomationId="MaintenanceStatus"/>
     </Grid>
 </Page>

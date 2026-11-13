@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,16 +19,9 @@ public sealed partial class ReportView : Page
     private readonly ICsvExportService _csvExportService;
     private readonly ITwoDExportService _twoDExportService;
 
-    private ComboBox ReportTypeCombo => this.FindChildByName<ComboBox>("ReportTypeCombo")!;
-    private ComboBox ExportFormatCombo => this.FindChildByName<ComboBox>("ExportFormatCombo")!;
-    private CalendarDatePicker StartDatePicker => this.FindChildByName<CalendarDatePicker>("StartDatePicker")!;
-    private CalendarDatePicker EndDatePicker => this.FindChildByName<CalendarDatePicker>("EndDatePicker")!;
-    private Button GenerateButton => this.FindChildByName<Button>("GenerateButton")!;
-    private Button ExportButton => this.FindChildByName<Button>("ExportButton")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public ReportView()
     {
+        InitializeComponent();
         _reportService = App.Services?.GetRequiredService<IReportService>()
             ?? throw new InvalidOperationException("ReportService not registered.");
         _excelExportService = App.Services?.GetRequiredService<IExcelExportService>()
@@ -90,7 +82,7 @@ public sealed partial class ReportView : Page
                         description = "Sales report";
                         break;
                     case "Excel":
-                        data = await _excelExportService.ExportSalesToExcelAsync();
+                        data = await _excelExportService.ExportSalesToExcelAsync(start, end);
                         extension = ".xlsx";
                         description = "Sales Excel export";
                         break;
@@ -143,7 +135,7 @@ public sealed partial class ReportView : Page
             }
 
             StatusMessage.Text = $"{description} generated ({data.Length} bytes).";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
 
             // Store the generated data for export
             _lastGeneratedData = data;
@@ -155,7 +147,7 @@ public sealed partial class ReportView : Page
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
         finally
         {
@@ -170,7 +162,7 @@ public sealed partial class ReportView : Page
         if (_lastGeneratedData == null)
         {
             StatusMessage.Text = "Please generate a report first.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlWarningTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Orange);
+            StatusMessage.Foreground = ThemeBrush.Warning;
             return;
         }
 
@@ -189,13 +181,13 @@ public sealed partial class ReportView : Page
             {
                 await Windows.Storage.FileIO.WriteBytesAsync(file, _lastGeneratedData);
                 StatusMessage.Text = $"Exported to {file.Path}";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = ThemeBrush.Success;
             }
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Export error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 

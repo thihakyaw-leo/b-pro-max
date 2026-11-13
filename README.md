@@ -81,7 +81,7 @@ b-pro-max/
 │   └── Views/                # 16 WinUI 3 Page views (.xaml + .xaml.cs)
 └── tests\
     ├── b-pro-max.tests.csproj
-    ├── ...                    # 21 unit test classes — 246 tests
+    ├── ...                    # 22 unit test classes — 257 tests
     └── e2e\
         └── b-pro-max.e2e.csproj  # 40 e2e tests against PostgreSQL
 ├── docs\
@@ -158,23 +158,21 @@ dotnet test tests\b-pro-max.tests.csproj --collect:"XPlat Code Coverage" --resul
 dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 ```
 
-## Console Menu
+### Live UI checks (Windows desktop, WinApp CLI)
 
-The console application provides a temporary interface for testing:
+```cmd
+.\ui-tests.ps1 -Target local                ; 20/20 UI automation checks
+.\smoke-report-sales-excel.ps1              ; Report -> Sales -> Excel against the real DB
+```
 
-| Option | Description |
-| --- | --- |
-| 1 | List all agents |
-| 2 | Search agents by name |
-| 3 | Add new agent |
-| 4 | Calculate commission |
-| 5 | Test sound alert |
-| 6 | Show configuration |
-| 0 | Exit |
+`ui-tests.ps1` drives the app with UI Automation and expects a `testuser` / `testpass`
+account in the local `bpro_max` database. The smoke script seeds and then removes one
+sale row, so it leaves the database as it found it. If the app dies without a message,
+check `%LOCALAPPDATA%\b-pro-max\crash.log`.
 
 ## WinUI 3 Views
 
-The console app is a temporary test harness. The UI is WinUI 3 XAML: 16 Page views live in `src\Views\` as `.xaml` + `.xaml.cs` pairs.
+The UI is WinUI 3 XAML: 16 Page views live in `src\Views\` as `.xaml` + `.xaml.cs` pairs.
 
 | View | Replaces VB6 Form |
 | --- | --- |
@@ -195,7 +193,7 @@ The console app is a temporary test harness. The UI is WinUI 3 XAML: 16 Page vie
 | SoundSettingsView | frmSoundSetting |
 | TimeLockView | frmTimeLock |
 
-> **Known limitation:** XAML compilation is currently disabled in `src\b-pro-max.csproj` (`MarkupCompilePass1`/`2` are no-op'd and `.xaml` files are excluded from compilation) because the XAML compiler cannot run against .NET 9 on this machine. Controls are resolved at runtime via `FindChildByName<T>()`, and there are no `InitializeComponent()` calls yet — restoring the XAML compiler or hand-writing the code-behind is required before the UI is fully renderable.
+> **Note:** XAML compilation is enabled in `src\b-pro-max.csproj`. All views use `InitializeComponent()` in their constructors and controls are resolved via `FindChildByName<T>()` with `AutomationProperties.AutomationId` set for UI automation.
 
 ## Hard Constraints
 

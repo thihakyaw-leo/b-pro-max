@@ -166,6 +166,6 @@
         </Pivot>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="2" Margin="12" TextWrapping="Wrap"
-                   Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="NumberWisdomStatus"/>
+                   Foreground="{ThemeResource SuccessTextBrush}" AutomationProperties.AutomationId="NumberWisdomStatus"/>
     </Grid>
 </Page>

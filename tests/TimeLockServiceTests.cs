@@ -137,4 +137,55 @@ public class TimeLockServiceTests
             It.IsAny<NpgsqlParameter[]>()),
             Times.Once);
     }
+
+    [Fact]
+    public void IsEnabledSetterDoesNotResetHours()
+    {
+        // Arrange
+        var service = CreateService();
+        service.StartHour = 8;
+        service.EndHour = 18;
+
+        // Act
+        service.IsEnabled = false;
+
+        // Assert — disabling must not clobber the configured hours
+        Assert.False(service.IsEnabled);
+        Assert.Equal(8, service.StartHour);
+        Assert.Equal(18, service.EndHour);
+    }
+
+    [Fact]
+    public void StartHourGreaterThanEndHourWhenEnabledThrows()
+    {
+        // Arrange — hours are set independently (as the view does), then enabled.
+        var service = CreateService(enabled: false);
+        service.EndHour = 9;
+        service.StartHour = 17;
+
+        // Act & Assert — enabling with an invalid window must throw.
+        Assert.Throws<InvalidOperationException>(() => service.IsEnabled = true);
+    }
+
+    [Fact]
+    public void StartHourEqualsEndHourWhenEnabledThrows()
+    {
+        // Arrange
+        var service = CreateService(enabled: false);
+        service.StartHour = 9;
+        service.EndHour = 9;
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => service.IsEnabled = true);
+    }
+
+    [Fact]
+    public async Task RequestAccessAsyncWithInvalidWindowThrows()
+    {
+        // Arrange — load an invalid window from the "database" mock.
+        var service = CreateService(enabled: true, startHour: 17, endHour: 9);
+
+        // Act & Assert — EnsureLoadedAsync loads DB values, then ValidateWindow throws.
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.RequestAccessAsync("Test"));
+    }
 }

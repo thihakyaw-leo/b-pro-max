@@ -60,3 +60,10 @@ test-results.json
 
 # Coverage output
 coverage/
+
+## Scratch / analysis artifacts (not source)
+BenchmarkDotNet.Artifacts/
+ui-test-artifacts/
+fix-plan.md
+package.json
+package-lock.json

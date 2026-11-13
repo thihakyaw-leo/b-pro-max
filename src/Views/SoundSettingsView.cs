@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -17,12 +16,9 @@ public sealed partial class SoundSettingsView : Page
     private readonly ISoundService _soundService;
     private readonly ISettingsStore _settings;
 
-    private CheckBox EnabledCheck => this.FindChildByName<CheckBox>("EnabledCheck")!;
-    private Slider VolumeSlider => this.FindChildByName<Slider>("VolumeSlider")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public SoundSettingsView()
     {
+        InitializeComponent();
         _soundService = App.Services?.GetRequiredService<ISoundService>()
             ?? throw new InvalidOperationException("SoundService not registered.");
         _settings = App.Services?.GetRequiredService<ISettingsStore>()
@@ -51,12 +47,12 @@ public sealed partial class SoundSettingsView : Page
         {
             await _soundService.PlayAlertSoundAsync();
             StatusMessage.Text = "Alert sound played.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -67,12 +63,12 @@ public sealed partial class SoundSettingsView : Page
         {
             await _soundService.PlayNotificationSoundAsync();
             StatusMessage.Text = "Notification sound played.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -87,6 +83,6 @@ public sealed partial class SoundSettingsView : Page
         await _settings.SetAsync(VolumeSettingKey, volume.ToString(CultureInfo.InvariantCulture));
 
         StatusMessage.Text = "Sound settings saved.";
-        StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+        StatusMessage.Foreground = ThemeBrush.Success;
     }
 }

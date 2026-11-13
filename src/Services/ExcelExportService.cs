@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using BProMax.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -12,10 +13,12 @@ namespace BProMax.Services;
 public class ExcelExportService : IExcelExportService
 {
     private readonly IAgentService _agentService;
+    private readonly ISalesService _salesService;
 
-    public ExcelExportService(IAgentService agentService)
+    public ExcelExportService(IAgentService agentService, ISalesService salesService)
     {
         _agentService = agentService;
+        _salesService = salesService;
     }
 
     public async Task<byte[]> ExportAgentsToExcelAsync()
@@ -24,11 +27,14 @@ public class ExcelExportService : IExcelExportService
         return GenerateAgentsExcel(agents);
     }
 
-    public Task<byte[]> ExportSalesToExcelAsync()
+    public async Task<byte[]> ExportSalesToExcelAsync(DateTime start, DateTime endDate)
     {
-        // TODO: Implement when sales data source exists
-        var sales = new List<SaleRecord>();
-        return Task.FromResult(GenerateSalesExcel(sales));
+        var sales = await _salesService.GetAllSalesAsync();
+        var filtered = sales
+            .Where(s => s.SaleDate >= start && s.SaleDate <= endDate.AddDays(1).AddSeconds(-1))
+            .OrderByDescending(s => s.SaleDate)
+            .ToList();
+        return GenerateSalesExcel(filtered);
     }
 
     private static byte[] GenerateAgentsExcel(List<Agent> agents)

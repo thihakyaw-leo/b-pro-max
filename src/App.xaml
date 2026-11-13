@@ -5,9 +5,22 @@
 
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
             <SolidColorBrush x:Key="BrandColor" Color="{ThemeResource SystemAccentColor}" />
             <SolidColorBrush x:Key="SurfaceColor" Color="{ThemeResource SystemAccentColorLight2}" />
             <SolidColorBrush x:Key="ErrorColor" Color="{ThemeResource SystemAccentColorDark1}" />
+
+            <!--
+                Semantic status brushes. WinUI 3 has no SystemControlSuccessTextForegroundBrush /
+                SystemControlWarningTextForegroundBrush (those are WinUI 2 keys), so the views use
+                these application-level brushes instead. Defined here because
+                Application.Resources is the only dictionary that can be read from code safely.
+            -->
+            <SolidColorBrush x:Key="SuccessTextBrush" Color="{ThemeResource SystemFillColorSuccess}" />
+            <SolidColorBrush x:Key="ErrorTextBrush" Color="{ThemeResource SystemFillColorCritical}" />
+            <SolidColorBrush x:Key="WarningTextBrush" Color="{ThemeResource SystemFillColorCaution}" />
         </ResourceDictionary>
     </Application.Resources>
 

@@ -1,5 +1,4 @@
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,15 +18,9 @@ public sealed partial class DrawsView : Page
     private readonly IPayoutService _payoutService;
     private readonly IAuthService _authService;
 
-    private CalendarDatePicker DrawDatePicker => this.FindChildByName<CalendarDatePicker>("DrawDatePicker")!;
-    private TextBox DrawTimeBox => this.FindChildByName<TextBox>("DrawTimeBox")!;
-    private ListView DrawsList => this.FindChildByName<ListView>("DrawsList")!;
-    private TextBox ResultBox => this.FindChildByName<TextBox>("ResultBox")!;
-    private ListView PayoutsList => this.FindChildByName<ListView>("PayoutsList")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public DrawsView()
     {
+        InitializeComponent();
         _drawService = App.Services?.GetRequiredService<IDrawService>()
             ?? throw new InvalidOperationException("DrawService not registered.");
         _payoutService = App.Services?.GetRequiredService<IPayoutService>()
@@ -282,9 +275,7 @@ public sealed partial class DrawsView : Page
     {
         StatusMessage.Text = message;
         StatusMessage.Foreground = isError
-            ? Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush
-                ?? new SolidColorBrush(Microsoft.UI.Colors.Red)
-            : Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush
-                ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+            ? ThemeBrush.Error
+            : ThemeBrush.Success;
     }
 }

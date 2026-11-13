@@ -49,6 +49,6 @@
         </ListView>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="AgentSearchStatus"/>
+                   Margin="12" Foreground="{ThemeResource SuccessTextBrush}" AutomationProperties.AutomationId="AgentSearchStatus"/>
     </Grid>
 </Page>

@@ -15,8 +15,8 @@ public sealed partial class SetupAdminView : Page
 {
     private readonly IAuthService _auth;
 
-    private static Brush ErrorBrush => (Brush)Application.Current.Resources["SystemControlErrorTextForegroundBrush"];
-    private static Brush SuccessBrush => (Brush)Application.Current.Resources["SystemControlSuccessTextForegroundBrush"];
+    private static Brush ErrorBrush => ThemeBrush.Error;
+    private static Brush SuccessBrush => ThemeBrush.Success;
 
     private TextBox UsernameBox { get; set; } = null!;
     private PasswordBox PasswordBox { get; set; } = null!;
@@ -57,7 +57,7 @@ public sealed partial class SetupAdminView : Page
             Margin = new Thickness(0, 0, 0, 8)
         };
         title.SetValue(Grid.RowProperty, 0);
-        title.Style = (Style)Application.Current.Resources["TitleTextBlockStyle"];
+        title.Style = ResolveStyle("TitleTextBlockStyle");
         root.Children.Add(title);
 
         var subtitle = new TextBlock
@@ -66,7 +66,7 @@ public sealed partial class SetupAdminView : Page
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 0, 0, 24),
         };
-        subtitle.Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"];
+        subtitle.Style = ResolveStyle("SubtitleTextBlockStyle");
         subtitle.SetValue(Grid.RowProperty, 1);
         root.Children.Add(subtitle);
 
@@ -139,6 +139,23 @@ public sealed partial class SetupAdminView : Page
         root.Children.Add(StatusMessage);
 
         this.Content = root;
+    }
+
+    /// <summary>
+    /// Looks up a framework style without risking the
+    /// <see cref="System.Runtime.InteropServices.COMException"/> that the
+    /// <see cref="ResourceDictionary"/> indexer raises for an unknown key.
+    /// </summary>
+    private static Style? ResolveStyle(string key)
+    {
+        if (Application.Current is { } app
+            && app.Resources.TryGetValue(key, out var value)
+            && value is Style style)
+        {
+            return style;
+        }
+
+        return null;
     }
 
     private async void CreateButton_Click(object sender, RoutedEventArgs e)

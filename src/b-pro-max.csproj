@@ -8,16 +8,14 @@
     <RootNamespace>BProMax</RootNamespace>
     <AssemblyName>b-pro-max</AssemblyName>
     <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
     <Platform>x64</Platform>
     <_WinUIRuntimeIdentifier>win-x64</_WinUIRuntimeIdentifier>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <UseXamlCompilerExecutable>false</UseXamlCompilerExecutable>
-    <SkipPriGen>true</SkipPriGen>
-    <DisablePriGen>true</DisablePriGen>
-    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
-    <AppxPackage>false</AppxPackage>
-    <EnableCoreMrtTooling>false</EnableCoreMrtTooling>
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,14 +40,6 @@
     <PackageReference Include="CsvHelper" Version="33.0.1" />
   </ItemGroup>
 
-<ItemGroup>
-    <Page Remove="Views/MainContentView.xaml" />
-    <None Include="Views/MainContentView.xaml" />
-    <!-- Remove all XAML pages from compilation — .g.cs files are pre-generated -->
-    <Page Remove="**\*.xaml" />
-    <ApplicationDefinition Remove="**\*.xaml" />
-</ItemGroup>
-
   <ItemGroup>
     <Content Include="Package.appxmanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -58,22 +48,6 @@
       <Link>appsettings.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <!-- Use existing pre-generated .g.cs files (XAML compilation is skipped because
-       the managed CompileXaml task needs System.Security.Permissions v6.0.0.0 which
-       is unavailable on .NET 9, and XamlCompiler.exe crashes silently. -->
-  <Target Name="MarkupCompilePass1" DependsOnTargets="" />
-  <Target Name="MarkupCompilePass2" DependsOnTargets="" />
-  <!-- PRI generation requires Visual Studio build tools (missing on SDK-only machine).
-       No-op for desktop WinExe app. -->
-  <Target Name="ExpandPriContent" DependsOnTargets="" />
-
-  <ItemGroup>
-    <!-- Pre-generated XAML .g.cs files. GlobalUsings.g.cs is excluded because the SDK
-         already contributes it to Compile; including it here duplicates it (CS2002). -->
-    <Compile Include="$(IntermediateOutputPath)**\*.g.cs"
-             Exclude="$(IntermediateOutputPath)**\*.GlobalUsings.g.cs" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 # AGENTS.md — b-pro-max
 
-WinUI 3 (.NET 9) desktop reimplementation of a VB6 lottery/agent app. Local PostgreSQL only (Npgsql); Windows desktop only — WinRT activation (`REGDB_E_CLASSNOTREG`) fails outside Windows.
+WinUI 3 (.NET 9) desktop reimplementation of a VB6 lottery/agent app. Local PostgreSQL only (Npgsql); Windows desktop only — WinRT activation requires a registered Windows App Runtime.
 
 ## Toolchain (verified in global.json / Directory.Build.props / csproj)
 - `global.json` pins .NET SDK `9.0.100` with `rollForward: latestFeature` (resolves to 9.0.321 here). Do **not** switch to `latestMajor` — preview SDKs (e.g. 11.0-rc) fail with `NETSDK1057`. Only the root `global.json` is tracked; never add `src/global.json` (gitignored).
@@ -11,7 +11,15 @@ WinUI 3 (.NET 9) desktop reimplementation of a VB6 lottery/agent app. Local Post
 - Transient `CS2012` file-lock errors (Microsoft Defender) can occur mid-build; retry.
 
 ## XAML
-XAML compilation is disabled: `MarkupCompilePass1`/`2` are no-ops, `**\*.xaml` is removed from compilation, and pre-generated `.g.cs` files are used (`System.Security.Permissions` v6 is missing on .NET 9; `XamlCompiler.exe` crashes silently). **Do not add new XAML pages expecting normal compilation.** Controls are resolved at runtime via `FindChildByName<T>()` — there are no `InitializeComponent()` calls yet.
+XAML compilation is enabled. Every XAML view uses `InitializeComponent()` in its constructor; controls are resolved via `FindChildByName<T>()` and carry `AutomationProperties.AutomationId` for UI automation.
+
+## WinUI 3 theme resources (crash-prone — read before touching view code)
+- `Application.Current.Resources[key]` **throws `COMException`** when the key is unknown; it does **not** return `null`. The idiom `Resources["X"] as Brush ?? fallback` therefore **never reaches the fallback** — the app dies instead.
+- WinUI 3 **removed** the WinUI 2 keys `SystemControlSuccessTextForegroundBrush` and `SystemControlWarningTextForegroundBrush`. `SystemControlErrorTextForegroundBrush`, `TitleTextBlockStyle` and `SubtitleTextBlockStyle` do still exist.
+- Always resolve brushes through `src/Views/ThemeBrush.cs` (`ThemeBrush.Success` / `.Error` / `.Warning`), which uses `TryGetValue` and falls back to a literal colour. The app-level keys it reads (`SuccessTextBrush`, `ErrorTextBrush`, `WarningTextBrush`) are declared in `src/App.xaml`.
+- In XAML use `{ThemeResource SuccessTextBrush}` — never the removed WinUI 2 keys.
+- `tests/ThemeResourceTests.cs` scans the sources to keep both rules enforced.
+- Unhandled exceptions are written to `%LOCALAPPDATA%\b-pro-max\crash.log` by `src/CrashLogger.cs`; a WinUI app has no console output, so check that file when the app dies silently.
 
 ## Line endings
 Working tree must be **LF** (`.gitattributes` + `.editorconfig` enforce `eol=lf`). `core.autocrlf=true` without `.gitattributes` checks out CRLF and fails `dotnet format --verify-no-changes` with `ENDOFLINE`. If endings drift: `git add --renormalize .`.
@@ -36,8 +44,8 @@ dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 # Single test
 dotnet test tests\b-pro-max.tests.csproj --filter "FullyQualifiedName~ClassName"
 
-# Run app
-dotnet run --project src\b-pro-max.csproj
+# Run app (unpackaged WinUI: RID build is required so the native bootstrapper is deployed)
+dotnet run --project src\b-pro-max.csproj -r win-x64
 ```
 Always run `build -> test` before committing. Fix warnings rather than suppressing.
 
