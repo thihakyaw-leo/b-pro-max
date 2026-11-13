@@ -36,14 +36,14 @@ public sealed partial class TimeLockView : Page
             !int.TryParse(EndHourBox.Text, NumberStyles.None, CultureInfo.InvariantCulture, out var endHour))
         {
             StatusMessage.Text = "Invalid hour values. Please enter whole numbers 0–23.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
         if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23)
         {
             StatusMessage.Text = "Hours must be between 0 and 23.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -56,22 +56,22 @@ public sealed partial class TimeLockView : Page
             if (_timeLockService.IsEnabled && _timeLockService.StartHour >= _timeLockService.EndHour)
             {
                 StatusMessage.Text = "Start hour must be less than end hour.";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ThemeBrush.Error;
                 return;
             }
 
             StatusMessage.Text = "Time lock settings saved.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (ArgumentOutOfRangeException ex)
         {
             StatusMessage.Text = ex.Message;
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
         catch (InvalidOperationException ex)
         {
             StatusMessage.Text = ex.Message;
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -80,6 +80,6 @@ public sealed partial class TimeLockView : Page
         StatusMessage.Text = string.Empty;
         var within = await _timeLockService.RequestAccessAsync("Time lock check");
         StatusMessage.Text = within ? "Access allowed at this time." : "Access denied at this time.";
-        StatusMessage.Foreground = (Application.Current.Resources[within ? "SystemControlSuccessTextForegroundBrush" : "SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(within ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+        StatusMessage.Foreground = within ? ThemeBrush.Success : ThemeBrush.Error;
     }
 }

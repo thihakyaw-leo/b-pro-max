@@ -80,7 +80,7 @@ public sealed partial class LoginView : Page
             if (result.Success)
             {
                 StatusMessage.Text = $"Welcome, {_auth.CurrentUser}!";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = ThemeBrush.Success;
 
                 if (App.MainWindowInstance is MainWindow mw)
                 {
@@ -100,7 +100,7 @@ public sealed partial class LoginView : Page
                     AuthFailureReason.EmptyInput => "Please enter username and password.",
                     _ => "Invalid username or password.",
                 };
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ThemeBrush.Error;
             }
         }
         finally

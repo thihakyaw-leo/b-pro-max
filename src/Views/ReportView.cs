@@ -135,7 +135,7 @@ public sealed partial class ReportView : Page
             }
 
             StatusMessage.Text = $"{description} generated ({data.Length} bytes).";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
 
             // Store the generated data for export
             _lastGeneratedData = data;
@@ -147,7 +147,7 @@ public sealed partial class ReportView : Page
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
         finally
         {
@@ -162,7 +162,7 @@ public sealed partial class ReportView : Page
         if (_lastGeneratedData == null)
         {
             StatusMessage.Text = "Please generate a report first.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlWarningTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Orange);
+            StatusMessage.Foreground = ThemeBrush.Warning;
             return;
         }
 
@@ -181,13 +181,13 @@ public sealed partial class ReportView : Page
             {
                 await Windows.Storage.FileIO.WriteBytesAsync(file, _lastGeneratedData);
                 StatusMessage.Text = $"Exported to {file.Path}";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = ThemeBrush.Success;
             }
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Export error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 

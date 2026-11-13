@@ -658,9 +658,7 @@ public sealed partial class SalesFilterView : Page
     {
         StatusMessage.Text = message;
         StatusMessage.Foreground = isError
-            ? Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush
-                ?? new SolidColorBrush(Microsoft.UI.Colors.Red)
-            : Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush
-                ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+            ? ThemeBrush.Error
+            : ThemeBrush.Success;
     }
 }

@@ -25,7 +25,7 @@ public sealed partial class AgentSearchView : Page
         if (string.IsNullOrWhiteSpace(term))
         {
             StatusMessage.Text = "Please enter a search term.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -34,7 +34,7 @@ public sealed partial class AgentSearchView : Page
             var agents = await _agentService.SearchAgentsAsync(term);
             SearchResults.ItemsSource = agents;
             StatusMessage.Text = $"Found {agents.Count} agents.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (Exception ex)
         {

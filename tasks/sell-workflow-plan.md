@@ -28,8 +28,8 @@
 
 ### Verified working
 - Build: 0 warnings, 0 errors (Release)
-- Unit tests: 246/246 pass
-- E2E tests: 37/37 pass
+- Unit tests: 255/255 pass
+- E2E tests: 40/40 pass
 - CI format gate: passes
 - `AutomationProperties.AutomationId` present on essentially all interactive controls
 - `SaleEntryService` constructor uses optional `ILogger` with `NullLogger` fallback (e2e-safe)
@@ -404,14 +404,14 @@ Phases B, C, D, E, F, G are all independent of each other (except B1→B2, C1→
 
 ## 6. Definition of Done (per task)
 
-- [ ] Code compiles with 0 warnings, 0 errors (`TreatWarningsAsErrors=true`)
-- [ ] `dotnet format --verify-no-changes` passes
-- [ ] New/changed unit tests pass
-- [ ] E2E tests pass against local PostgreSQL
-- [ ] No new hardcoded strings that should be localized (globalization is Phase 6)
-- [ ] `AutomationProperties.AutomationId` on any new interactive controls
-- [ ] No `async void` except event handlers; no `GetAwaiter().GetResult()` in new code
-- [ ] `ILogger` used via `LoggerMessage.Define` pattern (no direct `Log*` calls → CA1848)
+- [x] Code compiles with 0 warnings, 0 errors (`TreatWarningsAsErrors=true`)
+- [x] `dotnet format --verify-no-changes` passes
+- [x] New/changed unit tests pass
+- [x] E2E tests pass against local PostgreSQL
+- [x] No new hardcoded strings that should be localized (globalization is Phase 6)
+- [x] `AutomationProperties.AutomationId` on any new interactive controls
+- [x] No `async void` except event handlers; no `GetAwaiter().GetResult()` in new code
+- [x] `ILogger` used via `LoggerMessage.Define` pattern (no direct `Log*` calls → CA1848)
 
 ---
 

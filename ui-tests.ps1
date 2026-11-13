@@ -3,6 +3,10 @@
 # Requires: WinApp CLI 0.7+ (winapp), Windows desktop with WinRT runtime registered.
 #           Live execution: .\ui-tests.ps1 -Target local
 #
+# Credentials: the script logs in as 'testuser' / 'testpass'. That account must exist in
+#           the local 'bpro_max' database (users table). The password is PBKDF2-SHA256
+#           with a per-user salt, so it has to be seeded with the application's own hashing.
+#
 # AutomationIds referenced here match src\Views\*.xaml and src\MainWindow.xaml.
 
 param(
@@ -126,7 +130,9 @@ try {
         Invoke-Ui @('set-value', 'PasswordBox', 'testpass')
         Invoke-Ui @('invoke', 'LoginButton')
         Start-Sleep -Milliseconds 1500
-        Invoke-Ui @('wait-for', 'AgentListView', '-t', '8000')
+        # AgentListTitle lives inside AgentListView; the Page root itself is not exposed
+        # in the UI Automation tree.
+        Invoke-Ui @('wait-for', 'AgentListTitle', '-t', '8000')
     }
 
     # Agent list flow (requires login; NavAgents starts disabled)

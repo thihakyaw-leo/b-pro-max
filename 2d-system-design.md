@@ -2,7 +2,7 @@
 
 **Status:** Draft for approval  
 **Scope:** 2D only (`00`–`99`); no 3D or other number types  
-**Related:** `fix-plan.md` (M5), `todos.md`
+**Related:** `todos.md`, `tasks/plan.md`
 
 ---
 
@@ -577,4 +577,4 @@ register for the selected draw and supports marking payouts paid.
 | M5.5 | Batch entry + Quick Add + entry panel in `SalesFilterView` | View-model tests; batch auto-format/paste tests; label snapshot test (ten Burmese labels only); Windows UI smoke test | ✅ Code complete — 8 line-factory tests; Windows UI smoke test pending |
 | M5.6 | Reports/exports + Number Wisdom page | Report totals; config edit round-trip | ✅ Done — 4 reports × 3 formats; Number Wisdom config round-trip validated |
 
-**Definition of done:** 0 build warnings, all tests pass, the Sale Panel shows only the ten approved Burmese labels, Windows UI smoke test completed on a Windows desktop, and the design doc updated with the final decisions. Current state: 0 warnings, 246 tests passing; Windows UI smoke test remains.
+**Definition of done:** 0 build warnings, all tests pass, the Sale Panel shows only the ten approved Burmese labels, Windows UI smoke test completed on a Windows desktop, and the design doc updated with the final decisions. Current state: 0 warnings, 255 tests passing; Windows UI smoke test remains.

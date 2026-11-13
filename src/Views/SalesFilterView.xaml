@@ -259,7 +259,7 @@
         </StackPanel>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="5" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" TextWrapping="Wrap"
+                   Margin="12" Foreground="{ThemeResource SuccessTextBrush}" TextWrapping="Wrap"
                    AutomationProperties.AutomationId="SalesFilterStatus"/>
     </Grid>
 </Page>

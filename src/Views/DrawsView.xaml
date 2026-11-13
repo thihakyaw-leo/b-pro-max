@@ -91,6 +91,6 @@
         </ListView>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="5" Margin="12" TextWrapping="Wrap"
-                   Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="DrawsStatus"/>
+                   Foreground="{ThemeResource SuccessTextBrush}" AutomationProperties.AutomationId="DrawsStatus"/>
     </Grid>
 </Page>

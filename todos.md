@@ -24,7 +24,7 @@
 | P0-09 README.md | ✅ Done | Complete documentation |
 
 **Build:** `dotnet build b-pro-max.sln -c Release` — 0 errors, 0 warnings  
-**Tests:** `dotnet test tests\b-pro-max.tests.csproj` - 255 passed, 0 failed (unit); `dotnet test tests\e2e\b-pro-max.e2e.csproj` - 40 passed, 0 failed (e2e)  
+**Tests:** `dotnet test tests\b-pro-max.tests.csproj` - 257 passed, 0 failed (unit); `dotnet test tests\e2e\b-pro-max.e2e.csproj` - 40 passed, 0 failed (e2e)  
 **Format:** `dotnet format --verify-no-changes` — clean (required by the CI gate)  
 **App launch:** ✅ Launches successfully on Windows 11 (WinRT Runtime 1.7/1.8/2 installed; REGDB_E_CLASSNOTREG does not occur here — the container claim was stale)  
 **Code review:** `/winui-code-review` fixes applied — Window.Current → App.MainWindowInstance, hardcoded SolidColorBrush → ThemeResource, raw FontSize/FontWeight → Theme styles (19 issues across 15 files)
@@ -127,14 +127,15 @@ The app now connects to local PostgreSQL only. Supabase REST integration was rem
 
 - [x] P6-01 End-to-end testing against original DD.exe behavior — 40 e2e tests passing against PostgreSQL (`tests/e2e/`)
 - [x] P6-02 Performance benchmarking — scratch project under `/benchmarks` (gitignored, not added to solution); Baseline documented
-- [x] P6-03 UI/UX polish (WinUI 3 XAML styling, AutomationId audit) — AutomationId coverage done; Foreground="Green" → ThemeResource in 14 files; ReportView AutomationIds fixed in ui-tests.ps1. XAML compilation enabled; live smoke test run — 4/21 pass (login renders; post-login nav wait-for needs winapp harness fix — see test-results.json)
+- [x] P6-03 UI/UX polish (WinUI 3 XAML styling, AutomationId audit) — AutomationId coverage done; Foreground="Green" → ThemeResource in 14 files; ReportView AutomationIds fixed in ui-tests.ps1. XAML compilation enabled. Live UI automation run — **20/20 pass** after the WinUI 3 theme-resource crash fix (see P6-06)
 - [x] P6-04 Documentation and deployment scripts — README.md done, docs/deployment.md created, scripts/publish.ps1 created
 - [x] P6-05 Final audit: no VB6/ActiveX/Registry dependencies remain — VERIFIED CLEAN
+- [x] P6-06 Fix WinUI 3 theme-resource crash (release blocker) — `Application.Current.Resources[key]` throws `COMException` for unknown keys, and WinUI 3 dropped `SystemControlSuccessTextForegroundBrush` / `SystemControlWarningTextForegroundBrush`; every success/warning status path terminated the app (74 code sites + 14 XAML files). Fixed with `src/Views/ThemeBrush.cs` (TryGetValue + fallback) and app-level `SuccessTextBrush` / `ErrorTextBrush` / `WarningTextBrush` in `src/App.xaml`. Regression-guarded by `tests/ThemeResourceTests.cs` (2 tests) and `src/CrashLogger.cs` (writes `%LOCALAPPDATA%\b-pro-max\crash.log`)
 
 **Final audit results (Tasks 14–16):**
 - `src/`, `tests/`, `Scripts/`, `tools/` — no MSVBVM60, winmm.dll, ActiveX, .ocx, or Registry writes (RegCreate/RegSet/RegOpen/RegDelete/Microsoft.Win32.Registry).
 - `src/`, `tests/`, `Scripts/`, `tools/` — no hardcoded `D:\` paths.
-- Quality gate: `dotnet format --verify-no-changes` clean; build 0 warnings/0 errors; unit tests 255/255 pass; e2e tests 40/40 pass.
+- Quality gate: `dotnet format --verify-no-changes` clean; build 0 warnings/0 errors; unit tests 257/257 pass; e2e tests 40/40 pass.
 
 All Phase 6 tasks complete.
 
@@ -182,7 +183,7 @@ WinUI UI smoke tests require a Windows desktop with the WinRT runtime registered
 
 ---
 
-## Test Results (255 tests, all passing)
+## Test Results (257 tests, all passing)
 
 | Test Class | Tests |
 | --- | --- |
@@ -205,6 +206,7 @@ WinUI UI smoke tests require a Windows desktop with the WinRT runtime registered
 | SalePanelLineFactoryTests | 8 |
 | SalesFilterServiceTests | 9 |
 | SoundServiceTests | 4 |
+| ThemeResourceTests | 2 |
 | TimeLockServiceTests | 13 |
 | TwoDSeedDataTests | 16 |
 

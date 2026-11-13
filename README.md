@@ -81,7 +81,7 @@ b-pro-max/
 │   └── Views/                # 16 WinUI 3 Page views (.xaml + .xaml.cs)
 └── tests\
     ├── b-pro-max.tests.csproj
-    ├── ...                    # 21 unit test classes — 255 tests
+    ├── ...                    # 22 unit test classes — 257 tests
     └── e2e\
         └── b-pro-max.e2e.csproj  # 40 e2e tests against PostgreSQL
 ├── docs\
@@ -158,23 +158,9 @@ dotnet test tests\b-pro-max.tests.csproj --collect:"XPlat Code Coverage" --resul
 dotnet test tests\e2e\b-pro-max.e2e.csproj --no-build
 ```
 
-## Console Menu
-
-The console application provides a temporary interface for testing:
-
-| Option | Description |
-| --- | --- |
-| 1 | List all agents |
-| 2 | Search agents by name |
-| 3 | Add new agent |
-| 4 | Calculate commission |
-| 5 | Test sound alert |
-| 6 | Show configuration |
-| 0 | Exit |
-
 ## WinUI 3 Views
 
-The console app is a temporary test harness. The UI is WinUI 3 XAML: 16 Page views live in `src\Views\` as `.xaml` + `.xaml.cs` pairs.
+The UI is WinUI 3 XAML: 16 Page views live in `src\Views\` as `.xaml` + `.xaml.cs` pairs.
 
 | View | Replaces VB6 Form |
 | --- | --- |

@@ -49,7 +49,7 @@ public sealed partial class AgentDetailView : Page
             if (agent == null)
             {
                 StatusMessage.Text = "Agent not found.";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ThemeBrush.Error;
                 return;
             }
 
@@ -68,7 +68,7 @@ public sealed partial class AgentDetailView : Page
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error loading agent: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -81,13 +81,13 @@ public sealed partial class AgentDetailView : Page
         if (string.IsNullOrWhiteSpace(agentName))
         {
             StatusMessage.Text = "Agent name is required.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
         if (agentName.Length > 200)
         {
             StatusMessage.Text = "Agent name must be 200 characters or less.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -99,21 +99,21 @@ public sealed partial class AgentDetailView : Page
             !decimal.TryParse(CurrencyRateBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var currencyRate))
         {
             StatusMessage.Text = "Invalid numeric values.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
         if (commission < 0 || commission1 < 0 || currencyRate < 0)
         {
             StatusMessage.Text = "Commission and currency rate must be non-negative.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
         if (rate < 0 || rate > 100 || rate1 < 0 || rate1 > 100)
         {
             StatusMessage.Text = "Rate must be between 0 and 100.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -141,7 +141,7 @@ public sealed partial class AgentDetailView : Page
                 if (affected == 0)
                 {
                     StatusMessage.Text = "Agent not found. It may have been deleted by another user.";
-                    StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                    StatusMessage.Foreground = ThemeBrush.Error;
                     return;
                 }
                 StatusMessage.Text = "Agent updated.";
@@ -152,13 +152,13 @@ public sealed partial class AgentDetailView : Page
                 StatusMessage.Text = "Agent created.";
             }
 
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
             _ = this.Frame?.Navigate(typeof(AgentListView));
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error saving agent: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -183,17 +183,17 @@ public sealed partial class AgentDetailView : Page
                 if (affected == 0)
                 {
                     StatusMessage.Text = "Agent not found. It may have been deleted by another user.";
-                    StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                    StatusMessage.Foreground = ThemeBrush.Error;
                     return;
                 }
                 StatusMessage.Text = "Agent deleted.";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = ThemeBrush.Success;
                 _ = this.Frame?.Navigate(typeof(AgentListView));
             }
             catch (Exception ex)
             {
                 StatusMessage.Text = $"Error deleting agent: {ex.Message}";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ThemeBrush.Error;
             }
         }
     }
