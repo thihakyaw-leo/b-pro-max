@@ -35,6 +35,7 @@ public sealed partial class MainWindow : Window
     private NavigationViewItem NavCompact => this.FindChildByName<NavigationViewItem>("NavCompact")!;
     private NavigationViewItem NavSound => this.FindChildByName<NavigationViewItem>("NavSound")!;
     private NavigationViewItem NavTimeLock => this.FindChildByName<NavigationViewItem>("NavTimeLock")!;
+    private NavigationViewItem NavRegionalSettings => this.FindChildByName<NavigationViewItem>("NavRegionalSettings")!;
 
     public MainWindow()
     {
@@ -116,6 +117,7 @@ public sealed partial class MainWindow : Window
         else if (item == NavCompact) NavigateTo(typeof(CompactDatabaseView));
         else if (item == NavSound) NavigateTo(typeof(SoundSettingsView));
         else if (item == NavTimeLock) NavigateTo(typeof(TimeLockView));
+        else if (item == NavRegionalSettings) NavigateTo(typeof(RegionalSettingsView));
     }
 
     private void NavigateTo(Type pageType)
@@ -148,10 +150,27 @@ public sealed partial class MainWindow : Window
         NavCompact.IsEnabled = authenticated;
         NavSound.IsEnabled = authenticated;
         NavTimeLock.IsEnabled = authenticated;
+        NavRegionalSettings.IsEnabled = authenticated;
 
         NavLogin.Visibility = authenticated ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
         NavRegister.Visibility = authenticated ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
         NavLogout.Visibility = authenticated ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
         NavLogout.IsEnabled = authenticated;
+    }
+
+    /// <summary>
+    /// Applies a font family to the content frame so it is inherited by the displayed page.
+    /// </summary>
+    public void ApplyFontFamily(string fontFamily)
+    {
+        if (string.IsNullOrWhiteSpace(fontFamily)) return;
+        try
+        {
+            ContentFrame.FontFamily = new Microsoft.UI.Xaml.Media.FontFamily(fontFamily);
+        }
+        catch
+        {
+            // Invalid font family: leave the current font unchanged.
+        }
     }
 }

@@ -101,6 +101,12 @@
                     IsEnabled="False"
                     AutomationProperties.AutomationId="NavTimeLock" />
                 <NavigationViewItem
+                    x:Name="NavRegionalSettings"
+                    Content="Regional Settings"
+                    Icon="Globe"
+                    IsEnabled="False"
+                    AutomationProperties.AutomationId="NavRegionalSettings" />
+                <NavigationViewItem
                     x:Name="NavRegister"
                     Content="Register"
                     Icon="Key"

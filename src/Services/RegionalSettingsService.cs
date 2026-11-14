@@ -8,6 +8,7 @@ namespace BProMax.Services;
 /// Implementation of <see cref="IRegionalSettingsService"/> backed by <see cref="RegionalSettings"/>.
 /// Supports Myanmar (Burma) localization: Burmese culture (my-MM), Myanmar Kyat (MMK) currency,
 /// Burmese Era (ME) dates, and Myanmar locale formatting.
+/// Settings can be persisted to and loaded from the database via <see cref="ISettingsStore"/>.
 /// </summary>
 public class RegionalSettingsService : IRegionalSettingsService
 {
@@ -17,11 +18,23 @@ public class RegionalSettingsService : IRegionalSettingsService
     /// </summary>
     private const int BurmeseEraOffset = 638;
 
-    private readonly RegionalSettings _settings;
+    private const string CultureKey = "Regional:Culture";
+    private const string DateFormatKey = "Regional:DateFormat";
+    private const string DateTimeFormatKey = "Regional:DateTimeFormat";
+    private const string CurrencySymbolKey = "Regional:CurrencySymbol";
+    private const string CurrencyCodeKey = "Regional:CurrencyCode";
+    private const string DecimalDigitsKey = "Regional:DecimalDigits";
+    private const string Use24HourTimeKey = "Regional:Use24HourTime";
+    private const string FirstDayOfWeekKey = "Regional:FirstDayOfWeek";
+    private const string FontFamilyKey = "Regional:FontFamily";
 
-    public RegionalSettingsService(IOptions<RegionalSettings> settings)
+    private readonly RegionalSettings _settings;
+    private readonly ISettingsStore? _settingsStore;
+
+    public RegionalSettingsService(IOptions<RegionalSettings> settings, ISettingsStore? settingsStore = null)
     {
         _settings = settings.Value;
+        _settingsStore = settingsStore;
     }
 
     public string Culture
@@ -180,6 +193,63 @@ public class RegionalSettingsService : IRegionalSettingsService
     public void ApplyMyanmarUnicodeFont()
     {
         FontFamily = "Pyidaungsu";
+    }
+
+    /// <summary>
+    /// Loads regional settings from the database settings store, overriding in-memory values.
+    /// Missing keys leave the current value unchanged.
+    /// </summary>
+    public async Task LoadFromStoreAsync()
+    {
+        if (_settingsStore == null) return;
+
+        var culture = await _settingsStore.GetAsync(CultureKey);
+        if (!string.IsNullOrEmpty(culture)) Culture = culture;
+
+        var dateFormat = await _settingsStore.GetAsync(DateFormatKey);
+        if (!string.IsNullOrEmpty(dateFormat)) DateFormat = dateFormat;
+
+        var dateTimeFormat = await _settingsStore.GetAsync(DateTimeFormatKey);
+        if (!string.IsNullOrEmpty(dateTimeFormat)) DateTimeFormat = dateTimeFormat;
+
+        var currencySymbol = await _settingsStore.GetAsync(CurrencySymbolKey);
+        if (!string.IsNullOrEmpty(currencySymbol)) CurrencySymbol = currencySymbol;
+
+        var currencyCode = await _settingsStore.GetAsync(CurrencyCodeKey);
+        if (!string.IsNullOrEmpty(currencyCode)) CurrencyCode = currencyCode;
+
+        var decimalDigits = await _settingsStore.GetAsync(DecimalDigitsKey);
+        if (!string.IsNullOrEmpty(decimalDigits) && int.TryParse(decimalDigits, out var dd))
+            DecimalDigits = dd;
+
+        var use24Hour = await _settingsStore.GetAsync(Use24HourTimeKey);
+        if (!string.IsNullOrEmpty(use24Hour) && bool.TryParse(use24Hour, out var u24))
+            Use24HourTime = u24;
+
+        var firstDay = await _settingsStore.GetAsync(FirstDayOfWeekKey);
+        if (!string.IsNullOrEmpty(firstDay) && int.TryParse(firstDay, out var fd))
+            FirstDayOfWeek = fd;
+
+        var fontFamily = await _settingsStore.GetAsync(FontFamilyKey);
+        if (!string.IsNullOrEmpty(fontFamily)) FontFamily = fontFamily;
+    }
+
+    /// <summary>
+    /// Persists all regional settings to the database settings store.
+    /// </summary>
+    public async Task SaveToStoreAsync()
+    {
+        if (_settingsStore == null) return;
+
+        await _settingsStore.SetAsync(CultureKey, Culture);
+        await _settingsStore.SetAsync(DateFormatKey, DateFormat);
+        await _settingsStore.SetAsync(DateTimeFormatKey, DateTimeFormat);
+        await _settingsStore.SetAsync(CurrencySymbolKey, CurrencySymbol);
+        await _settingsStore.SetAsync(CurrencyCodeKey, CurrencyCode);
+        await _settingsStore.SetAsync(DecimalDigitsKey, DecimalDigits.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        await _settingsStore.SetAsync(Use24HourTimeKey, Use24HourTime.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        await _settingsStore.SetAsync(FirstDayOfWeekKey, FirstDayOfWeek.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        await _settingsStore.SetAsync(FontFamilyKey, FontFamily);
     }
 }
 

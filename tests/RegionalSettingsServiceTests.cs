@@ -2,6 +2,7 @@ using System.Globalization;
 using BProMax.Configuration;
 using BProMax.Services;
 using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace BProMax.Tests;
@@ -9,6 +10,7 @@ namespace BProMax.Tests;
 public class RegionalSettingsServiceTests
 {
     private readonly RegionalSettingsService _service;
+    private readonly Mock<ISettingsStore> _mockSettings;
 
     public RegionalSettingsServiceTests()
     {
@@ -23,7 +25,8 @@ public class RegionalSettingsServiceTests
             Use24HourTime = true,
             FirstDayOfWeek = 1
         });
-        _service = new RegionalSettingsService(settings);
+        _mockSettings = new Mock<ISettingsStore>();
+        _service = new RegionalSettingsService(settings, _mockSettings.Object);
     }
 
     [Fact]
@@ -280,5 +283,80 @@ public class RegionalSettingsServiceTests
         Assert.Equal("Pyidaungsu", _service.FontFamily);
         Assert.Equal("MMK", _service.CurrencyCode);
         Assert.Equal("Ks", _service.CurrencySymbol);
+    }
+
+    [Fact]
+    public async Task LoadFromStoreAsyncOverridesInMemoryValues()
+    {
+        // Arrange
+        _mockSettings.Setup(x => x.GetAsync("Regional:Culture")).ReturnsAsync("my-MM");
+        _mockSettings.Setup(x => x.GetAsync("Regional:DateFormat")).ReturnsAsync("dd/MM/yyyy");
+        _mockSettings.Setup(x => x.GetAsync("Regional:CurrencySymbol")).ReturnsAsync("Ks");
+        _mockSettings.Setup(x => x.GetAsync("Regional:FontFamily")).ReturnsAsync("Pyidaungsu");
+        _mockSettings.Setup(x => x.GetAsync("Regional:DecimalDigits")).ReturnsAsync("0");
+        _mockSettings.Setup(x => x.GetAsync("Regional:Use24HourTime")).ReturnsAsync("true");
+        _mockSettings.Setup(x => x.GetAsync("Regional:FirstDayOfWeek")).ReturnsAsync("0");
+
+        // Act
+        await _service.LoadFromStoreAsync();
+
+        // Assert
+        Assert.Equal("my-MM", _service.Culture);
+        Assert.Equal("dd/MM/yyyy", _service.DateFormat);
+        Assert.Equal("Ks", _service.CurrencySymbol);
+        Assert.Equal("Pyidaungsu", _service.FontFamily);
+        Assert.Equal(0, _service.DecimalDigits);
+        Assert.True(_service.Use24HourTime);
+        Assert.Equal(0, _service.FirstDayOfWeek);
+    }
+
+    [Fact]
+    public async Task LoadFromStoreAsyncSkipsEmptyValues()
+    {
+        // Arrange
+        _mockSettings.Setup(x => x.GetAsync(It.IsAny<string>())).ReturnsAsync((string?)null);
+
+        // Act
+        await _service.LoadFromStoreAsync();
+
+        // Assert: defaults unchanged
+        Assert.Equal("en-US", _service.Culture);
+        Assert.Equal("yyyy-MM-dd", _service.DateFormat);
+    }
+
+    [Fact]
+    public async Task SaveToStoreAsyncPersistsAllSettings()
+    {
+        // Arrange
+        _service.ApplyMyanmarPreset();
+        var saved = new Dictionary<string, string>();
+        _mockSettings.Setup(x => x.SetAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .Callback<string, string>((k, v) => saved[k] = v)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _service.SaveToStoreAsync();
+
+        // Assert
+        Assert.Equal("my-MM", saved["Regional:Culture"]);
+        Assert.Equal("dd/MM/yyyy", saved["Regional:DateFormat"]);
+        Assert.Equal("Ks", saved["Regional:CurrencySymbol"]);
+        Assert.Equal("MMK", saved["Regional:CurrencyCode"]);
+        Assert.Equal("0", saved["Regional:DecimalDigits"]);
+        Assert.Equal("True", saved["Regional:Use24HourTime"]);
+        Assert.Equal("0", saved["Regional:FirstDayOfWeek"]);
+        Assert.Equal("Pyidaungsu", saved["Regional:FontFamily"]);
+    }
+
+    [Fact]
+    public async Task SaveToStoreAsyncWithNullStoreDoesNotThrow()
+    {
+        // Arrange
+        var settings = Options.Create(new RegionalSettings { Culture = "en-US" });
+        var service = new RegionalSettingsService(settings, null);
+
+        // Act & Assert
+        await service.LoadFromStoreAsync();
+        await service.SaveToStoreAsync();
     }
 }

@@ -1,0 +1,108 @@
+<Page
+    x:Class="BProMax.Views.RegionalSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="RegionalSettingsView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12" Spacing="8">
+            <TextBlock Text="Regional Settings" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="RegionalSettingsTitle"/>
+            <TextBlock Text="Date, number, currency, and locale formatting. Select Myanmar to use Pyidaungsu font for Myanmar Unicode text."
+                       Margin="0,0,0,8"
+                       AutomationProperties.AutomationId="RegionalSettingsDescription"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="12" Spacing="12">
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Culture:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalCultureLabel"/>
+                <ComboBox x:Name="CultureCombo" Width="200" AutomationProperties.AutomationId="RegionalCultureCombo">
+                    <ComboBoxItem Content="en-US (English)" AutomationProperties.AutomationId="RegionalCultureEnUs"/>
+                    <ComboBoxItem Content="my-MM (Myanmar)" AutomationProperties.AutomationId="RegionalCultureMyMm"/>
+                    <ComboBoxItem Content="th-TH (Thai)" AutomationProperties.AutomationId="RegionalCultureThTh"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Date Format:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalDateFormatLabel"/>
+                <TextBox x:Name="DateFormatBox" Width="200"
+                         AutomationProperties.AutomationId="RegionalDateFormatBox"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Date-Time Format:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalDateTimeFormatLabel"/>
+                <TextBox x:Name="DateTimeFormatBox" Width="200"
+                         AutomationProperties.AutomationId="RegionalDateTimeFormatBox"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Currency Symbol:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalCurrencySymbolLabel"/>
+                <TextBox x:Name="CurrencySymbolBox" Width="200"
+                         AutomationProperties.AutomationId="RegionalCurrencySymbolBox"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Currency Code:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalCurrencyCodeLabel"/>
+                <TextBox x:Name="CurrencyCodeBox" Width="200"
+                         AutomationProperties.AutomationId="RegionalCurrencyCodeBox"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Decimal Digits:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalDecimalDigitsLabel"/>
+                <TextBox x:Name="DecimalDigitsBox" Width="200"
+                         AutomationProperties.AutomationId="RegionalDecimalDigitsBox"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="First Day of Week:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalFirstDayLabel"/>
+                <ComboBox x:Name="FirstDayOfWeekCombo" Width="200" AutomationProperties.AutomationId="RegionalFirstDayCombo">
+                    <ComboBoxItem Content="Sunday" AutomationProperties.AutomationId="RegionalFirstDaySunday"/>
+                    <ComboBoxItem Content="Monday" AutomationProperties.AutomationId="RegionalFirstDayMonday"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <CheckBox x:Name="Use24HourCheck" Content="24-Hour Time"
+                          AutomationProperties.AutomationId="RegionalUse24HourCheck"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Font Family:" Width="140" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="RegionalFontFamilyLabel"/>
+                <TextBox x:Name="FontFamilyBox" Width="200"
+                         AutomationProperties.AutomationId="RegionalFontFamilyBox"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="ApplyMyanmarButton" Content="Apply Myanmar Preset" Click="ApplyMyanmarButton_Click"
+                        AutomationProperties.AutomationId="RegionalApplyMyanmarButton"/>
+                <Button x:Name="ApplyFontButton" Content="Apply Pyidaungsu Font" Click="ApplyFontButton_Click"
+                        AutomationProperties.AutomationId="RegionalApplyFontButton"/>
+                <Button x:Name="SaveButton" Content="Save" Click="SaveButton_Click"
+                        AutomationProperties.AutomationId="RegionalSaveButton"/>
+            </StackPanel>
+
+        </StackPanel>
+
+        <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="RegionalSettingsStatus"/>
+    </Grid>
+
+</Page>
