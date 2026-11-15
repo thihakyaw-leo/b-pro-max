@@ -47,18 +47,20 @@ public sealed partial class TimeLockView : Page
             return;
         }
 
+        var isEnabled = EnabledCheck.IsChecked == true;
+        if (isEnabled && startHour >= endHour)
+        {
+            StatusMessage.Text = "Start hour must be less than end hour.";
+            StatusMessage.Foreground = ThemeBrush.Error;
+            return;
+        }
+
         try
         {
-            _timeLockService.IsEnabled = EnabledCheck.IsChecked == true;
+            _timeLockService.IsEnabled = false;
             _timeLockService.StartHour = startHour;
             _timeLockService.EndHour = endHour;
-
-            if (_timeLockService.IsEnabled && _timeLockService.StartHour >= _timeLockService.EndHour)
-            {
-                StatusMessage.Text = "Start hour must be less than end hour.";
-                StatusMessage.Foreground = ThemeBrush.Error;
-                return;
-            }
+            _timeLockService.IsEnabled = isEnabled;
 
             StatusMessage.Text = "Time lock settings saved.";
             StatusMessage.Foreground = ThemeBrush.Success;
