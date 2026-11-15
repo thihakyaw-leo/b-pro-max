@@ -13,8 +13,22 @@
 #
 # Usage: .\smoke-report-sales-excel.ps1
 
+param(
+    [string]$PsqlPath
+)
+
 $ErrorActionPreference = 'Stop'
-$psql = 'C:\Program Files\PostgreSQL\17\bin\psql.exe'
+$psql = $PsqlPath
+if (-not $psql) {
+    $psqlCommand = Get-Command psql -ErrorAction SilentlyContinue
+    if (-not $psqlCommand) {
+        throw 'psql was not found on PATH. Specify its executable path with -PsqlPath.'
+    }
+    $psql = $psqlCommand.Source
+}
+if (-not (Test-Path -LiteralPath $psql -PathType Leaf)) {
+    throw "psql executable not found: $psql"
+}
 
 function Get-AppWindow {
     $wins = @(& winapp ui list-windows --json | ConvertFrom-Json)
