@@ -33,6 +33,6 @@
         </StackPanel>
 
         <TextBlock x:Name="StatusMessage" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="CreateDatabaseStatus"/>
+                   Margin="12" Foreground="{ThemeResource SuccessTextBrush}" AutomationProperties.AutomationId="CreateDatabaseStatus"/>
     </Grid>
 </Page>

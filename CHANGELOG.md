@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Bug fixes: UI & layout
+- **Fixed an app-terminating crash on login and on every success/warning status message.** WinUI 3 removed the WinUI 2 `SystemControlSuccessTextForegroundBrush` and `SystemControlWarningTextForegroundBrush` theme keys, and `Application.Current.Resources[key]` raises a `COMException` for an unknown key instead of returning `null` — so the usual `Resources["X"] as Brush ?? fallback` idiom never reached its fallback. Affected 74 code-behind call sites across 16 views plus 14 XAML files; the app died silently with no console output and no Windows event-log entry.
+- Brushes now resolve through `ThemeBrush` (`TryGetValue` with a literal fallback) and the app-level `SuccessTextBrush` / `ErrorTextBrush` / `WarningTextBrush` resources in `App.xaml`.
+- Unhandled exceptions are now written to `%LOCALAPPDATA%\b-pro-max\crash.log` so a silent termination is diagnosable.
+
+### Features: Tooling & testing
+- Added `tests/ThemeResourceTests.cs`, which scans the view sources and fails if a removed WinUI 2 brush key or an unsafe `Application.Current.Resources[...]` indexer lookup comes back.
+- UI automation (`ui-tests.ps1`) now passes 20/20 against the live app.
+
 ## 2026-11-11 — v2.0.0 (M5 + Phase 6)
 
 This release completes the M5 2D sales system and Phase 6 login, migrating the app from a console-style layout to WinUI 3 with direct PostgreSQL access.

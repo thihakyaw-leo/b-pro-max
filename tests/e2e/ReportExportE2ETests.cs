@@ -134,7 +134,8 @@ public class ReportExportE2ETests : E2ETestBase
     {
         var db = CreateDatabaseService();
         var agentService = new AgentService(db, NullLogger<AgentService>.Instance);
-        return new ExcelExportService(agentService);
+        var salesService = new SalesService(db, NullLogger<SalesService>.Instance);
+        return new ExcelExportService(agentService, salesService);
     }
 
     private CsvExportService BuildCsvService()

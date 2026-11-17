@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
@@ -17,27 +16,9 @@ public sealed partial class MainWindow : Window
     private readonly IAuthService _auth;
     private readonly ILicensingService _licensing;
 
-    private NavigationView NavView => this.FindChildByName<NavigationView>("NavView")!;
-    private Frame ContentFrame => this.FindChildByName<Frame>("ContentFrame")!;
-    private NavigationViewItem NavLogin => this.FindChildByName<NavigationViewItem>("NavLogin")!;
-    private NavigationViewItem NavRegister => this.FindChildByName<NavigationViewItem>("NavRegister")!;
-    private NavigationViewItem NavLogout => this.FindChildByName<NavigationViewItem>("NavLogout")!;
-    private NavigationViewItem NavAgents => this.FindChildByName<NavigationViewItem>("NavAgents")!;
-    private NavigationViewItem NavSearch => this.FindChildByName<NavigationViewItem>("NavSearch")!;
-    private NavigationViewItem NavSales => this.FindChildByName<NavigationViewItem>("NavSales")!;
-    private NavigationViewItem NavDraws => this.FindChildByName<NavigationViewItem>("NavDraws")!;
-    private NavigationViewItem NavNumberWisdom => this.FindChildByName<NavigationViewItem>("NavNumberWisdom")!;
-    private NavigationViewItem NavAutoBuy => this.FindChildByName<NavigationViewItem>("NavAutoBuy")!;
-    private NavigationViewItem NavReports => this.FindChildByName<NavigationViewItem>("NavReports")!;
-    private NavigationViewItem NavMaintenance => this.FindChildByName<NavigationViewItem>("NavMaintenance")!;
-    private NavigationViewItem NavBackup => this.FindChildByName<NavigationViewItem>("NavBackup")!;
-    private NavigationViewItem NavCreateDb => this.FindChildByName<NavigationViewItem>("NavCreateDb")!;
-    private NavigationViewItem NavCompact => this.FindChildByName<NavigationViewItem>("NavCompact")!;
-    private NavigationViewItem NavSound => this.FindChildByName<NavigationViewItem>("NavSound")!;
-    private NavigationViewItem NavTimeLock => this.FindChildByName<NavigationViewItem>("NavTimeLock")!;
-
     public MainWindow()
     {
+        InitializeComponent();
         App.MainWindowPtr = WinRT.Interop.WindowNative.GetWindowHandle(this);
         App.MainWindowInstance = this;
         _auth = App.Services?.GetRequiredService<IAuthService>()
@@ -47,6 +28,7 @@ public sealed partial class MainWindow : Window
 
         NavView.ItemInvoked += NavView_ItemInvoked;
         NavView.PaneOpened += (_, _) => UpdateMenuState();
+        NavView.SelectionChanged += NavView_SelectionChanged;
 
         SizeWindow();
 
@@ -94,6 +76,11 @@ public sealed partial class MainWindow : Window
             NavigateTo(typeof(LoginView));
             return;
         }
+        if (item == NavSettings)
+        {
+            NavigateTo(typeof(SettingsView));
+            return;
+        }
 
         // Feature pages require authentication.
         if (!_auth.IsAuthenticated)
@@ -116,6 +103,20 @@ public sealed partial class MainWindow : Window
         else if (item == NavCompact) NavigateTo(typeof(CompactDatabaseView));
         else if (item == NavSound) NavigateTo(typeof(SoundSettingsView));
         else if (item == NavTimeLock) NavigateTo(typeof(TimeLockView));
+    }
+
+    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs e)
+    {
+        var selectedItem = (NavigationViewItem) e.SelectedItem;
+        if (selectedItem != null)
+        {
+            switch (selectedItem.Name)
+            {
+                case "NavSettings":
+                    NavigateTo(typeof(SettingsView));
+                    break;
+            }
+        }
     }
 
     private void NavigateTo(Type pageType)

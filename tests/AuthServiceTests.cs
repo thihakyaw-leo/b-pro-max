@@ -338,4 +338,83 @@ public class AuthServiceTests
                 It.IsAny<NpgsqlParameter[]>()),
             Times.Once);
     }
+
+    [Fact]
+    public async Task RegisterCredentialAsyncRejectsDuplicateUsername()
+    {
+        // Arrange: an existing user (different case) is found by the case-insensitive lookup.
+        var existing = CreateTestUser("Admin", "password");
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("LOWER(username)")),
+                It.IsAny<Func<NpgsqlDataReader, User?>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(existing);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.RegisterCredentialAsync("admin", "Password123!"));
+        Assert.Contains("already exists", ex.Message);
+    }
+
+    [Fact]
+    public async Task RegisterCredentialAsyncRejectsEmptyUsername()
+    {
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.RegisterCredentialAsync("  ", "Password123!"));
+        Assert.StartsWith("Username is required.", ex.Message);
+    }
+
+    [Fact]
+    public async Task RegisterCredentialAsyncRejectsEmptyPassword()
+    {
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.RegisterCredentialAsync("newuser", "   "));
+        Assert.StartsWith("Password is required.", ex.Message);
+    }
+
+    [Fact]
+    public async Task UserPersistsAcrossServiceReInstantiation()
+    {
+        // Arrange: first service instance creates a user.
+        var user = CreateTestUser("admin", "password");
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("LOWER(username)")),
+                It.IsAny<Func<NpgsqlDataReader, User?>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(user);
+        _mockDb
+            .Setup(x => x.ExecuteNonQueryAsync(
+                It.Is<string>(s => s.Contains("failed_attempts = 0")),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(1);
+
+        var service1 = new AuthService(_mockDb.Object, _mockTimeLock.Object, new TestLogger<AuthService>());
+        var result1 = await service1.LoginAsync("admin", "password");
+        Assert.True(result1.Success);
+
+        // Second service instance re-reads the same user from the database.
+        _mockDb
+            .Setup(x => x.QuerySingleAsync(
+                It.Is<string>(s => s.Contains("LOWER(username)")),
+                It.IsAny<Func<NpgsqlDataReader, User?>>(),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(user);
+        _mockDb
+            .Setup(x => x.ExecuteNonQueryAsync(
+                It.Is<string>(s => s.Contains("failed_attempts = 0")),
+                It.IsAny<NpgsqlParameter[]>()))
+            .ReturnsAsync(1);
+
+        var service2 = new AuthService(_mockDb.Object, _mockTimeLock.Object, new TestLogger<AuthService>());
+        var result2 = await service2.LoginAsync("admin", "password");
+
+        // Assert: the account persists across service re-instantiation.
+        Assert.True(result2.Success);
+        Assert.Equal("admin", service2.CurrentUser);
+        Assert.True(service2.IsAuthenticated);
+    }
 }

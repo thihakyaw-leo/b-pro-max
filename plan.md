@@ -142,29 +142,29 @@ Rebuild DD.exe as a modern WinUI 3 desktop application with the **same internal 
 
 ## 11. Verification Checklist (feature parity with DD.exe)
 
-- [ ] Agent CRUD (Create, Read, Update, Delete)
-- [ ] Agent search by name
-- [ ] Agent list sorted by name
-- [ ] Commission/rate calculation
-- [ ] Sales filtering with native DatePicker
-- [ ] Auto-purchase
-- [ ] Currency type/rate support
-- [ ] PdfSharpCore report generation
-- [ ] EPPlus Excel export
-- [ ] CSV export
-- [ ] PostgreSQL backup
-- [ ] PostgreSQL compaction/VACUUM
-- [ ] Create new database
-- [ ] Login/authentication
-- [ ] Registration/licensing
-- [ ] Sound alerts (.NET SoundPlayer, no winmm.dll)
-- [ ] Time-lock access control
-- [ ] Regional/locale settings
-- [ ] No Registry writes (JSON config only)
-- [ ] No hardcoded D:\ paths
-- [ ] No ActiveX controls
-- [ ] No MSVBVM60 dependency
-- [ ] WinUI 3 / Windows App SDK only (no WPF, no WinForms)
+- [x] Agent CRUD (Create, Read, Update, Delete)
+- [x] Agent search by name
+- [x] Agent list sorted by name
+- [x] Commission/rate calculation
+- [x] Sales filtering with native DatePicker
+- [x] Auto-purchase
+- [x] Currency type/rate support
+- [x] PdfSharpCore report generation
+- [x] EPPlus Excel export
+- [x] CSV export
+- [x] PostgreSQL backup
+- [x] PostgreSQL compaction/VACUUM
+- [x] Create new database
+- [x] Login/authentication
+- [x] Registration/licensing
+- [x] Sound alerts (no winmm.dll)
+- [x] Time-lock access control
+- [x] Regional/locale settings
+- [x] No Registry writes (JSON config only)
+- [x] No hardcoded D:\ paths
+- [x] No ActiveX controls
+- [x] No MSVBVM60 dependency
+- [x] WinUI 3 / Windows App SDK only (no WPF, no WinForms)
 
 ---
 

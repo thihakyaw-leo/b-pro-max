@@ -1,0 +1,115 @@
+<Page
+    x:Class="BProMax.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:BProMax.Models"
+    mc:Ignorable="d"
+    AutomationProperties.AutomationId="SettingsView">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12,12,12,8" Spacing="4">
+            <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.AutomationId="SettingsTitle"/>
+            <TextBlock Text="Configure application-wide settings."
+                       TextWrapping="Wrap"
+                       AutomationProperties.AutomationId="SettingsSubtitle"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="0,0,0,12" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- General Settings -->
+                <Expander Header="General" IsExpanded="True" Margin="0,0,0,8" 
+                          AutomationProperties.AutomationId="GeneralExpander">
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="Theme" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.AutomationId="ThemeLabel"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ComboBox x:Name="ThemeComboBox" Width="120" 
+                                      AutomationProperties.AutomationId="ThemeComboBox"/>
+                            <TextBlock Text="Light" VerticalAlignment="Center"/>
+                            <TextBlock Text="Dark" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Appearance Settings -->
+                <Expander Header="Appearance" IsExpanded="False" Margin="0,0,0,8" 
+                          AutomationProperties.AutomationId="AppearanceExpander">
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="Font size" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.AutomationId="FontSizeLabel"/>
+                        <Slider x:Name="FontSizeSlider" Minimum="12" Maximum="24" 
+                                Value="14" TickFrequency="1" 
+                                AutomationProperties.AutomationId="FontSizeSlider"/>
+                        <TextBlock Text="{Binding ElementName=FontSizeSlider, Path=Value}"
+                                   AutomationProperties.AutomationId="FontSizeValue"/>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Notifications Settings -->
+                <Expander Header="Notifications" IsExpanded="False" Margin="0,0,0,8" 
+                          AutomationProperties.AutomationId="NotificationsExpander">
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="Enable toast notifications" 
+                                   AutomationProperties.AutomationId="NotificationsEnableLabel"/>
+                        <ToggleSwitch x:Name="NotificationsToggle" 
+                                      AutomationProperties.AutomationId="NotificationsToggle"/>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Database Settings -->
+                <Expander Header="Database" IsExpanded="False" Margin="0,0,0,8" 
+                          AutomationProperties.AutomationId="DatabaseExpander">
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="Database connection" 
+                                   AutomationProperties.AutomationId="DatabaseLabel"/>
+                        <TextBox x:Name="DatabaseConnectionBox" 
+                                 Text="Server=.;Database=BProMax;Trusted_Connection=True;" 
+                                 AutomationProperties.AutomationId="DatabaseConnectionBox"/>
+                        <Button Content="Test Connection" 
+                                Click="TestConnectionButton_Click"
+                                AutomationProperties.AutomationId="TestConnectionButton"/>
+                    </StackPanel>
+                </Expander>
+
+                <!-- Advanced Settings -->
+                <Expander Header="Advanced" IsExpanded="False" Margin="0,0,0,8" 
+                          AutomationProperties.AutomationId="AdvancedExpander">
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="Enable logging" 
+                                   AutomationProperties.AutomationId="AdvancedLoggingLabel"/>
+                        <ToggleSwitch x:Name="AdvancedLoggingToggle" 
+                                      AutomationProperties.AutomationId="AdvancedLoggingToggle"/>
+                        
+                        <TextBlock Text="Log level" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.AutomationId="LogLevelLabel"/>
+                        <ComboBox x:Name="LogLevelComboBox" 
+                                  Width="120" 
+                                  AutomationProperties.AutomationId="LogLevelComboBox">
+                            <ComboBoxItem Content="Warning" />
+                            <ComboBoxItem Content="Info" Selected="True"/>
+                            <ComboBoxItem Content="Debug" />
+                        </ComboBox>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Margin="12,0,12,0" Spacing="8">
+            <Button Content="Save Settings" 
+                    Click="SaveSettingsButton_Click"
+                    AutomationProperties.AutomationId="SaveSettingsButton"/>
+            <Button Content="Reset to Default" 
+                    Click="ResetSettingsButton_Click"
+                    AutomationProperties.AutomationId="ResetSettingsButton"/>
+        </StackPanel>
+    </Grid>
+</Page>

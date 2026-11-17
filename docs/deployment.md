@@ -6,7 +6,7 @@ This guide covers building, packaging (MSIX), and deploying b-pro-max on Windows
 
 - **Windows 10/11** (WinUI 3 requires Windows desktop; WinRT activation is unavailable in containers/Linux)
 - **.NET 9 SDK** — https://dotnet.microsoft.com/download/dotnet/9.0 (pinned to 9.0.100 in `global.json`)
-- **PostgreSQL** — local instance for the `bpro_max` database (https://www.postgresql.org/download/windows/)
+- **PostgreSQL** — local instance for the `bpro_max` database (https://www.postgresql.org/download/windows/). Add PostgreSQL `bin` to PATH for backup/restore via `pg_dump`/`pg_restore`.
 - **Pyidaungsu font** — required for correct Myanmar Unicode rendering (install `Pyidaungsu.ttf` on the target machine)
 - **Windows App SDK** — included via NuGet packages in the project; no separate SDK install required for packaging
 
@@ -192,4 +192,6 @@ winget install Microsoft.WindowsAppSDK
 
 - **Windows desktop only** — WinRT activation (`REGDB_E_CLASSNOTREG`) fails outside Windows.
 - **PostgreSQL only** — no SQLite/SQL Server support.
-- **XAML compilation disabled** — controls resolved at runtime via `FindChildByName<T>()`; UI is functional but not yet fully renderable via compiled XAML (Phase 6 polish item).
+- **XAML compilation enabled** — all views use `InitializeComponent()`; controls resolved via `FindChildByName<T>()` with `AutomationProperties.AutomationId`.
+- **Sound volume** — `SoundService` persists volume via `ISettingsStore` and uses `Console.Beep` for alerts; `Console.Beep` does not honor volume on all Windows versions, so volume is stored but may not be audible on every device. (Known limitation)
+- **Backup/Restore** — `BackupView`/`Restore` shell out to `pg_dump`/`pg_restore`; ensure PostgreSQL `bin` is on the system `PATH` for backup/restore to succeed.

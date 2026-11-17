@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using BProMax.Helpers;
 using BProMax.Models;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,39 +34,9 @@ public sealed partial class SalesFilterView : Page
     private bool _formattingBatch;
     private string _previousBatchText = string.Empty;
 
-    private ComboBox AgentCombo => this.FindChildByName<ComboBox>("AgentCombo")!;
-    private ComboBox DrawCombo => this.FindChildByName<ComboBox>("DrawCombo")!;
-    private TextBox BatchNumbersBox => this.FindChildByName<TextBox>("BatchNumbersBox")!;
-    private TextBox BatchAmountBox => this.FindChildByName<TextBox>("BatchAmountBox")!;
-    private ComboBox BatchAmountModeCombo => this.FindChildByName<ComboBox>("BatchAmountModeCombo")!;
-    private CheckBox BatchReverseCheck => this.FindChildByName<CheckBox>("BatchReverseCheck")!;
-    private ComboBox SaleTypeCombo => this.FindChildByName<ComboBox>("SaleTypeCombo")!;
-    private StackPanel SelectionRow => this.FindChildByName<StackPanel>("SelectionRow")!;
-    private TextBox SelectionBox => this.FindChildByName<TextBox>("SelectionBox")!;
-    private TextBox ManualAmountBox => this.FindChildByName<TextBox>("ManualAmountBox")!;
-    private CheckBox ManualReverseCheck => this.FindChildByName<CheckBox>("ManualReverseCheck")!;
-    private ComboBox QuickAddGroupCombo => this.FindChildByName<ComboBox>("QuickAddGroupCombo")!;
-    private TextBox QuickAddAmountBox => this.FindChildByName<TextBox>("QuickAddAmountBox")!;
-    private CheckBox QuickAddReverseCheck => this.FindChildByName<CheckBox>("QuickAddReverseCheck")!;
-    private ListView CurrentSaleList => this.FindChildByName<ListView>("CurrentSaleList")!;
-    private TextBlock CurrentSaleTotalText => this.FindChildByName<TextBlock>("CurrentSaleTotalText")!;
-    private TextBlock CurrentSaleCommissionText => this.FindChildByName<TextBlock>("CurrentSaleCommissionText")!;
-    private TextBlock CurrentSaleMaxPayoutText => this.FindChildByName<TextBlock>("CurrentSaleMaxPayoutText")!;
-    private Button SaveSaleButton => this.FindChildByName<Button>("SaveSaleButton")!;
-
-    private CalendarDatePicker StartDatePicker => this.FindChildByName<CalendarDatePicker>("StartDatePicker")!;
-    private CalendarDatePicker EndDatePicker => this.FindChildByName<CalendarDatePicker>("EndDatePicker")!;
-    private TextBox AgentNameBox => this.FindChildByName<TextBox>("AgentNameBox")!;
-    private ComboBox StatusCombo => this.FindChildByName<ComboBox>("StatusCombo")!;
-    private TextBox MinAmountBox => this.FindChildByName<TextBox>("MinAmountBox")!;
-    private TextBox MaxAmountBox => this.FindChildByName<TextBox>("MaxAmountBox")!;
-    private ListView SalesList => this.FindChildByName<ListView>("SalesList")!;
-    private TextBlock TotalAmountText => this.FindChildByName<TextBlock>("TotalAmountText")!;
-    private TextBlock TotalCommissionText => this.FindChildByName<TextBlock>("TotalCommissionText")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public SalesFilterView()
     {
+        InitializeComponent();
         _salesFilterService = App.Services?.GetRequiredService<ISalesFilterService>()
             ?? throw new InvalidOperationException("SalesFilterService not registered.");
         _agentService = App.Services?.GetRequiredService<IAgentService>()
@@ -689,9 +658,7 @@ public sealed partial class SalesFilterView : Page
     {
         StatusMessage.Text = message;
         StatusMessage.Foreground = isError
-            ? Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush
-                ?? new SolidColorBrush(Microsoft.UI.Colors.Red)
-            : Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush
-                ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+            ? ThemeBrush.Error
+            : ThemeBrush.Success;
     }
 }

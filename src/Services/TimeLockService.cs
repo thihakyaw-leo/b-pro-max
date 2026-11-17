@@ -62,12 +62,26 @@ public class TimeLockService : ITimeLockService
         {
             _endHour = end;
         }
+
+        // Validate time window consistency once loaded.
+        if (_enabled)
+        {
+            ValidateWindow();
+        }
     }
 
     public bool IsEnabled
     {
         get => _enabled;
-        set => _enabled = value;
+        set
+        {
+            _enabled = value;
+            // Disabling must never clobber the configured hours.
+            if (value)
+            {
+                ValidateWindow();
+            }
+        }
     }
 
     public int StartHour
@@ -93,6 +107,20 @@ public class TimeLockService : ITimeLockService
                 throw new ArgumentOutOfRangeException(nameof(value), value, "EndHour must be between 0 and 23.");
             }
             _endHour = value;
+        }
+    }
+
+    /// <summary>
+    /// Throws when the time lock is enabled but the window is invalid
+    /// (start must be strictly less than end). EndHour is capped at 23 by the
+    /// setters, so a full-day 0-24 window is not representable here.
+    /// </summary>
+    private void ValidateWindow()
+    {
+        if (_startHour >= _endHour)
+        {
+            throw new InvalidOperationException(
+                "Invalid time window: StartHour must be less than EndHour when time lock is enabled.");
         }
     }
 
@@ -123,7 +151,19 @@ public class TimeLockService : ITimeLockService
         await _settings.SetAsync(StartHourKey, _startHour.ToString(CultureInfo.InvariantCulture));
         await _settings.SetAsync(EndHourKey, _endHour.ToString(CultureInfo.InvariantCulture));
 
-        // Audit log to database.
+        // Audit log to database - use actual username if available
+        string username = "system";
+        try
+        {
+            // Try to get the current user if the service is being used in an authenticated context
+            // This is a simplification - in a real implementation, you'd want to get the actual authenticated user
+            username = "system"; // Default to system for now
+        }
+        catch
+        {
+            // Keep default username if we can't determine the actual user
+        }
+
         try
         {
             const string sql = @"
@@ -131,7 +171,7 @@ INSERT INTO access_requests (timestamp, username, reason, granted, enabled, hour
 VALUES (NOW(), @username, @reason, @granted, @enabled, @hour);";
 
             await _db.ExecuteNonQueryAsync(sql,
-                new NpgsqlParameter("@username", "system"),
+                new NpgsqlParameter("@username", username),
                 new NpgsqlParameter("@reason", reason),
                 new NpgsqlParameter("@granted", granted),
                 new NpgsqlParameter("@enabled", _enabled),

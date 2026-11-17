@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -13,11 +12,9 @@ public sealed partial class CreateDatabaseView : Page
 {
     private readonly IDatabaseMaintenanceService _maintenanceService;
 
-    private TextBox DatabaseNameBox => this.FindChildByName<TextBox>("DatabaseNameBox")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public CreateDatabaseView()
     {
+        InitializeComponent();
         _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
             ?? throw new InvalidOperationException("DatabaseMaintenanceService not registered.");
     }
@@ -29,7 +26,7 @@ public sealed partial class CreateDatabaseView : Page
         if (string.IsNullOrWhiteSpace(dbName))
         {
             StatusMessage.Text = "Please enter a database name.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -37,12 +34,12 @@ public sealed partial class CreateDatabaseView : Page
         {
             var ok = await _maintenanceService.CreateNewDatabaseAsync(dbName);
             StatusMessage.Text = ok ? $"Database '{dbName}' created." : "Database creation failed.";
-            StatusMessage.Foreground = (Application.Current.Resources[ok ? "SystemControlSuccessTextForegroundBrush" : "SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(ok ? Microsoft.UI.Colors.Green : Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ok ? ThemeBrush.Success : ThemeBrush.Error;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 }

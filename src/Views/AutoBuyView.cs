@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -13,15 +12,9 @@ public sealed partial class AutoBuyView : Page
 {
     private readonly IAutoBuyService _autoBuyService;
 
-    private TextBox AgentNameBox => this.FindChildByName<TextBox>("AgentNameBox")!;
-    private TextBox TriggerAmountBox => this.FindChildByName<TextBox>("TriggerAmountBox")!;
-    private TextBox AutoBuyAmountBox => this.FindChildByName<TextBox>("AutoBuyAmountBox")!;
-    private CheckBox EnabledCheck => this.FindChildByName<CheckBox>("EnabledCheck")!;
-    private ListView RulesList => this.FindChildByName<ListView>("RulesList")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public AutoBuyView()
     {
+        InitializeComponent();
         _autoBuyService = App.Services?.GetRequiredService<IAutoBuyService>()
             ?? throw new InvalidOperationException("AutoBuyService not registered.");
     }
@@ -46,7 +39,7 @@ public sealed partial class AutoBuyView : Page
             !decimal.TryParse(AutoBuyAmountBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var autoBuyAmt))
         {
             StatusMessage.Text = "Invalid numeric values.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -63,17 +56,17 @@ public sealed partial class AutoBuyView : Page
             await _autoBuyService.CreateRuleAsync(rule);
             await LoadRulesAsync();
             StatusMessage.Text = "Rule created.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (InvalidOperationException ex)
         {
             StatusMessage.Text = ex.Message;
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -85,7 +78,7 @@ public sealed partial class AutoBuyView : Page
             !decimal.TryParse(AutoBuyAmountBox.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var autoBuyAmt))
         {
             StatusMessage.Text = "Invalid numeric values.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -94,7 +87,7 @@ public sealed partial class AutoBuyView : Page
         if (existing == null)
         {
             StatusMessage.Text = "No rule found for this agent.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -108,17 +101,17 @@ public sealed partial class AutoBuyView : Page
             await _autoBuyService.UpdateRuleAsync(existing);
             await LoadRulesAsync();
             StatusMessage.Text = "Rule updated.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (InvalidOperationException ex)
         {
             StatusMessage.Text = ex.Message;
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -131,7 +124,7 @@ public sealed partial class AutoBuyView : Page
         if (rule == null)
         {
             StatusMessage.Text = "No rule found for this agent.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
             return;
         }
 
@@ -140,12 +133,12 @@ public sealed partial class AutoBuyView : Page
             await _autoBuyService.DeleteRuleAsync(rule.Id);
             await LoadRulesAsync();
             StatusMessage.Text = "Rule deleted.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 

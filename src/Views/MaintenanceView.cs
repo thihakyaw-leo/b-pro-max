@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -14,10 +13,9 @@ public sealed partial class MaintenanceView : Page
     private readonly IDatabaseMigrationService _migrationService;
     private readonly IDatabaseMaintenanceService _maintenanceService;
 
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public MaintenanceView()
     {
+        InitializeComponent();
         _migrationService = App.Services?.GetRequiredService<IDatabaseMigrationService>()
             ?? throw new InvalidOperationException("DatabaseMigrationService not registered.");
         _maintenanceService = App.Services?.GetRequiredService<IDatabaseMaintenanceService>()
@@ -33,12 +31,12 @@ public sealed partial class MaintenanceView : Page
             StatusMessage.Text = tableExists
                 ? $"Database ready: {agentCount} agents."
                 : "Database not initialized.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 
@@ -50,12 +48,12 @@ public sealed partial class MaintenanceView : Page
             await _migrationService.EnsureTablesCreatedAsync();
             await _migrationService.SeedDataAsync();
             StatusMessage.Text = "Migration and seeding completed.";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Green);
+            StatusMessage.Foreground = ThemeBrush.Success;
         }
         catch (Exception ex)
         {
             StatusMessage.Text = $"Error: {ex.Message}";
-            StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Microsoft.UI.Xaml.Media.Brush) ?? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Red);
+            StatusMessage.Foreground = ThemeBrush.Error;
         }
     }
 }

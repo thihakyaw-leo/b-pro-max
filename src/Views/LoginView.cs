@@ -1,4 +1,3 @@
-using BProMax.Helpers;
 using BProMax.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -15,15 +14,34 @@ public sealed partial class LoginView : Page
 {
     private readonly IAuthService _auth;
 
-    private TextBox UsernameBox => this.FindChildByName<TextBox>("UsernameBox")!;
-    private PasswordBox PasswordBox => this.FindChildByName<PasswordBox>("PasswordBox")!;
-    private Button LoginButton => this.FindChildByName<Button>("LoginButton")!;
-    private TextBlock StatusMessage => this.FindChildByName<TextBlock>("StatusMessage")!;
-
     public LoginView()
     {
+        InitializeComponent();
         _auth = App.Services?.GetRequiredService<IAuthService>()
             ?? throw new InvalidOperationException("AuthService not registered.");
+
+        // Support Enter key in username/password fields to trigger login.
+        UsernameBox.KeyDown += OnUsernameBoxKeyDown;
+        PasswordBox.KeyDown += OnPasswordBoxKeyDown;
+        CreateAdminButton.Click += CreateAdminButton_Click;
+    }
+
+    private void OnUsernameBoxKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            e.Handled = true;
+            Login_Click(this, new Microsoft.UI.Xaml.RoutedEventArgs());
+        }
+    }
+
+    private void OnPasswordBoxKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            e.Handled = true;
+            Login_Click(this, new Microsoft.UI.Xaml.RoutedEventArgs());
+        }
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -39,8 +57,9 @@ public sealed partial class LoginView : Page
             bool anyUser = await _auth.AnyUserExistsAsync();
             if (!anyUser)
             {
-                // No accounts exist yet: redirect to first-run admin setup.
-                _ = this.Frame?.Navigate(typeof(SetupAdminView));
+                // No accounts exist yet: show "Create admin account" button.
+                CreateAdminButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                LoginButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
             }
         }
         catch
@@ -61,7 +80,7 @@ public sealed partial class LoginView : Page
             if (result.Success)
             {
                 StatusMessage.Text = $"Welcome, {_auth.CurrentUser}!";
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlSuccessTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Green);
+                StatusMessage.Foreground = ThemeBrush.Success;
 
                 if (App.MainWindowInstance is MainWindow mw)
                 {
@@ -81,12 +100,17 @@ public sealed partial class LoginView : Page
                     AuthFailureReason.EmptyInput => "Please enter username and password.",
                     _ => "Invalid username or password.",
                 };
-                StatusMessage.Foreground = (Application.Current.Resources["SystemControlErrorTextForegroundBrush"] as Brush) ?? new SolidColorBrush(Microsoft.UI.Colors.Red);
+                StatusMessage.Foreground = ThemeBrush.Error;
             }
         }
         finally
         {
             LoginButton.IsEnabled = true;
         }
+    }
+
+    private void CreateAdminButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = this.Frame?.Navigate(typeof(SetupAdminView));
     }
 }

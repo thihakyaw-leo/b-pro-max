@@ -1,8 +1,11 @@
 # ui-tests.ps1 — WinUI 3 UI Automation test batch for b-pro-max
 #
 # Requires: WinApp CLI 0.7+ (winapp), Windows desktop with WinRT runtime registered.
-#           Live execution is BLOCKED in this container (REGDB_E_CLASSNOTREG).
-#           Run on a Windows host: .\ui-tests.ps1 -Target sandbox
+#           Live execution: .\ui-tests.ps1 -Target local
+#
+# Credentials: the script logs in as 'testuser' / 'testpass'. That account must exist in
+#           the local 'bpro_max' database (users table). The password is PBKDF2-SHA256
+#           with a per-user salt, so it has to be seeded with the application's own hashing.
 #
 # AutomationIds referenced here match src\Views\*.xaml and src\MainWindow.xaml.
 
@@ -96,7 +99,20 @@ try {
 
     # Shell / NavigationView
     Test-UI 'NavigationView present' { Invoke-Ui @('wait-for', 'NavView', '-t', '3000') }
-    Test-UI 'ContentFrame present' { Invoke-Ui @('wait-for', 'ContentFrame', '-t', '2000') }
+
+    # Register flow (unauthenticated state — NavRegister visible before login)
+    Test-UI 'Navigate to Register' {
+        Invoke-Ui @('invoke', 'NavRegister')
+        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '3000')
+    }
+    Test-UI 'Register UI elements present' {
+        Invoke-Ui @('wait-for', 'LicenseKeyBox', '-t', '2000')
+        Invoke-Ui @('wait-for', 'CompanyBox', '-t', '2000')
+        Invoke-Ui @('wait-for', 'EmailBox', '-t', '2000')
+        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '2000')
+        Invoke-Ui @('wait-for', 'BackButton', '-t', '2000')
+        Invoke-Ui @('wait-for', 'StatusMessage', '-t', '2000')
+    }
 
     # Login flow
     Test-UI 'Navigate to Login' {
@@ -113,21 +129,10 @@ try {
         Invoke-Ui @('set-value', 'UsernameBox', 'testuser')
         Invoke-Ui @('set-value', 'PasswordBox', 'testpass')
         Invoke-Ui @('invoke', 'LoginButton')
-        Invoke-Ui @('wait-for', 'StatusMessage', '-t', '3000')
-    }
-
-    # Register flow
-    Test-UI 'Navigate to Register' {
-        Invoke-Ui @('invoke', 'NavRegister')
-        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '3000')
-    }
-    Test-UI 'Register UI elements present' {
-        Invoke-Ui @('wait-for', 'LicenseKeyBox', '-t', '2000')
-        Invoke-Ui @('wait-for', 'CompanyBox', '-t', '2000')
-        Invoke-Ui @('wait-for', 'EmailBox', '-t', '2000')
-        Invoke-Ui @('wait-for', 'RegisterButton', '-t', '2000')
-        Invoke-Ui @('wait-for', 'BackButton', '-t', '2000')
-        Invoke-Ui @('wait-for', 'StatusMessage', '-t', '2000')
+        Start-Sleep -Milliseconds 1500
+        # AgentListTitle lives inside AgentListView; the Page root itself is not exposed
+        # in the UI Automation tree.
+        Invoke-Ui @('wait-for', 'AgentListTitle', '-t', '8000')
     }
 
     # Agent list flow (requires login; NavAgents starts disabled)

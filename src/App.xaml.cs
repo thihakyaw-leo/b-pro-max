@@ -22,7 +22,27 @@ public sealed partial class App : Application
 
     public App()
     {
+        InitializeComponent();
+
+        // An exception escaping an async void event handler terminates a WinUI app
+        // with no console output. Capture it to a log file so crashes are diagnosable.
+        UnhandledException += OnXamlUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+
         Initialize();
+    }
+
+    private void OnXamlUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        CrashLogger.Write(e.Exception, "XAML unhandled exception");
+
+        // Keep the app alive: the UI thread is still usable and the user can continue.
+        e.Handled = true;
+    }
+
+    private static void OnDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+    {
+        CrashLogger.Write(e.ExceptionObject as Exception, "AppDomain unhandled exception");
     }
 
     private void Initialize()

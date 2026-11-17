@@ -75,6 +75,6 @@
                    Margin="12" VerticalAlignment="Center" HorizontalAlignment="Center"
                    AutomationProperties.AutomationId="ReportOutput"/>
         <TextBlock x:Name="StatusMessage" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   Margin="12" Foreground="{ThemeResource SystemControlSuccessTextForegroundBrush}" AutomationProperties.AutomationId="ReportStatus"/>
+                   Margin="12" Foreground="{ThemeResource SuccessTextBrush}" AutomationProperties.AutomationId="ReportStatus"/>
     </Grid>
 </Page>
