@@ -405,3 +405,54 @@ dotnet run --project src\b-pro-max.csproj
 
 Commit: `b636693` — LegacyMigrator fixes + `src/Services/DatabaseMigrationService.cs` hint.
 ```
+
+---
+
+## Code Review & Audit (2026-11-13)
+
+Scope: full repo review (src/, tests/, tools/, Scripts/, CI, config, root docs). Items are ordered by priority.
+
+### 🔴 Security (must fix before distribution)
+
+| ID | Task | Location | Notes |
+| --- | --- | --- | --- |
+| AUD-S01 | Remove `xDB2.mdb` (22 MB Access DB) from git history | repo root, `DatabaseMigrationService.cs`, `tools/LegacyMigrator` | Binary legacy DB may contain real customer/agent data. Confirm contents, purge with `git filter-repo`, move to private storage, update migrator to take a path argument. |
+| AUD-S02 | Licensing is client-side only | `LicensingService.cs` (`VerifyKeyChecksum`) | Checksum is a simple weighted sum; any key can be forged from source. Replace with a signed key (Ed25519 public-key verify) and store only the public key in the app. |
+| AUD-S03 | Time lock is trivially bypassed | `TimeLockService.IsWithinAllowedTime` | Uses local `DateTime.Now`, which the user can change. Document as a soft control, or validate against a trusted time source / DB `now()`. |
+| AUD-S04 | Shell-argument injection in backup/restore | `DatabaseMaintenanceService.cs` (pg_dump/pg_restore args) | Host/user/db/path are interpolated into `Arguments`. Use `ArgumentList` instead of a single string and validate `backupPath`. |
+| AUD-S05 | Interpolated SQL/DDL with identifiers | `tools/LegacyMigrator/Program.cs:329`, `DatabaseMaintenanceService.cs:161` | Table/database names are interpolated. Whitelist names or quote-escape via a helper. |
+| AUD-S06 | Empty DB password in committed config | `appsettings.json`, `tools/LegacyMigrator/Program.cs` | Ensure real credentials only come from `.env` / `DATABASE_URL`. Document this in README. Leave `Password=` blank in committed files only. |
+| AUD-S07 | Lockout is per-username only | `AuthService.cs` | Brute-force across many usernames is not throttled. Add IP/machine-level throttling or exponential backoff. |
+
+### 🟠 Correctness / Error handling
+
+| ID | Task | Location | Notes |
+| --- | --- | --- | --- |
+| AUD-C01 | Audit the 60 `catch` blocks | `src/Services/*` | Look for swallowed exceptions. Each catch should log, rethrow, or return a typed failure. |
+| AUD-C02 | Views rely on `FindChildByName<T>()` with no `InitializeComponent` | `src/Views/*.xaml.cs` (16 views) | Controls resolve at runtime and fail silently if a name is wrong. Add null checks that throw with the control name, plus a test that asserts each name exists. |
+| AUD-C03 | XAML compilation disabled | `src/b-pro-max.csproj` | Blocks UI tests (W3-13). Track a fix for the XAML compiler on .NET 9 or migrate off the disabled path. |
+| AUD-C04 | Time-lock uses local hour with no timezone handling | `TimeLockService.cs` | Confirm the business rule (Asia/Yangon vs machine TZ) and use an explicit `TimeZoneInfo`. |
+| AUD-C05 | `package.json` lists `@supabase/server` | repo root | Supabase was removed, so this dependency is stale. Remove it along with `package-lock.json` if nothing uses Node. |
+| AUD-C06 | `src/Strings/Resources.resx` and `Strings.cs` may be out of sync | `src/Strings/` | Verify every key used in Views exists in both files. |
+
+### 🟡 Cleanup (unnecessary files and code)
+
+| ID | Task | Status |
+| --- | --- | --- |
+| AUD-D01 | Delete generated `BenchmarkDotNet.Artifacts/` (results committed) | ✅ Removed in this audit. Add `BenchmarkDotNet.Artifacts/` to `.gitignore`. |
+| AUD-D02 | Delete `src/App.cs` (2-line stub, superseded by `App.xaml.cs`) | ✅ Removed in this audit. Also remove its mention in README line 73. |
+| AUD-D03 | Consolidate 4 task trackers into one | ⬜ Open. `todos.md`, `tasks/todo.md`, `fix-plan.md`, `plan.md`, `todos/SELL_WORKFLOW_PLAN.md`, `tasks/sell-workflow-plan.md` overlap. Keep `todos.md` as the single tracker, archive the rest under `docs/archive/`. |
+| AUD-D04 | Review `.impeccable/`, `Plan6-LoginView.md`, `2d-system-design.md`, `CppProperties.json` | ⬜ Open. Keep if still used. Delete if they are C++/VS leftovers (`CppProperties.json` is not a C# artifact). |
+| AUD-D05 | Vendored `.agents/skills/supabase*` | ⬜ Open. Remove if the project no longer uses Supabase tooling. |
+| AUD-D06 | `skills-lock.json`, `ui-tests.ps1` | ⬜ Open. Confirm they are needed for CI or local tooling. |
+| AUD-D07 | `.gitignore` excludes `src/global.json` but root has one | ⬜ Open. Verify the ignore rule is not hiding a required file. |
+| AUD-D08 | Remove dead code: unused `Helpers/`, `Configuration/RegionalSettings` duplicates | ⬜ Open. Run an analyzer for unused members (IDE0051/IDE0052) and remove hits. |
+| AUD-D09 | Test fixtures use hardcoded `postgres/postgres` | ⬜ Open. Move test DB credentials to env vars for CI. |
+
+### 🔵 Quality gates
+
+| ID | Task | Notes |
+| --- | --- | --- |
+| AUD-Q01 | Add secret scanning to CI | GitHub secret scanning + `gitleaks` step in `.github/workflows/dotnet.yml`. |
+| AUD-Q02 | Add `dotnet list package --vulnerable` to CI | Fails the build on known vulnerable NuGet packages. |
+| AUD-Q03 | Run CI on Windows and Linux for unit tests | Only Windows runs today. Unit tests that do not touch WinUI can run on `ubuntu-latest` for faster feedback. |
