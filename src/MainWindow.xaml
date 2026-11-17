@@ -14,6 +14,7 @@
             IsBackButtonVisible="Collapsed"
             PaneDisplayMode="Left"
             IsPaneToggleButtonVisible="True"
+            SelectionChanged="NavView_SelectionChanged"
             AutomationProperties.AutomationId="NavView">
 
             <NavigationView.MenuItems>
@@ -105,6 +106,11 @@
                     Content="Register"
                     Icon="Account"
                     AutomationProperties.AutomationId="NavRegister" />
+                <NavigationViewItem
+                    x:Name="NavSettings"
+                    Content="Settings"
+                    Icon="Setting"
+                    AutomationProperties.AutomationId="NavSettings" />
                 <NavigationViewItem
                     x:Name="NavLogout"
                     Content="Logout"

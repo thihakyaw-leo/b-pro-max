@@ -7,6 +7,21 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary>
+                    <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="24"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Margin" Value="0,0,0,4"/>
+                        <Setter Property="TextWrapping" Value="NoWrap"/>
+                    </Style>
+                    <Style x:Key="SubtitleTextBlockStyle" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="Normal"/>
+                        <Setter Property="Margin" Value="0,0,0,8"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="Opacity" Value="0.8"/>
+                    </Style>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <SolidColorBrush x:Key="BrandColor" Color="{ThemeResource SystemAccentColor}" />
             <SolidColorBrush x:Key="SurfaceColor" Color="{ThemeResource SystemAccentColorLight2}" />

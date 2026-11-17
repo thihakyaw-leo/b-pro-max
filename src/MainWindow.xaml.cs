@@ -28,6 +28,7 @@ public sealed partial class MainWindow : Window
 
         NavView.ItemInvoked += NavView_ItemInvoked;
         NavView.PaneOpened += (_, _) => UpdateMenuState();
+        NavView.SelectionChanged += NavView_SelectionChanged;
 
         SizeWindow();
 
@@ -75,6 +76,11 @@ public sealed partial class MainWindow : Window
             NavigateTo(typeof(LoginView));
             return;
         }
+        if (item == NavSettings)
+        {
+            NavigateTo(typeof(SettingsView));
+            return;
+        }
 
         // Feature pages require authentication.
         if (!_auth.IsAuthenticated)
@@ -97,6 +103,20 @@ public sealed partial class MainWindow : Window
         else if (item == NavCompact) NavigateTo(typeof(CompactDatabaseView));
         else if (item == NavSound) NavigateTo(typeof(SoundSettingsView));
         else if (item == NavTimeLock) NavigateTo(typeof(TimeLockView));
+    }
+
+    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs e)
+    {
+        var selectedItem = (NavigationViewItem) e.SelectedItem;
+        if (selectedItem != null)
+        {
+            switch (selectedItem.Name)
+            {
+                case "NavSettings":
+                    NavigateTo(typeof(SettingsView));
+                    break;
+            }
+        }
     }
 
     private void NavigateTo(Type pageType)
